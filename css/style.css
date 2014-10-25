@@ -1,0 +1,209 @@
+/* body */
+body {
+	font-size: 80%;
+}
+
+h1 {
+	margin-bottom: 2px;
+	padding: 5px;
+	color: #ffffff;
+	background-color: #000000;
+	border-radius: 0.2em;
+}
+h2 {
+	margin-bottom: 2px;
+	padding: 5px;
+	color: #ffffff;
+	background-color: #000000;
+	border-radius: 0.2em;
+}
+
+p {
+}
+
+/* box */
+div.box {
+	display: flex;
+	display: -webkit-box;
+}
+.left-box {
+	-webkit-box-flex : 1;
+	-webkit-box-ordinal-group : 1;
+	-webkit-flex-grow: 0;
+	flex-grow: 1;
+	-webkit-order: 0;
+	order: 0;
+}
+.right-box {
+	-webkit-box-ordinal-group : 2;
+	-webkit-order: 1;
+	order: 1;
+}
+
+/* table */
+table {
+	margin: 1em 0;
+	border-spacing: 1px;
+}
+th {
+	color: #ffffff;
+	background-color: #000000;
+	padding: 2px 4px;
+}
+tbody#idol_list > tr:hover {
+	cursor: move;
+}
+td {
+	background-color: #cccccc;
+	padding: 2px 4px;
+}
+td.numeric {
+	text-align: right !important;
+}
+td.skill_input_auto {
+	display: none;
+}
+tr.idol > td {
+	text-align: center;
+}
+tr.idol > td.character {
+	text-align: left;
+}
+tr.idol > td.front {
+	background-color: #ffcccc;
+}
+tr.idol > td.back {
+	background-color: #ccccff;
+}
+tr.idol > td.survival20 {
+	background-color: #ccccff;
+}
+tr.idol > td.survival40 {
+	background-color: #ccffff;
+}
+tr.idol > td.survival60 {
+	background-color: #ccffcc;
+}
+tr.idol > td.survival80 {
+	background-color: #ffcccc;
+}
+tr.idol > td.survival100 {
+	background-color: #ffffcc;
+}
+tr.idol > td.cost_over {
+	color: #808080;
+}
+
+
+table.inner_table {
+	margin: 0;
+	border-spacing: 1px;
+}
+table.inner_table th {
+	color: #ffffff;
+	background-color: #000000;
+	padding: 2px 4px;
+}
+table.inner_table td {
+	background-color: #ffffff;
+	padding: 2px 4px;
+}
+
+/* list */
+ul {
+	/*list-style-type: square;*/
+	margin-top: 0;
+	padding-left: 1em;
+}
+
+/* input */
+input {
+	border-radius: 3px;
+	box-shadow: none;
+}
+input[type="button"],
+input[type="submit"] {
+	padding: 3px 5px;
+}
+input[type="text"] {
+	padding: 3px 2px;
+}
+input[type="number"] {
+	text-align: right;
+	padding: 3px 2px;
+}
+select {
+	margin: 2px 0;
+	padding: 3px 2px;
+	border-radius: 3px;
+	height: 2.2em;
+}
+
+input[name="front_num"],
+input[name="total_cost"],
+input[name="status_up"],
+input[name="combo_level"] {
+	width: 5em;
+}
+
+input.rival_front_member,
+input.rival_back_member {
+	width: 3em;
+}
+
+input[name="cost"],
+input.skill {
+	width: 3em;
+}
+select.name,
+select[name="id"],
+select[name="name"] {
+	width: 20em;
+}
+input.status {
+	width: 5em;
+}
+input.skill {
+}
+select[name="skill_id"] {
+	width: 20em;
+}
+
+button {
+	padding: 3px 5px;
+	border-radius: 3px;
+	box-shadow: none;
+}
+button.control {
+	width: 2.5em;
+	height: 2.5em;
+}
+
+div.skill_input_auto {
+	text-align: left;
+	display: none;
+}
+span.offense_per_cost {
+	color: #ff0000;
+}
+span.defense_per_cost {
+	color: #0000ff;
+}
+span.disable {
+	color: #808080;
+}
+
+blockquote {
+	background-color: #cccccc;
+	margin: 1em 0;
+	padding: 0.5em;
+}
+
+.select2-container {
+	width: 20em;
+}
+
+.side-bar {
+	width: 220px;
+	margin: 0 0 0 10px;
+}

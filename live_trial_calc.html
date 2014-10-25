@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="author" content="Mutsuki Kimuraya" />
+		<link rel="stylesheet" href="css/style.css" />
+		<link rel="stylesheet" href="css/select2.css" />
+		<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+		<script src="script/knockout.js"></script>
+		<script src="script/jquery-ui.min.js"></script>
+		<script src="script/knockout-sortable.min.js"></script>
+		<script src="script/zlib.min.js"></script>
+		<script src="script/select2.min.js"></script>
+		<script src="script/select2_locale_ja.js"></script>
+		<script src="script/knockout-select2.js"></script>
+		<script src="script/live_trial_calc.min.js"></script>
+		<title>発揮値計算機 for LIVEトライアル</title>
+	</head>
+	<body>
+		<h1>発揮値計算機 for LIVEトライアル</h1>
+
+		<div class="box">
+			<table class="left-box">
+				<tbody>
+					<tr>
+						<th>フロントの人数</th>
+						<td>
+							<select name="front_num" data-bind="value: front_num">
+								<option value="0">0人</option>
+								<option value="1">1人</option>
+								<option value="2">2人</option>
+								<option value="3">3人</option>
+								<option value="4">4人</option>
+								<option value="5" selected="selected">5人</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th>使用コスト</th>
+						<td>
+							<input type="number" name="total_cost" value="0" data-bind="textInput: total_cost" />
+							<select name="use_cost_percent" data-bind="value: use_cost_percent">
+								<option value="20">20%</option>
+								<option value="40">40%</option>
+								<option value="60">60%</option>
+								<option value="80">80%</option>
+								<option value="100" selected="selected">100%</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th>属性</th>
+						<td>
+							<select name="producer_type" data-bind="value: producer_type">
+								<option value="-1" selected="selected">無し</option>
+								<option value="0">キュート</option>
+								<option value="1">クール</option>
+								<option value="2">パッション</option>
+							</select>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<table class="right-box">
+				<tbody>
+					<tr>
+						<th>特技入力</th>
+						<td>
+							<select name="skill_input_type" data-bind="value: skill_input_type">
+								<option value="0" selected="selected">マニュアル</option>
+								<option value="1">オート</option>
+								<option value="2">オート(期待値)</option>
+							</select>
+
+							<!-- ko ifnot: is_skill_input_type_manual() -->
+							<select name="enable_skill_type" data-bind="value: enable_skill_type">
+								<option value="0">全特技有効</option>
+								<option value="1" selected="selected">攻撃時特技有効</option>
+								<option value="2">守備時特技有効</option>
+							</select>
+							<!-- /ko -->
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<table>
+			<thead>
+				<tr>
+					<th>&nbsp;</th>
+					<th>アイドル</th>
+					<th>コスト</th>
+					<th>ステータス</th>
+					<th>イベント<br />パワー</th>
+					<th>コスト比</th>
+					<th>スキル</th>
+					<th>攻発揮値</th>
+					<th>守発揮値</th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					<th colspan="7">フロントメンバー発揮値</th>
+					<td class="numeric" data-bind="text: front_offense">0</td>
+					<td class="numeric" data-bind="text: front_defense">0</td>
+				</tr>
+				<tr>
+					<th colspan="7">バックメンバー発揮値</th>
+					<td class="numeric" data-bind="text: back_offense">0</td>
+					<td class="numeric" data-bind="text: back_defense">0</td>
+				</tr>
+				<tr>
+					<th colspan="7">総発揮値</th>
+					<td class="numeric" data-bind="text: actual_status()[0]">0</td>
+					<td class="numeric" data-bind="text: actual_status()[1]">0</td>
+				</tr>
+			</tfoot>
+			<tbody id="idol_list" data-bind="sortable: idol_list">
+				<tr class="idol">
+					<td>
+						<button type="button" name="up" class="control" data-bind="click: $root.move_up">△</button><br />
+						<button type="button" name="down" class="control" data-bind="click: $root.move_down">▽</button>
+					</td>
+					<td class="character">
+						<select name="type" data-bind="value: type, event: { change: set_idol_list }">
+							<option value="0" selected="selected">キュート</option>
+							<option value="1">クール</option>
+							<option value="2">パッション</option>
+						</select>
+						<select name="rarity" data-bind="value: rarity, event: { change: set_idol_list }">
+							<option value="0" selected="selected">ノーマル</option>
+							<option value="1">ノーマル+</option>
+							<option value="2">レア</option>
+							<option value="3">レア+</option>
+							<option value="4">Sレア</option>
+							<option value="5">Sレア+</option>
+						</select><br />
+						<!-- ko if: $root.is_smartphone() -->
+						<select name="id" class="name" data-bind="value: id, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						</select>
+						<!-- /ko -->
+						<!-- ko ifnot: $root.is_smartphone() -->
+						<select name="id" class="name" data-bind="value: id, select2: {}, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						</select>
+						<!-- /ko -->
+					</td>
+					<td><input type="number" name="cost" value="0" data-bind="textInput: cost" /></td>
+					<td>
+						<span style="color: #ff0000;">攻</span>
+						<input type="number" name="offense" class="status" value="0" data-bind="textInput: offense" /><br />
+						<span style="color: #0000ff;">守</span>
+						<input type="number" name="defense" class="status" value="0" data-bind="textInput: defense" /><br />
+					</td>
+					<td>
+						<select name="event_power" data-bind="value: event_power">
+							<option value="1" selected="selected">無し</option>
+							<option value="1.5">1.5倍</option>
+							<option value="2">2倍</option>
+							<option value="3">3倍</option>
+							<option value="4">4倍</option>
+						</select>
+					</td>
+					<td>
+						<span class="offense_per_cost" data-bind="text: offense_per_cost">0</span><br />
+						<span class="defense_per_cost" data-bind="text: defense_per_cost">0</span><br />
+						<span data-bind="text: status_per_cost">0</span><br />
+					</td>
+					<td>
+						<!-- ko if: $root.is_skill_input_type_manual() -->
+						<span style="color: #ff0000;">攻</span>
+						<input type="number" name="offense_skill" class="skill" value="0" data-bind="textInput: offense_skill" />%<br />
+						<span style="color: #0000ff;">守</span>
+						<input type="number" name="defense_skill" class="skill" value="0" data-bind="textInput: defense_skill" />%<br />
+						<!-- /ko -->
+						<div style="text-align: left;" data-bind="ifnot: $root.is_skill_input_type_manual()">
+							<span class="skill_name" data-bind="text: skill_name, css: { disable: !enable_skill() }">無し</span><br />
+							<select name="skill_id" data-bind="value: skill_id, options: select_skill_list, optionsValue: 'id', optionsText: 'name'">
+							</select>
+							<select name="skill_level" data-bind="value: skill_level">
+								<option value="0">無効</option>
+								<option value="1">LV1</option>
+								<option value="2">LV2</option>
+								<option value="3">LV3</option>
+								<option value="4">LV4</option>
+								<option value="5">LV5</option>
+								<option value="6">LV6</option>
+								<option value="7">LV7</option>
+								<option value="8">LV8</option>
+								<option value="9">LV9</option>
+								<option value="10" selected="selected">LV10</option>
+							</select>
+						</div>
+					</td>
+					<td class="numeric" data-bind="text: display_offense, css: style">0</td>
+					<td class="numeric" data-bind="text: display_defense, css: style">0</td>
+					<td style="background-color : #ffffff;">
+						<button type="button" name="remove" class="control" data-bind="click: $root.remove">－</button><br />
+						<button type="button" name="add" class="control" data-bind="click: $root.add">＋</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<table>
+			<tbody>
+				<tr>
+					<th>一括追加</th>
+					<td>
+						<!-- ko with: add_idol -->
+						<select name="type" data-bind="value: type, event: { change: set_idol_list }">
+							<option value="0" selected="selected">キュート</option>
+							<option value="1">クール</option>
+							<option value="2">パッション</option>
+						</select>
+						<select name="rarity" data-bind="value: rarity, event: { change: set_idol_list }">
+							<option value="0" selected="selected">ノーマル</option>
+							<option value="1">ノーマル+</option>
+							<option value="2">レア</option>
+							<option value="3">レア+</option>
+							<option value="4">Sレア</option>
+							<option value="5">Sレア+</option>
+						</select>
+						<!-- ko if: $root.is_smartphone() -->
+						<select name="id" class="name" data-bind="value: id, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						</select>
+						<!-- /ko -->
+						<!-- ko ifnot: $root.is_smartphone() -->
+						<select name="id" class="name" data-bind="value: id, select2: {}, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						</select>
+						<!-- /ko -->
+						<!-- /ko -->
+						<select name="add_idol_num" data-bind="value: add_idol_num">
+							<option value="1" selected="selected">1人</option>
+							<option value="2">2人</option>
+							<option value="3">3人</option>
+							<option value="4">4人</option>
+							<option value="5">5人</option>
+							<option value="6">6人</option>
+							<option value="7">7人</option>
+							<option value="8">8人</option>
+							<option value="9">9人</option>
+							<option value="10">10人</option>
+						</select>
+						<button type="button" name="add_idols" data-bind="click: add_idols">追加</button>
+					</td>
+				</tr>
+				<tr>
+					<th>自動ソート</th>
+					<td>
+						<input type="checkbox" name="auto_sort" value="1" data-bind="checked: auto_sort" />
+						有効
+					</td>
+				</tr>
+				<tr>
+					<th>セーブデータ</th>
+					<td>
+						<select name="save_data_id" data-bind="value: save_data_id">
+							<option value="1" selected="selected">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+						</select>
+						<input type="text" name="save_data_title" value="" data-bind="value: save_data_title" />
+						<button type="button" name="save" data-bind="click: save_setting">保存</button>
+						<button type="button" name="load" data-bind="click: load_setting">読込</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<p>
+			<textarea name="code" cols="80" rows="10" data-bind="value: code"></textarea><br />
+			<button type="button" name="generate_code" data-bind="click: generate_code">コード生成</button>
+			<button type="button" name="apply_code" data-bind="click: apply_code">コード適用</button>
+			<!-- ko if: apply_code_url -->
+			<a href="live_calc.html" data-bind="attr: { href: apply_code_url }">Link</a>
+			<!-- /ko -->
+		</p>
+	</body>
+</html>
