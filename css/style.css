@@ -140,10 +140,15 @@ select {
 }
 
 input[name="front_num"],
-input[name="total_cost"],
 input[name="status_up"],
 input[name="combo_level"] {
 	width: 5em;
+}
+
+
+input[name="rest_cost"],
+input[name="total_cost"] {
+	width: 4em;
 }
 
 input.rival_front_member,

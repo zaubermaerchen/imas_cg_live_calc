@@ -5,6 +5,7 @@
  * http://opensource.org/licenses/mit-license.php
  */
 /// <reference path="live_calc.base.ts" />
+/// <reference path="petit_idol.ts" />
 
 class ViewModel extends BaseLiveCalcViewModel {
 	// 定数
@@ -14,14 +15,18 @@ class ViewModel extends BaseLiveCalcViewModel {
 	MAX_INVOKE_SKILL_NUM: number = 3;
 	// スキル発動率
 	SKILL_INVOCATION_RATE_LIST: number[] = [100, 50, 37.5, 28.125, 21.09375];
+	// ぷちアイドル最大数
+	PETIT_IDOL_NUM: number = 3;
 
 	// 入力項目
+	rest_cost: KnockoutObservable<any>;
 	total_cost: KnockoutObservable<any>;
 	use_cost_percent: KnockoutObservable<any>;
 	institution: KnockoutObservableArray<any>;
 	status_up: KnockoutObservable<any>;
 	high_tension: KnockoutObservable<any>;
 	groove_type: KnockoutObservable<any>;
+	petit_idol_list: KnockoutObservableArray<any>;
 	auto_sort: KnockoutObservable<boolean>;
 	sort_type: KnockoutObservable<any>;
 	add_idol: KnockoutObservable<UserIdol>;
@@ -42,6 +47,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 
 		this.calc_type(CALCULATION_TYPE.NORMAL);
 		// 入力項目
+		this.rest_cost = ko.observable(0);
 		this.total_cost = ko.observable(0);
 		this.use_cost_percent = ko.observable(100);
 		this.front_num = ko.observable(5);
@@ -49,6 +55,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.status_up = ko.observable(0);
 		this.high_tension = ko.observable(0);
 		this.groove_type = ko.observable(-1);
+		this.petit_idol_list = ko.observableArray();
 		this.auto_sort = ko.observable(false);
 		this.sort_type = ko.observable(0);
 		this.add_idol = ko.observable(new UserIdol(false));
@@ -76,10 +83,22 @@ class ViewModel extends BaseLiveCalcViewModel {
 	}
 
 	// アイドルリスト初期化
+	init_petit_idol_list(): void {
+		var petit_idols: UserPetitIdol[] = [];
+		for(var i: number = 0; i < this.PETIT_IDOL_NUM; i++) {
+			var petit_idol: UserPetitIdol = new UserPetitIdol();
+			petit_idols.push(petit_idol);
+		}
+		this.petit_idol_list(petit_idols);
+	}
 	init_idol_list(): void {
 		var idols: UserIdol[] = [];
 		idols.push(new UserIdol(false));
 		this.idol_list(idols);
+	}
+	init_list(): void {
+		this.init_petit_idol_list();
+		super.init_list();
 	}
 
 	is_festival(): boolean { return (parseInt(this.calc_type()) == CALCULATION_TYPE.FESTIVAL); }
@@ -102,21 +121,48 @@ class ViewModel extends BaseLiveCalcViewModel {
 		// スキル効果反映
 		this.calc_skill_value();
 
+		var total_cost: number = parseInt(this.total_cost());
+		if(isNaN(total_cost)) {
+			total_cost = 0;
+		}
 		var calc_type: number = parseInt(this.calc_type());
 		var producer_type: number = parseInt(this.producer_type());
 		var status_up: number = parseInt(this.status_up());
+		if(isNaN(status_up)) {
+			status_up = 0;
+		}
 		var high_tension: boolean = (parseInt(this.high_tension()) == 1);
 		var groove_type: number = parseInt(this.groove_type());
 		var training_room_level = parseInt(this.training_room_level());
-		var cost_cut: boolean = (parseInt(this.total_cost()) > 0);
+		var cost_cut: boolean = (total_cost > 0);
 
 		// 使用コスト計算
-		var ratio: number = parseInt(this.use_cost_percent()) / 100;
-		var rest_cost: number = Math.floor(parseInt(this.total_cost()) * ratio);
+		var rest_cost: number = total_cost;
+		if(this.is_festival() || this.is_festivalS()) {
+			var ratio: number = parseInt(this.use_cost_percent()) / 100;
+			rest_cost = Math.floor(total_cost * ratio);
+		} else {
+			rest_cost = parseInt(this.rest_cost());
+			if(isNaN(rest_cost) || rest_cost < 1) {
+				rest_cost = total_cost;
+			}
+		}
 
-		// 合計発揮値計算
 		var total_offense: number = 0;
 		var total_defense: number = 0;
+
+		// ぷちデレラボーナス計算
+		var petit_idol_bonus: number = 0;
+		for(var i: number = 0; i < this.petit_idol_list().length; i++) {
+			var petit_idol: UserPetitIdol = this.petit_idol_list()[i];
+			petit_idol_bonus += petit_idol.status();
+		}
+		if(total_cost > 0) {
+			petit_idol_bonus = Math.floor(petit_idol_bonus * (rest_cost / total_cost));
+		}
+		total_offense += petit_idol_bonus;
+
+		// アイドルの発揮値計算
 		var front_offense: number = 0;
 		var front_defense: number = 0;
 		var back_offense: number = 0;
@@ -289,11 +335,37 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.idol_list.valueHasMutated();
 	}
 
+	// ぷちアイドル設定取得
+	get_petit_idol_setting(): { [index: string]: string; }[] {
+		var setting: { [index: string]: string; }[] = [];
+		for(var i: number = 0; i < this.petit_idol_list().length; i++) {
+			setting.push(this.petit_idol_list()[i].get_setting());
+		}
+
+		return	setting;
+	}
+
+	// ぷちアイドル設定反映
+	set_petit_idol_setting(settings: { [index: string]: string; }[], max_num: number): void{
+		if(settings == null) {
+			return;
+		}
+		var petit_idols: UserPetitIdol[] = [];
+		for(var i: number = 0; i < settings.length && i != max_num; i++) {
+			var petit_idol: UserPetitIdol = new UserPetitIdol();
+			petit_idol.set_setting(settings[i]);
+			petit_idols.push(petit_idol);
+		}
+
+		this.petit_idol_list(petit_idols);
+	}
+
 	// 設定取得
 	get_setting(): { [index: string]: any; } {
 		var setting: { [index: string]: any; } = {};
 
 		// 共通部分のパラメータ取得
+		setting["user_rest_cost"] = this.rest_cost();
 		setting["user_cost"] = this.total_cost();
 		setting["use_cost_percent"] = this.use_cost_percent();
 		setting["front_num"] = this.front_num();
@@ -312,12 +384,16 @@ class ViewModel extends BaseLiveCalcViewModel {
 		// アイドル個別のパラメータ取得
 		setting["idol"] = this.get_idol_setting();
 
+		// ぷちアイドル個別のパラメータ取得
+		setting["petit_idol"] = this.get_petit_idol_setting();
+
 		return setting;
 	}
 
 	// 設定反映
 	set_setting(setting: { [index: string]: any; }): void {
 		// 共通部分のパラメータ設定
+		this.rest_cost(setting["user_rest_cost"]);
 		this.total_cost(setting["user_cost"]);
 		this.use_cost_percent(setting["use_cost_percent"]);
 		this.front_num(setting["front_num"]);
@@ -338,6 +414,9 @@ class ViewModel extends BaseLiveCalcViewModel {
 		jQuery.when(this.set_idol_setting(setting["idol"], -1, false)).done(function() {
 			self.change_calc_type();
 		});
+
+		// ぷちアイドル個別のパラメータ取得
+		this.set_petit_idol_setting(setting["petit_idol"], this.PETIT_IDOL_NUM);
 	}
 }
 

@@ -1781,12 +1781,62 @@ var BaseLiveCalcViewModel = (function () {
     return BaseLiveCalcViewModel;
 })();
 /*!
+* Copyright (c) 2014 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
+* Released under the MIT license
+* http://opensource.org/licenses/mit-license.php
+*/
+/// <reference path="typings/knockout/knockout.d.ts" />
+var UserPetitIdol = (function () {
+    function UserPetitIdol() {
+        // ステータス
+        this.vocal = ko.observable(0);
+        this.dance = ko.observable(0);
+        this.visual = ko.observable(0);
+    }
+    // 総ステータス取得
+    UserPetitIdol.prototype.status = function () {
+        var status = 0;
+        var vocal = parseInt(this.vocal());
+        if (!isNaN(vocal)) {
+            status += vocal;
+        }
+        var dance = parseInt(this.dance());
+        if (!isNaN(dance)) {
+            status += dance;
+        }
+        var visual = parseInt(this.visual());
+        if (!isNaN(visual)) {
+            status += visual;
+        }
+        return status;
+    };
+
+    // 設定取得
+    UserPetitIdol.prototype.get_setting = function () {
+        var setting = {};
+        setting["vocal"] = this.vocal();
+        setting["dance"] = this.dance();
+        setting["visual"] = this.visual();
+
+        return setting;
+    };
+
+    // 設定反映
+    UserPetitIdol.prototype.set_setting = function (setting) {
+        this.vocal(setting["vocal"]);
+        this.dance(setting["dance"]);
+        this.visual(setting["visual"]);
+    };
+    return UserPetitIdol;
+})();
+/*!
 * THE IDOLM@STER CINDERELLA GIRLS Exertion Value Calculator
 * Copyright (c) 2012 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
 * Released under the MIT license
 * http://opensource.org/licenses/mit-license.php
 */
 /// <reference path="live_calc.base.ts" />
+/// <reference path="petit_idol.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -1804,12 +1854,15 @@ var ViewModel = (function (_super) {
         this.MAX_INVOKE_SKILL_NUM = 3;
         // スキル発動率
         this.SKILL_INVOCATION_RATE_LIST = [100, 50, 37.5, 28.125, 21.09375];
+        // ぷちアイドル最大数
+        this.PETIT_IDOL_NUM = 3;
 
         var self = this;
 
         this.calc_type(0 /* NORMAL */);
 
         // 入力項目
+        this.rest_cost = ko.observable(0);
         this.total_cost = ko.observable(0);
         this.use_cost_percent = ko.observable(100);
         this.front_num = ko.observable(5);
@@ -1817,6 +1870,7 @@ var ViewModel = (function (_super) {
         this.status_up = ko.observable(0);
         this.high_tension = ko.observable(0);
         this.groove_type = ko.observable(-1);
+        this.petit_idol_list = ko.observableArray();
         this.auto_sort = ko.observable(false);
         this.sort_type = ko.observable(0);
         this.add_idol = ko.observable(new UserIdol(false));
@@ -1845,10 +1899,22 @@ var ViewModel = (function (_super) {
         this.init_list();
     }
     // アイドルリスト初期化
+    ViewModel.prototype.init_petit_idol_list = function () {
+        var petit_idols = [];
+        for (var i = 0; i < this.PETIT_IDOL_NUM; i++) {
+            var petit_idol = new UserPetitIdol();
+            petit_idols.push(petit_idol);
+        }
+        this.petit_idol_list(petit_idols);
+    };
     ViewModel.prototype.init_idol_list = function () {
         var idols = [];
         idols.push(new UserIdol(false));
         this.idol_list(idols);
+    };
+    ViewModel.prototype.init_list = function () {
+        this.init_petit_idol_list();
+        _super.prototype.init_list.call(this);
     };
 
     ViewModel.prototype.is_festival = function () {
@@ -1875,21 +1941,48 @@ var ViewModel = (function (_super) {
         // スキル効果反映
         this.calc_skill_value();
 
+        var total_cost = parseInt(this.total_cost());
+        if (isNaN(total_cost)) {
+            total_cost = 0;
+        }
         var calc_type = parseInt(this.calc_type());
         var producer_type = parseInt(this.producer_type());
         var status_up = parseInt(this.status_up());
+        if (isNaN(status_up)) {
+            status_up = 0;
+        }
         var high_tension = (parseInt(this.high_tension()) == 1);
         var groove_type = parseInt(this.groove_type());
         var training_room_level = parseInt(this.training_room_level());
-        var cost_cut = (parseInt(this.total_cost()) > 0);
+        var cost_cut = (total_cost > 0);
 
         // 使用コスト計算
-        var ratio = parseInt(this.use_cost_percent()) / 100;
-        var rest_cost = Math.floor(parseInt(this.total_cost()) * ratio);
+        var rest_cost = total_cost;
+        if (this.is_festival() || this.is_festivalS()) {
+            var ratio = parseInt(this.use_cost_percent()) / 100;
+            rest_cost = Math.floor(total_cost * ratio);
+        } else {
+            rest_cost = parseInt(this.rest_cost());
+            if (isNaN(rest_cost) || rest_cost < 1) {
+                rest_cost = total_cost;
+            }
+        }
 
-        // 合計発揮値計算
         var total_offense = 0;
         var total_defense = 0;
+
+        // ぷちデレラボーナス計算
+        var petit_idol_bonus = 0;
+        for (var i = 0; i < this.petit_idol_list().length; i++) {
+            var petit_idol = this.petit_idol_list()[i];
+            petit_idol_bonus += petit_idol.status();
+        }
+        if (total_cost > 0) {
+            petit_idol_bonus = Math.floor(petit_idol_bonus * (rest_cost / total_cost));
+        }
+        total_offense += petit_idol_bonus;
+
+        // アイドルの発揮値計算
         var front_offense = 0;
         var front_defense = 0;
         var back_offense = 0;
@@ -2061,11 +2154,37 @@ var ViewModel = (function (_super) {
         this.idol_list.valueHasMutated();
     };
 
+    // ぷちアイドル設定取得
+    ViewModel.prototype.get_petit_idol_setting = function () {
+        var setting = [];
+        for (var i = 0; i < this.petit_idol_list().length; i++) {
+            setting.push(this.petit_idol_list()[i].get_setting());
+        }
+
+        return setting;
+    };
+
+    // ぷちアイドル設定反映
+    ViewModel.prototype.set_petit_idol_setting = function (settings, max_num) {
+        if (settings == null) {
+            return;
+        }
+        var petit_idols = [];
+        for (var i = 0; i < settings.length && i != max_num; i++) {
+            var petit_idol = new UserPetitIdol();
+            petit_idol.set_setting(settings[i]);
+            petit_idols.push(petit_idol);
+        }
+
+        this.petit_idol_list(petit_idols);
+    };
+
     // 設定取得
     ViewModel.prototype.get_setting = function () {
         var setting = {};
 
         // 共通部分のパラメータ取得
+        setting["user_rest_cost"] = this.rest_cost();
         setting["user_cost"] = this.total_cost();
         setting["use_cost_percent"] = this.use_cost_percent();
         setting["front_num"] = this.front_num();
@@ -2084,12 +2203,16 @@ var ViewModel = (function (_super) {
         // アイドル個別のパラメータ取得
         setting["idol"] = this.get_idol_setting();
 
+        // ぷちアイドル個別のパラメータ取得
+        setting["petit_idol"] = this.get_petit_idol_setting();
+
         return setting;
     };
 
     // 設定反映
     ViewModel.prototype.set_setting = function (setting) {
         // 共通部分のパラメータ設定
+        this.rest_cost(setting["user_rest_cost"]);
         this.total_cost(setting["user_cost"]);
         this.use_cost_percent(setting["use_cost_percent"]);
         this.front_num(setting["front_num"]);
@@ -2110,6 +2233,9 @@ var ViewModel = (function (_super) {
         jQuery.when(this.set_idol_setting(setting["idol"], -1, false)).done(function () {
             self.change_calc_type();
         });
+
+        // ぷちアイドル個別のパラメータ取得
+        this.set_petit_idol_setting(setting["petit_idol"], this.PETIT_IDOL_NUM);
     };
     return ViewModel;
 })(BaseLiveCalcViewModel);
