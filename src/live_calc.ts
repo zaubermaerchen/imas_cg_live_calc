@@ -137,36 +137,25 @@ class ViewModel extends BaseLiveCalcViewModel {
 		var cost_cut: boolean = (total_cost > 0);
 
 		// 使用コスト計算
-		var rest_cost: number = total_cost;
+		var use_cost: number = total_cost;
 		if(this.is_festival() || this.is_festivalS()) {
 			var ratio: number = parseInt(this.use_cost_percent()) / 100;
-			rest_cost = Math.floor(total_cost * ratio);
+			use_cost = Math.floor(total_cost * ratio);
 		} else {
-			rest_cost = parseInt(this.rest_cost());
-			if(isNaN(rest_cost) || rest_cost < 1) {
-				rest_cost = total_cost;
+			use_cost = parseInt(this.rest_cost());
+			if(isNaN(use_cost) || use_cost < 1) {
+				use_cost = total_cost;
 			}
 		}
-
-		var total_offense: number = 0;
-		var total_defense: number = 0;
-
-		// ぷちデレラボーナス計算
-		var petit_idol_bonus: number = 0;
-		for(var i: number = 0; i < this.petit_idol_list().length; i++) {
-			var petit_idol: UserPetitIdol = this.petit_idol_list()[i];
-			petit_idol_bonus += petit_idol.status();
-		}
-		if(total_cost > 0) {
-			petit_idol_bonus = Math.floor(petit_idol_bonus * (rest_cost / total_cost));
-		}
-		total_offense += petit_idol_bonus;
+		var rest_cost: number = use_cost;
 
 		// アイドルの発揮値計算
 		var front_offense: number = 0;
 		var front_defense: number = 0;
 		var back_offense: number = 0;
 		var back_defense: number = 0;
+		var total_offense: number = 0;
+		var total_defense: number = 0;
 		for(var i: number = 0; i < this.idol_list().length; i++) {
 			var idol: UserIdol = this.idol_list()[i];
 			var member_type: boolean = (i < parseInt(this.front_num()));
@@ -210,6 +199,17 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.front_defense(Math.round(front_defense));
 		this.back_offense(Math.round(back_offense));
 		this.back_defense(Math.round(back_defense));
+
+		// ぷちデレラボーナス計算
+		var petit_idol_bonus: number = 0;
+		for(var i: number = 0; i < this.petit_idol_list().length; i++) {
+			var petit_idol: UserPetitIdol = this.petit_idol_list()[i];
+			petit_idol_bonus += petit_idol.status();
+		}
+		if(total_cost > 0) {
+			petit_idol_bonus = Math.floor(petit_idol_bonus * ((use_cost - rest_cost) / total_cost));
+		}
+		total_offense += petit_idol_bonus;
 
 		return [Math.round(total_offense), Math.round(total_defense)];
 	}
