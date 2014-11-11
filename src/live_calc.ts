@@ -210,6 +210,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 			petit_idol_bonus = Math.floor(petit_idol_bonus * ((use_cost - rest_cost) / total_cost));
 		}
 		total_offense += petit_idol_bonus;
+		total_defense += petit_idol_bonus;
 
 		return [Math.round(total_offense), Math.round(total_defense)];
 	}
