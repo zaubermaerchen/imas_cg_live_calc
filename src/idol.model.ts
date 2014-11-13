@@ -143,6 +143,7 @@ class UserIdol {
 	get_cost_corrected_status(status: number, cost: number, rest_cost: number): number {
 		if(cost > rest_cost) {
 			var ratio: number = rest_cost / cost;
+			/*
 			if(this.is_festival() || this.is_survival()) {
 				status = Math.ceil(status * ratio);
 			} else {
@@ -150,6 +151,9 @@ class UserIdol {
 				//status = Math.round(status * ratio);
 				status = Math.ceil(status * ratio);
 			}
+			*/
+			ratio = Math.ceil(ratio * 10) / 10;
+			status = Math.ceil(status * ratio);
 		}
 
 		return status;
@@ -345,20 +349,22 @@ class UserIdol {
 	/******************************************************************************/
 	// 攻発揮値計算
 	calculation(cost_cut: boolean, rest_cost: number, member_type: boolean, producer_type: number, appeal_bonus_list: any[], institution_list: any[], status_up: number, training_room_level: number, high_tension: boolean): void {
-		var offense: number = parseInt(this.offense());
-		var defense: number = parseInt(this.defense());
-		var offense_skill: number = parseFloat(this.offense_skill());
-		var defense_skill: number = parseFloat(this.defense_skill());
 		var actual_offense: number = 0;
 		var actual_defense: number = 0;
-		if(member_type) {
-			// フロント
-			actual_offense = this.calc_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
-			actual_defense = this.calc_front_status(defense, defense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
-		} else {
-			// バック
-			actual_offense = this.calc_back_status(offense, offense_skill, cost_cut, rest_cost);
-			actual_defense = this.calc_back_status(defense, defense_skill, cost_cut, rest_cost);
+		if(!cost_cut || rest_cost >= 1) {
+			var offense: number = parseInt(this.offense());
+			var defense: number = parseInt(this.defense());
+			var offense_skill: number = parseFloat(this.offense_skill());
+			var defense_skill: number = parseFloat(this.defense_skill());
+			if(member_type) {
+				// フロント
+				actual_offense = this.calc_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
+				actual_defense = this.calc_front_status(defense, defense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
+			} else {
+				// バック
+				actual_offense = this.calc_back_status(offense, offense_skill, cost_cut, rest_cost);
+				actual_defense = this.calc_back_status(defense, defense_skill, cost_cut, rest_cost);
+			}
 		}
 		this.actual_offense(actual_offense);
 		this.actual_defense(actual_defense);

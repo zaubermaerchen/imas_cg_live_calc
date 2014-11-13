@@ -140,14 +140,14 @@ class ViewModel extends BaseLiveCalcViewModel {
 		var use_cost: number = total_cost;
 		if(this.is_festival() || this.is_festivalS()) {
 			var ratio: number = parseInt(this.use_cost_percent()) / 100;
-			use_cost = Math.floor(total_cost * ratio);
+			use_cost = total_cost * ratio;
 		} else {
 			use_cost = parseInt(this.rest_cost());
 			if(isNaN(use_cost) || use_cost < 1) {
 				use_cost = total_cost;
 			}
 		}
-		var rest_cost: number = use_cost;
+		var rest_cost: number = Math.floor(use_cost);
 
 		// アイドルの発揮値計算
 		var front_offense: number = 0;

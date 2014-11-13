@@ -260,14 +260,17 @@ var UserIdol = (function () {
     UserIdol.prototype.get_cost_corrected_status = function (status, cost, rest_cost) {
         if (cost > rest_cost) {
             var ratio = rest_cost / cost;
-            if (this.is_festival() || this.is_survival()) {
+            /*
+            if(this.is_festival() || this.is_survival()) {
                 status = Math.ceil(status * ratio);
-            }
-            else {
+            } else {
                 ratio = Math.ceil(ratio * 10) / 10;
                 //status = Math.round(status * ratio);
                 status = Math.ceil(status * ratio);
             }
+            */
+            ratio = Math.ceil(ratio * 10) / 10;
+            status = Math.ceil(status * ratio);
         }
         return status;
     };
@@ -432,21 +435,23 @@ var UserIdol = (function () {
     /******************************************************************************/
     // 攻発揮値計算
     UserIdol.prototype.calculation = function (cost_cut, rest_cost, member_type, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension) {
-        var offense = parseInt(this.offense());
-        var defense = parseInt(this.defense());
-        var offense_skill = parseFloat(this.offense_skill());
-        var defense_skill = parseFloat(this.defense_skill());
         var actual_offense = 0;
         var actual_defense = 0;
-        if (member_type) {
-            // フロント
-            actual_offense = this.calc_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
-            actual_defense = this.calc_front_status(defense, defense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
-        }
-        else {
-            // バック
-            actual_offense = this.calc_back_status(offense, offense_skill, cost_cut, rest_cost);
-            actual_defense = this.calc_back_status(defense, defense_skill, cost_cut, rest_cost);
+        if (!cost_cut || rest_cost >= 1) {
+            var offense = parseInt(this.offense());
+            var defense = parseInt(this.defense());
+            var offense_skill = parseFloat(this.offense_skill());
+            var defense_skill = parseFloat(this.defense_skill());
+            if (member_type) {
+                // フロント
+                actual_offense = this.calc_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
+                actual_defense = this.calc_front_status(defense, defense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
+            }
+            else {
+                // バック
+                actual_offense = this.calc_back_status(offense, offense_skill, cost_cut, rest_cost);
+                actual_defense = this.calc_back_status(defense, defense_skill, cost_cut, rest_cost);
+            }
         }
         this.actual_offense(actual_offense);
         this.actual_defense(actual_defense);
@@ -1710,7 +1715,7 @@ var ViewModel = (function (_super) {
         var use_cost = total_cost;
         if (this.is_festival() || this.is_festivalS()) {
             var ratio = parseInt(this.use_cost_percent()) / 100;
-            use_cost = Math.floor(total_cost * ratio);
+            use_cost = total_cost * ratio;
         }
         else {
             use_cost = parseInt(this.rest_cost());
@@ -1718,7 +1723,7 @@ var ViewModel = (function (_super) {
                 use_cost = total_cost;
             }
         }
-        var rest_cost = use_cost;
+        var rest_cost = Math.floor(use_cost);
         // アイドルの発揮値計算
         var front_offense = 0;
         var front_defense = 0;

@@ -1,20 +1,20 @@
 /*!
-* Copyright (c) 2012 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
-* Released under the MIT license
-* http://opensource.org/licenses/mit-license.php
-*/
+ * Copyright (c) 2012 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
+ * Released under the MIT license
+ * http://opensource.org/licenses/mit-license.php
+ */
 /// <reference path="typings/jquery/jquery.d.ts" />
-
 var Common = (function () {
     function Common() {
     }
     // アイドルリスト読込
     Common.load_idol_list = function (type, rarity, fields) {
-        if (typeof fields === "undefined") { fields = []; }
+        if (fields === void 0) { fields = []; }
         var key = this.IDOL_LIST_KEY_BASE;
         if (type == -1 && rarity == -1) {
             key += "_all";
-        } else {
+        }
+        else {
             if (type != -1) {
                 key += "_t" + type;
             }
@@ -23,12 +23,12 @@ var Common = (function () {
             }
         }
         var data = this.cache_data[key];
-
         var self = this;
         var deferred = jQuery.Deferred();
         if (data != null) {
             deferred.resolve(JSON.parse(data));
-        } else {
+        }
+        else {
             var post_data = {};
             if (type != -1) {
                 post_data["type"] = type;
@@ -44,29 +44,25 @@ var Common = (function () {
                 deferred.resolve(response);
             }, "json");
         }
-
         return deferred.promise();
     };
-
     // スキルリスト読込
     Common.load_skill_list = function () {
         var key = this.SKILL_LIST_KEY;
         var data = this.cache_data[key];
-
         var self = this;
         var deferred = jQuery.Deferred();
         if (data != null) {
             deferred.resolve(JSON.parse(data));
-        } else {
+        }
+        else {
             jQuery.post(this.SKILL_DATA_API_URL, function (response) {
                 self.cache_data[key] = JSON.stringify(response);
                 deferred.resolve(response);
             }, "json");
         }
-
         return deferred.promise();
     };
-
     // 文字列圧縮
     Common.get_compress_data = function (str) {
         // 文字列を文字コード配列に変換
@@ -76,19 +72,15 @@ var Common = (function () {
             var dec = parseInt(char_code.toString(), 10);
             data.push(dec);
         }
-
         //  データを圧縮
         var compress_data = new Zlib.Deflate(data).compress();
-
         // バイナリ文字列に変換
         var binary = "";
         for (var i = 0; i < compress_data.length; i++) {
             binary += ("0" + compress_data[i].toString(16)).slice(-2);
         }
-
         return binary;
     };
-
     // 文字列伸長
     Common.get_decompress_data = function (binary) {
         // バイナリ文字列を文字コード配列に変換
@@ -96,23 +88,18 @@ var Common = (function () {
         for (var i = 0; i < binary.length; i = i + 2) {
             data.push(parseInt(binary.substr(i, 2), 16));
         }
-
         // データを伸張
         var decompress_data = new Zlib.Inflate(data).decompress();
-
         // 文字列に変換
         var str = "";
         for (var i = 0; i < decompress_data.length; i++) {
             str += String.fromCharCode(decompress_data[i]);
         }
-
         return str;
     };
-
     // URLからパラメータ取得
     Common.get_param_list = function () {
         var param_list = {};
-
         var index = location.href.indexOf("?");
         if (index > -1) {
             var query_string = location.href.slice(index + 1);
@@ -124,10 +111,8 @@ var Common = (function () {
                 }
             }
         }
-
         return param_list;
     };
-
     // 表示しているページのURL取得
     Common.get_page_url = function () {
         var url = location.href;
@@ -137,46 +122,42 @@ var Common = (function () {
         }
         return url;
     };
-
     Common.get_qrcode_url = function (url, size) {
-        if (typeof size === "undefined") { size = 150; }
+        if (size === void 0) { size = 150; }
         var param_list = [];
         param_list.push("chs=" + size + "x" + size);
         param_list.push("cht=qr");
         param_list.push("chl=" + url);
-
         return this.GOOGLE_CHART_API_URL + "?" + param_list.join("&");
     };
-
     // 文字列を数値に変換
     Common.to_int = function (value) {
         // 整数文字列以外の場合は0に
         if (!value.match(/^[-+]?[0-9]+$/)) {
             value = "0";
         }
-
         return parseInt(value, 10);
     };
-
     Common.is_smartphone = function () {
         return (navigator.userAgent.match(/(Android|iPhone|iPad|Mobile)/g) != null);
     };
+    // 各種定義
+    // アイドルデータAPI関係
     Common.IDOL_DATA_API_URL = "http://www4018uf.sakura.ne.jp/imas_cg/api/idol/list/";
     Common.IDOL_LIST_KEY_BASE = "imas_cg_idol_list";
-
+    // スキルデータAPI関係
     Common.SKILL_DATA_API_URL = "http://www4018uf.sakura.ne.jp/imas_cg/api/skill/list/";
     Common.SKILL_LIST_KEY = "imas_cg_skill_list";
-
+    // QRコード関連
     Common.GOOGLE_CHART_API_URL = "http://chart.apis.google.com/chart";
-
     Common.cache_data = {};
     return Common;
 })();
 /*!
-* Copyright (c) 2012 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
-* Released under the MIT license
-* http://opensource.org/licenses/mit-license.php
-*/
+ * Copyright (c) 2012 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
+ * Released under the MIT license
+ * http://opensource.org/licenses/mit-license.php
+ */
 /// <reference path="typings/knockout/knockout.d.ts" />
 /// <reference path="common.ts" />
 var UserIdol = (function () {
@@ -192,17 +173,16 @@ var UserIdol = (function () {
         // 相性ボーナス係数
         this.COMPATIBILITY_BONUS_COEFFICIENT = 0.2;
         // LIVEツアー係数
-        this.LIVE_TOUR_NORMAL_LIVE_COEFFICIENT = 0.5;
-        this.LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT = 2;
+        this.LIVE_TOUR_NORMAL_LIVE_COEFFICIENT = 0.5; // 通常LIVE時
+        this.LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT = 2; // 全力LIVE時
         // ドリームLIVEフェス
-        this.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT = 0.5;
-        this.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT = 2.5;
-        this.DREAM_LIVE_FESTIVAL_COMBO_LEVEL_COEFFICIENT = 125;
+        this.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT = 0.5; // 通常LIVE時
+        this.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT = 2.5; // 全力LIVE時
+        this.DREAM_LIVE_FESTIVAL_COMBO_LEVEL_COEFFICIENT = 125; // コンボLV係数
         // トークバトル
-        this.TALK_BATTLE_FULL_POWER_LIVE_COEFFICIENT = 5;
-        this.TALK_BATTLE_COMBO_LEVEL_COEFFICIENT = 50;
+        this.TALK_BATTLE_FULL_POWER_LIVE_COEFFICIENT = 5; // 全力LIVE時
+        this.TALK_BATTLE_COMBO_LEVEL_COEFFICIENT = 50; // コンボLV係数
         var self = this;
-
         // ステータス
         this.id = ko.observable(0);
         this.type = ko.observable(0);
@@ -211,7 +191,6 @@ var UserIdol = (function () {
         this.offense = ko.observable(0);
         this.defense = ko.observable(0);
         this.event_power = ko.observable(1);
-
         // スキル
         this.offense_skill = ko.observable(0);
         this.defense_skill = ko.observable(0);
@@ -222,7 +201,6 @@ var UserIdol = (function () {
         this.is_survival = ko.observable(false);
         this.use_tour_skill = ko.observable(use_tour_skill);
         this.enable_skill = ko.observable(false);
-
         // 発揮値
         this.actual_offense = ko.observable(0);
         this.actual_defense = ko.observable(0);
@@ -233,7 +211,6 @@ var UserIdol = (function () {
             return Math.ceil(self.actual_defense());
         });
         this.style = ko.observable("numeric");
-
         // コスト比
         this.offense_per_cost = ko.computed(function () {
             return self.calc_cost_ratio(self.offense());
@@ -244,19 +221,16 @@ var UserIdol = (function () {
         this.status_per_cost = ko.computed(function () {
             return self.calc_cost_ratio(self.status());
         });
-
         // アイドル選択リスト
         this.idol_data_list = ko.observableArray();
         this.select_idol_list = ko.computed(function () {
             return self.idol_data_list();
         });
-
         // スキル選択リスト
         this.skill_data_list = ko.observableArray();
         this.select_skill_list = ko.computed(function () {
             return self.skill_data_list();
         });
-
         this.set_idol_list();
         this.set_skill_list();
     }
@@ -264,17 +238,14 @@ var UserIdol = (function () {
     UserIdol.prototype.status = function () {
         return parseInt(this.offense()) + parseInt(this.defense());
     };
-
     // 実コスト取得
     UserIdol.prototype.get_cost = function () {
         var cost = parseInt(this.cost());
         if (this.is_festival() && cost == this.TRAINER_COST) {
             cost = 5;
         }
-
         return cost;
     };
-
     // コスト比計算
     UserIdol.prototype.calc_cost_ratio = function (status) {
         // コスト取得
@@ -285,24 +256,24 @@ var UserIdol = (function () {
         }
         return ratio;
     };
-
     // コストオーバー時のステータス補正
     UserIdol.prototype.get_cost_corrected_status = function (status, cost, rest_cost) {
         if (cost > rest_cost) {
             var ratio = rest_cost / cost;
-            if (this.is_festival() || this.is_survival()) {
+            /*
+            if(this.is_festival() || this.is_survival()) {
                 status = Math.ceil(status * ratio);
             } else {
                 ratio = Math.ceil(ratio * 10) / 10;
-
                 //status = Math.round(status * ratio);
                 status = Math.ceil(status * ratio);
             }
+            */
+            ratio = Math.ceil(ratio * 10) / 10;
+            status = Math.ceil(status * ratio);
         }
-
         return status;
     };
-
     // アイドルリスト設定
     UserIdol.prototype.set_idol_list = function () {
         var self = this;
@@ -311,7 +282,6 @@ var UserIdol = (function () {
         var rarity = self.rarity();
         jQuery.when(self.load_idol_list(type, rarity)).done(function (list) {
             self.set_select_idol_list(list);
-
             self.id(0);
             self.cost(0);
             self.offense(0);
@@ -320,54 +290,39 @@ var UserIdol = (function () {
             self.defense_skill(0);
             self.skill_level(10);
             self.set_skill_info(null);
-
             deferred.resolve();
         });
-
         return deferred.promise();
     };
-
     UserIdol.prototype.set_select_idol_list = function (list) {
         var idol_list = [];
-
         idol_list.push({ "id": 0, "name": "-" });
-
         for (var key in list) {
             if (list.hasOwnProperty(key)) {
                 var data = list[key];
-
                 idol_list.push({ "id": data["idol_id"], "name": data["name"] });
             }
         }
-
         this.idol_data_list(idol_list);
     };
-
     // スキルリスト設定
     UserIdol.prototype.set_skill_list = function () {
         var self = this;
         var deferred = jQuery.Deferred();
         jQuery.when(Common.load_skill_list()).done(function (list) {
             var skill_list = [];
-
             skill_list.push({ "id": 0, "name": "-" });
-
             for (var key in list) {
                 if (list.hasOwnProperty(key)) {
                     var data = list[key];
-
                     skill_list.push({ "id": data["skill_id"], "name": data["comment"] });
                 }
             }
-
             self.skill_data_list(skill_list);
-
             deferred.resolve();
         });
-
         return deferred.promise();
     };
-
     // アイドル選択時
     UserIdol.prototype.change_idol = function () {
         var self = this;
@@ -379,26 +334,24 @@ var UserIdol = (function () {
         if (id != 0) {
             jQuery.when(self.load_idol_list(type, rarity)).done(function (idol_list) {
                 var idol_data = idol_list[id];
-
                 // ステータス設定
                 self.cost(idol_data["cost"]);
                 self.offense(idol_data["max_offense"]);
                 self.defense(idol_data["max_defense"]);
                 self.set_skill_info(idol_data);
             });
-        } else {
+        }
+        else {
             self.cost(0);
             self.offense(0);
             self.defense(0);
             self.set_skill_info(null);
         }
     };
-
     // スキル情報設定
     UserIdol.prototype.set_skill_info = function (data) {
         var skill_id = 0;
         var skill_name = "無し";
-
         if (data != null) {
             skill_id = parseInt(data["skill_id"]);
             if (this.use_tour_skill()) {
@@ -411,7 +364,6 @@ var UserIdol = (function () {
         this.skill_name(skill_name);
         this.skill_id(skill_id);
     };
-
     // 設定取得
     UserIdol.prototype.get_setting = function () {
         var setting = {};
@@ -426,19 +378,15 @@ var UserIdol = (function () {
         setting["defense_skill"] = this.defense_skill();
         setting["skill_id"] = this.skill_id();
         setting["skill_level"] = this.skill_level();
-
         return setting;
     };
-
     // 設定反映
     UserIdol.prototype.set_setting = function (setting) {
         var self = this;
-
         self.type(setting["type"]);
         self.rarity(setting["rarity"]);
         jQuery.when(self.load_idol_list(parseInt(setting["type"]), parseInt(setting["rarity"]))).done(function (idol_list) {
             self.set_select_idol_list(idol_list);
-
             self.id(setting["id"]);
             if (setting["cost"] != null) {
                 self.cost(setting["cost"]);
@@ -451,11 +399,9 @@ var UserIdol = (function () {
             self.set_skill_setting(idol_list[setting["id"]], setting["skill_id"], setting["skill_level"]);
         });
     };
-
     UserIdol.prototype.set_skill_setting = function (idol_data, skill_id, skill_level) {
         this.set_skill_info(idol_data);
         this.skill_level(skill_level);
-
         var self = this;
         jQuery.when(Common.load_skill_list()).done(function (skill_list) {
             if (skill_list.hasOwnProperty(skill_id)) {
@@ -463,55 +409,53 @@ var UserIdol = (function () {
             }
         });
     };
-
     // プロデューサー+アピールボーナスの補正値取得
     UserIdol.prototype.get_type_ratio = function (producer_type, appeal_bonus_list) {
         var type = parseInt(this.type());
         var ratio = 0;
         if (type == producer_type) {
             ratio += this.PRODUCER_TYPE_COEFFICIENT;
-        } else {
+        }
+        else {
             // プロデューサーとタイプが不一致の場合のみアピールボーナス補正値取得
             ratio += (parseInt(appeal_bonus_list[type]) / 100);
         }
-
         return ratio;
     };
-
     UserIdol.prototype.load_idol_list = function (type, rarity) {
         var fields = ["type", "rarity", "name", "cost", "max_offense", "max_defense", "skill_name", "skill_id", "live_tour_skill_id"];
         var deferred = jQuery.Deferred();
         jQuery.when(Common.load_idol_list(type, rarity, fields)).done(function (response) {
             deferred.resolve(response);
         });
-
         return deferred.promise();
     };
-
     /******************************************************************************/
     // 通常・フェスティバル
     /******************************************************************************/
     // 攻発揮値計算
     UserIdol.prototype.calculation = function (cost_cut, rest_cost, member_type, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension) {
-        var offense = parseInt(this.offense());
-        var defense = parseInt(this.defense());
-        var offense_skill = parseFloat(this.offense_skill());
-        var defense_skill = parseFloat(this.defense_skill());
         var actual_offense = 0;
         var actual_defense = 0;
-        if (member_type) {
-            // フロント
-            actual_offense = this.calc_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
-            actual_defense = this.calc_front_status(defense, defense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
-        } else {
-            // バック
-            actual_offense = this.calc_back_status(offense, offense_skill, cost_cut, rest_cost);
-            actual_defense = this.calc_back_status(defense, defense_skill, cost_cut, rest_cost);
+        if (!cost_cut || rest_cost >= 1) {
+            var offense = parseInt(this.offense());
+            var defense = parseInt(this.defense());
+            var offense_skill = parseFloat(this.offense_skill());
+            var defense_skill = parseFloat(this.defense_skill());
+            if (member_type) {
+                // フロント
+                actual_offense = this.calc_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
+                actual_defense = this.calc_front_status(defense, defense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
+            }
+            else {
+                // バック
+                actual_offense = this.calc_back_status(offense, offense_skill, cost_cut, rest_cost);
+                actual_defense = this.calc_back_status(defense, defense_skill, cost_cut, rest_cost);
+            }
         }
         this.actual_offense(actual_offense);
         this.actual_defense(actual_defense);
     };
-
     UserIdol.prototype.calculation_festivalS = function (cost_cut, rest_cost, member_type, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension, groove_type) {
         var offense = parseInt(this.offense());
         var defense = parseInt(this.defense());
@@ -523,7 +467,8 @@ var UserIdol = (function () {
             // フロント
             actual_offense = this.calc_festivalS_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension, groove_type);
             actual_defense = this.calc_festivalS_front_status(defense, defense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension, -1);
-        } else {
+        }
+        else {
             // バック
             actual_offense = this.calc_back_status(offense, offense_skill, cost_cut, rest_cost);
             actual_defense = this.calc_back_status(defense, defense_skill, cost_cut, rest_cost);
@@ -531,14 +476,12 @@ var UserIdol = (function () {
         this.actual_offense(actual_offense);
         this.actual_defense(actual_defense);
     };
-
     // フロントメンバー発揮値計算
     UserIdol.prototype.calc_front_status = function (status, skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension) {
         // コスト補正
         if (cost_cut) {
             status = this.get_cost_corrected_status(status, this.get_cost(), rest_cost);
         }
-
         // 施設補正
         var type = parseInt(this.type());
         for (var i = 0; i < institution_list.length; i++) {
@@ -547,7 +490,6 @@ var UserIdol = (function () {
                 break;
             }
         }
-
         // ボーナス補正計算
         var ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + (status_up + skill) / 100;
         if (this.is_festival()) {
@@ -557,41 +499,32 @@ var UserIdol = (function () {
             }
         }
         status = Math.ceil(status * ratio);
-
         return status;
     };
-
     // バックメンバー発揮値計算
     UserIdol.prototype.calc_back_status = function (status, skill, cost_cut, rest_cost) {
         // コスト値修正
         var cost = this.get_cost();
-
         // バックメンバー補正
         var base_status = Math.ceil(status * this.BACK_MEMBER_COEFFICIENT);
         var actual_status = base_status;
-
         // コスト補正
         if (cost_cut) {
             actual_status = this.get_cost_corrected_status(actual_status, cost, rest_cost);
         }
-
         // スキル補正計算
         if (!this.is_festival() || (!cost_cut || rest_cost >= cost)) {
             var ratio = (skill) / 100;
             actual_status = Math.floor(actual_status) + Math.ceil(base_status * ratio * 10) / 10;
-            //actual_status = Math.floor(actual_status) + Math.round(base_status * ratio);
         }
-
         return actual_status;
     };
-
     // フェスフロントメンバー発揮値計算
     UserIdol.prototype.calc_festivalS_front_status = function (status, skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension, groove_type) {
         // コスト補正
         if (cost_cut) {
             status = this.get_cost_corrected_status(status, this.get_cost(), rest_cost);
         }
-
         // 施設補正
         var type = parseInt(this.type());
         for (var i = 0; i < institution_list.length; i++) {
@@ -600,52 +533,41 @@ var UserIdol = (function () {
                 break;
             }
         }
-
         // ボーナス補正計算
         var ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + (skill + training_room_level) / 100;
         status = Math.ceil(status * ratio);
-
         // コンボボーナス・
         ratio = 1 + status_up / 100;
         status = status * ratio;
-
         // グルーヴボーナス
         ratio = 1;
         if (type == groove_type) {
             ratio += 0.2;
         }
         status = Math.round(status * ratio);
-
         // ハイテンションボーナス
         ratio = 1;
         if (high_tension) {
             ratio += 0.1;
         }
-
         //status = Math.floor(status * ratio);
         status = Math.round(status * ratio);
-
         return status;
     };
-
     /******************************************************************************/
     // アイドルサバイバル
     /******************************************************************************/
     // 発揮値計算
     UserIdol.prototype.calculation_survival = function (cost_cut, rest_cost) {
         this.is_survival(true);
-
         // サバイバルパワー補正
         var status = Math.floor(parseInt(this.offense()) * parseFloat(this.event_power()));
-
         // コスト補正
         if (cost_cut) {
             status = this.get_cost_corrected_status(status, this.get_cost(), rest_cost);
         }
-
         this.actual_offense(status);
     };
-
     /******************************************************************************/
     // LIVEツアー
     /******************************************************************************/
@@ -660,7 +582,8 @@ var UserIdol = (function () {
             // フロント
             actual_offense = this.calc_live_tour_front_status(offense, offense_skill, producer_type, appeal_bonus_list, voltage_bonus, status_up, compatibility_type, training_room_level);
             actual_defense = this.calc_live_tour_front_status(defense, defense_skill, producer_type, appeal_bonus_list, voltage_bonus, status_up, compatibility_type, training_room_level);
-        } else {
+        }
+        else {
             // バック
             actual_offense = this.calc_live_tour_back_status(offense, offense_skill, voltage_bonus);
             actual_defense = this.calc_live_tour_back_status(defense, defense_skill, voltage_bonus);
@@ -668,88 +591,69 @@ var UserIdol = (function () {
         this.actual_offense(actual_offense);
         this.actual_defense(actual_defense);
     };
-
     // 発揮値計算
     UserIdol.prototype.calc_live_tour_status = function (status, skill, producer_type, appeal_bonus_list, status_up, compatibility_type) {
         // スターダムパワー補正
         var actual_status = Math.floor(status * parseFloat(this.event_power()));
-
         // プロデューサー+アピールボーナス+スキル補正計算
         var ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + skill / 100;
         actual_status = Math.ceil(actual_status * ratio);
-
         // コンボボーナス
         ratio = 1;
         ratio += (status_up) / 100;
         actual_status = Math.ceil(actual_status * ratio);
-
         // 相性ボーナス
         ratio = 1;
         if (parseInt(this.type()) == compatibility_type) {
             ratio += this.COMPATIBILITY_BONUS_COEFFICIENT;
         }
         actual_status = actual_status * ratio;
-
         return actual_status;
     };
-
     UserIdol.prototype.calc_live_tour_front_status = function (status, skill, producer_type, appeal_bonus_list, voltage_bonus, status_up, compatibility_type, training_room_level) {
         // スターダムパワー補正
         var actual_status = Math.floor(status * parseFloat(this.event_power()));
-
         // ボーナス補正計算
         var ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + (skill + training_room_level) / 100;
         actual_status = Math.ceil(actual_status * ratio);
-
         // ボルテージボーナス
         ratio = 1 + voltage_bonus / 100;
         actual_status = Math.ceil(actual_status * ratio);
-
         // コンボボーナス
         ratio = 1 + status_up / 100;
         actual_status = Math.ceil(actual_status * ratio);
-
         // 相性ボーナス
         ratio = 1;
         if (parseInt(this.type()) == compatibility_type) {
             ratio += this.COMPATIBILITY_BONUS_COEFFICIENT;
         }
         actual_status = actual_status * ratio;
-
         return actual_status;
     };
-
     UserIdol.prototype.calc_live_tour_back_status = function (status, skill, voltage_bonus) {
         // スターダムパワー補正
         var actual_status = Math.floor(status * parseFloat(this.event_power()));
-
         // バックメンバー補正
         actual_status = Math.ceil(actual_status * this.BACK_MEMBER_COEFFICIENT);
-
         // スキル・ボルテージボーナス補正計算
         var ratio = 1 + (skill + voltage_bonus) / 100;
         actual_status = Math.ceil(actual_status * ratio);
-
         return actual_status;
     };
-
     // ダメージ計算
     UserIdol.prototype.calc_live_tour_damage = function (full_power) {
         var damage = Math.floor(this.actual_offense());
-
         if (full_power) {
             // フルパワー
             damage = damage * this.LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT;
-        } else {
+        }
+        else {
             // LP1
             damage = damage * this.LIVE_TOUR_NORMAL_LIVE_COEFFICIENT;
         }
-
         damage = damage / 5;
-
         return damage;
     };
-
     /******************************************************************************/
     // ドリームLIVEフェス
     /******************************************************************************/
@@ -764,7 +668,8 @@ var UserIdol = (function () {
             // フロント
             actual_offense = this.calc_dream_live_festival_front_status(offense, offense_skill, producer_type, appeal_bonus_list, combo_level, fever_bonus, training_room_level);
             actual_defense = this.calc_dream_live_festival_front_status(defense, defense_skill, producer_type, appeal_bonus_list, combo_level, fever_bonus, training_room_level);
-        } else {
+        }
+        else {
             // バック
             actual_offense = this.calc_dream_live_festival_back_status(offense, offense_skill, fever_bonus);
             actual_defense = this.calc_dream_live_festival_back_status(defense, defense_skill, fever_bonus);
@@ -772,62 +677,48 @@ var UserIdol = (function () {
         this.actual_offense(actual_offense);
         this.actual_defense(actual_defense);
     };
-
     UserIdol.prototype.calc_dream_live_festival_front_status = function (status, skill, producer_type, appeal_bonus_list, combo_level, fever_bonus, training_room_level) {
         // スターダムパワー補正
         var actual_status = Math.floor(status * parseFloat(this.event_power()));
-
         // フィーバー補正
         var ratio = 1 + fever_bonus / 100;
         actual_status = Math.floor(actual_status * ratio);
-
         // ボーナス補正計算
         ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + (skill + training_room_level) / 100;
         actual_status = Math.ceil(actual_status * ratio);
-
         // コンボボーナス
         ratio = 1;
         ratio += (Math.sqrt(this.DREAM_LIVE_FESTIVAL_COMBO_LEVEL_COEFFICIENT * combo_level)) / 100;
         actual_status = Math.ceil(actual_status * ratio);
-
         return actual_status;
     };
-
     UserIdol.prototype.calc_dream_live_festival_back_status = function (status, skill, fever_bonus) {
         // スターダムパワー補正
         var actual_status = Math.floor(status * parseFloat(this.event_power()));
-
         // バックメンバー補正
         actual_status = Math.ceil(actual_status * this.BACK_MEMBER_COEFFICIENT);
-
         // フィーバー補正
         var ratio = 1 + fever_bonus / 100;
         actual_status = Math.floor(actual_status * ratio);
-
         // スキルボーナス補正計算
         ratio = 1 + (skill) / 100;
         actual_status = Math.ceil(actual_status * ratio);
-
         return actual_status;
     };
-
     // 与ダメージ計算
     UserIdol.prototype.calc_dream_live_festival_damage = function (full_power) {
         var damage = Math.floor(this.actual_offense());
-
         if (full_power) {
             // フルパワー
             damage = damage * this.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT;
-        } else {
+        }
+        else {
             // LP1
             damage = damage * this.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT;
         }
-
         damage = damage / 5;
-
         return damage;
     };
-
     /******************************************************************************/
     // LIVEロワイヤル
     /******************************************************************************/
@@ -843,16 +734,15 @@ var UserIdol = (function () {
             // フロント
             actual_offense = this.calc_live_royal_front_status(offense, offense_skill, enable_royal_power, producer_type, appeal_bonus_list, voltage_bonus, battle_point_rate, training_room_level);
             actual_defense = this.calc_live_royal_front_status(defense, defense_skill, enable_royal_power, producer_type, appeal_bonus_list, voltage_bonus, battle_point_rate, training_room_level);
-        } else {
+        }
+        else {
             // バック
             actual_offense = this.calc_live_royal_back_status(offense, offense_skill, enable_royal_power, voltage_bonus, battle_point_rate);
             actual_defense = this.calc_live_royal_back_status(defense, defense_skill, enable_royal_power, voltage_bonus, battle_point_rate);
         }
-
         this.actual_offense(actual_offense);
         this.actual_defense(actual_defense);
     };
-
     // フロントメンバー発揮値計算
     UserIdol.prototype.calc_live_royal_front_status = function (status, skill, enable_royal_power, producer_type, appeal_bonus_list, voltage_bonus, battle_point_rate, training_room_level) {
         // ロワイヤルパワー補正
@@ -861,21 +751,16 @@ var UserIdol = (function () {
             event_power = parseFloat(this.event_power());
         }
         var actual_status = Math.ceil(status * event_power);
-
         // ボルテージボーナス
         actual_status = actual_status * voltage_bonus;
-
         // BP補正
         actual_status = actual_status * battle_point_rate;
-
         // ボーナス補正計算
         var ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + (skill + training_room_level) / 100;
         actual_status = actual_status * ratio;
-
         actual_status = Math.round(actual_status * 10) / 10;
         return Math.ceil(actual_status);
     };
-
     // バックメンバー発揮値計算
     UserIdol.prototype.calc_live_royal_back_status = function (status, skill, enable_royal_power, voltage_bonus, battle_point_rate) {
         // ロワイヤルパワー補正
@@ -884,29 +769,22 @@ var UserIdol = (function () {
             event_power = parseFloat(this.event_power());
         }
         var actual_status = Math.ceil(status * event_power);
-
         // バックメンバー補正
         actual_status = Math.ceil(actual_status * this.BACK_MEMBER_COEFFICIENT);
-
         // ボルテージボーナス
         actual_status = actual_status * voltage_bonus;
-
         // BP補正
         actual_status = actual_status * battle_point_rate;
-
         // スキル補正
         var ratio = 1 + skill / 100;
         actual_status = actual_status * ratio;
-
         actual_status = Math.round(actual_status * 10) / 10;
         return Math.ceil(actual_status);
     };
-
     // ダメージ計算
     UserIdol.prototype.calc_live_royal_damage = function () {
         return Math.floor(this.actual_offense()) / 5;
     };
-
     /******************************************************************************/
     // LIVEトライアル
     /******************************************************************************/
@@ -922,26 +800,23 @@ var UserIdol = (function () {
             // フロント
             actual_offense = this.calc_live_trial_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type);
             actual_defense = this.calc_live_trial_front_status(defense, defense_skill, cost_cut, rest_cost, producer_type);
-        } else {
+        }
+        else {
             // バック
             actual_offense = this.calc_live_trial_back_status(offense, offense_skill, cost_cut, rest_cost);
             actual_defense = this.calc_live_trial_back_status(defense, defense_skill, cost_cut, rest_cost);
         }
-
         this.actual_offense(actual_offense);
         this.actual_defense(actual_defense);
     };
-
     // フロントメンバー発揮値計算
     UserIdol.prototype.calc_live_trial_front_status = function (status, skill, cost_cut, rest_cost, producer_type) {
         // コスト値修正
         var cost = this.get_cost();
-
         // コスト補正
         if (cost_cut) {
             status = this.get_cost_corrected_status(status, cost, rest_cost);
         }
-
         // プロデューサー+スキル補正計算
         var ratio = 1;
         if (parseInt(this.type()) == producer_type) {
@@ -949,19 +824,15 @@ var UserIdol = (function () {
         }
         ratio += (skill) / 100;
         status = Math.ceil(status * ratio);
-
         return status;
     };
-
     // バックメンバー発揮値計算
     UserIdol.prototype.calc_live_trial_back_status = function (status, skill, cost_cut, rest_cost) {
         // コスト値修正
         var cost = this.get_cost();
-
         // バックメンバー補正
         var base_status = Math.floor(status * this.BACK_MEMBER_COEFFICIENT);
         var calc_status = base_status;
-
         // コスト補正
         if (cost_cut) {
             calc_status = this.get_cost_corrected_status(calc_status, cost, rest_cost);
@@ -969,16 +840,13 @@ var UserIdol = (function () {
                 calc_status = calc_status * this.BACK_MEMBER_COEFFICIENT;
             }
         }
-
         // スキル補正計算
         if (!cost_cut || rest_cost >= cost) {
             var ratio = (skill) / 100;
             calc_status = Math.floor(calc_status) + Math.ceil(base_status * ratio * 10) / 10;
         }
-
         return Math.floor(calc_status);
     };
-
     /******************************************************************************/
     // トークバトル
     /******************************************************************************/
@@ -993,7 +861,8 @@ var UserIdol = (function () {
             // フロント
             actual_offense = this.calc_talk_battle_front_status(offense, offense_skill, producer_type, appeal_bonus_list, combo_level, cheer_bonus, training_room_level);
             actual_defense = this.calc_talk_battle_front_status(defense, defense_skill, producer_type, appeal_bonus_list, combo_level, cheer_bonus, training_room_level);
-        } else {
+        }
+        else {
             // バック
             actual_offense = this.calc_talk_battle_back_status(offense, offense_skill, combo_level, cheer_bonus);
             actual_defense = this.calc_talk_battle_back_status(defense, defense_skill, combo_level, cheer_bonus);
@@ -1001,70 +870,52 @@ var UserIdol = (function () {
         this.actual_offense(actual_offense);
         this.actual_defense(actual_defense);
     };
-
     UserIdol.prototype.calc_talk_battle_front_status = function (status, skill, producer_type, appeal_bonus_list, combo_level, cheer_bonus, training_room_level) {
         // トークパワー補正
         var actual_status = Math.floor(status * parseFloat(this.event_power()));
-
         // プロデューサー+アピールボーナス計算
         var ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list);
         actual_status = Math.ceil(actual_status * ratio);
-
         // スキル補正計算
         ratio = 1 + skill / 100;
         actual_status = Math.round(actual_status * ratio);
-
         // トレーニングルーム
         ratio = 1 + training_room_level / 100;
         actual_status = Math.round(actual_status * ratio);
-
         // コンボボーナス
         ratio = 1 + (Math.sqrt(this.TALK_BATTLE_COMBO_LEVEL_COEFFICIENT * combo_level)) / 100;
         actual_status = Math.round(actual_status * ratio);
-
         // 応援ボーナス
         ratio = 1 + cheer_bonus / 100;
         actual_status = Math.ceil(actual_status * ratio);
-
         return actual_status;
     };
-
     UserIdol.prototype.calc_talk_battle_back_status = function (status, skill, combo_level, cheer_bonus) {
         // トークパワー補正
         var actual_status = Math.floor(status * parseFloat(this.event_power()));
-
         // バックメンバー補正
         actual_status = Math.ceil(actual_status * this.BACK_MEMBER_COEFFICIENT);
-
         // スキル補正計算
         var ratio = 1 + skill / 100;
         actual_status = Math.round(actual_status * ratio);
-
         // コンボボーナス
         ratio = 1 + (Math.sqrt(this.TALK_BATTLE_COMBO_LEVEL_COEFFICIENT * combo_level)) / 100;
         actual_status = Math.round(actual_status * ratio);
-
         // 応援ボーナス
         ratio = 1 + cheer_bonus / 100;
         actual_status = Math.ceil(actual_status * ratio);
-
         return actual_status;
     };
-
     // ダメージ計算
     UserIdol.prototype.calc_talk_battle_damage = function (full_power) {
         var damage = Math.floor(this.actual_offense());
-
         if (full_power) {
             // 全力トーク
             damage = damage * this.TALK_BATTLE_FULL_POWER_LIVE_COEFFICIENT;
         }
-
         damage = damage / 5;
-
         return damage;
     };
-
     /******************************************************************************/
     // アイドルチャレンジ
     /******************************************************************************/
@@ -1079,7 +930,8 @@ var UserIdol = (function () {
             // フロント
             actual_offense = this.calc_challenge_front_status(offense, offense_skill, producer_type, appeal_bonus_list, unit_type, fever_bonus, training_room_level);
             actual_defense = this.calc_challenge_front_status(defense, defense_skill, producer_type, appeal_bonus_list, unit_type, fever_bonus, training_room_level);
-        } else {
+        }
+        else {
             // バック
             actual_offense = this.calc_challenge_back_status(offense, offense_skill, unit_type);
             actual_defense = this.calc_challenge_back_status(defense, defense_skill, unit_type);
@@ -1087,7 +939,6 @@ var UserIdol = (function () {
         this.actual_offense(actual_offense);
         this.actual_defense(actual_defense);
     };
-
     UserIdol.prototype.calc_challenge_front_status = function (status, skill, producer_type, appeal_bonus_list, unit_type, fever_bonus, training_room_level) {
         // チャレンジパワー・ユニットタイプ補正
         var ratio = parseFloat(this.event_power());
@@ -1095,26 +946,20 @@ var UserIdol = (function () {
             ratio *= 2;
         }
         var actual_status = Math.floor(status * ratio);
-
         // 本気モードボーナス
         ratio = 1 + fever_bonus / 100;
         actual_status = Math.floor(actual_status * ratio);
-
         // プロデューサー+アピールボーナス計算
         ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list);
         actual_status = Math.ceil(actual_status * ratio);
-
         // スキル補正計算
         ratio = 1 + skill / 100;
         actual_status = Math.round(actual_status * ratio);
-
         // トレーニングルーム
         ratio = 1 + training_room_level / 100;
         actual_status = Math.round(actual_status * ratio);
-
         return actual_status;
     };
-
     UserIdol.prototype.calc_challenge_back_status = function (status, skill, unit_type) {
         // チャレンジパワー・ユニットタイプ補正
         var ratio = parseFloat(this.event_power());
@@ -1122,17 +967,13 @@ var UserIdol = (function () {
             ratio *= 2;
         }
         var actual_status = Math.floor(status * ratio);
-
         // バックメンバー補正
         actual_status = Math.ceil(actual_status * this.BACK_MEMBER_COEFFICIENT);
-
         // スキル補正計算
         ratio = 1 + skill / 100;
         actual_status = Math.round(actual_status * ratio);
-
         return actual_status;
     };
-
     // ダメージ計算
     UserIdol.prototype.calc_challenge_damage = function () {
         return Math.floor(this.actual_offense()) / 5;
@@ -1140,11 +981,11 @@ var UserIdol = (function () {
     return UserIdol;
 })();
 /*!
-* THE IDOLM@STER CINDERELLA GIRLS Exertion Value Calculator Base Class
-* Copyright (c) 2012 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
-* Released under the MIT license
-* http://opensource.org/licenses/mit-license.php
-*/
+ * THE IDOLM@STER CINDERELLA GIRLS Exertion Value Calculator Base Class
+ * Copyright (c) 2012 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
+ * Released under the MIT license
+ * http://opensource.org/licenses/mit-license.php
+ */
 /// <reference path="typings/knockout/knockout.d.ts" />
 /// <reference path="common.ts" />
 /// <reference path="idol.model.ts" />
@@ -1161,42 +1002,37 @@ var CALCULATION_TYPE;
     CALCULATION_TYPE[CALCULATION_TYPE["ROYAL_GUEST"] = 7] = "ROYAL_GUEST";
     CALCULATION_TYPE[CALCULATION_TYPE["TALK_BATTLE"] = 8] = "TALK_BATTLE";
     CALCULATION_TYPE[CALCULATION_TYPE["CHALLENGE"] = 9] = "CHALLENGE";
-    CALCULATION_TYPE[CALCULATION_TYPE["FESTIVAL_S"] = 10] = "FESTIVAL_S";
+    CALCULATION_TYPE[CALCULATION_TYPE["FESTIVAL_S"] = 10] = "FESTIVAL_S"; // フェスS
 })(CALCULATION_TYPE || (CALCULATION_TYPE = {}));
-
 // スキル効果対象ユニット
 var SKILL_TARGET_UNIT;
 (function (SKILL_TARGET_UNIT) {
     SKILL_TARGET_UNIT[SKILL_TARGET_UNIT["OWN"] = 0] = "OWN";
-    SKILL_TARGET_UNIT[SKILL_TARGET_UNIT["RIVAL"] = 1] = "RIVAL";
+    SKILL_TARGET_UNIT[SKILL_TARGET_UNIT["RIVAL"] = 1] = "RIVAL"; // 相手ユニット
 })(SKILL_TARGET_UNIT || (SKILL_TARGET_UNIT = {}));
-
 // スキル効果対象メンバー
 var SKILL_TARGET_MEMBER;
 (function (SKILL_TARGET_MEMBER) {
     SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["SELF"] = 0] = "SELF";
     SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["FRONT"] = 1] = "FRONT";
     SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["BACK"] = 2] = "BACK";
-    SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["ALL"] = 3] = "ALL";
+    SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["ALL"] = 3] = "ALL"; // 全メンバー
 })(SKILL_TARGET_MEMBER || (SKILL_TARGET_MEMBER = {}));
-
 // スキル効果対象属性
 var SKILL_TARGET_TYPE;
 (function (SKILL_TARGET_TYPE) {
     SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["CUTE"] = 1] = "CUTE";
     SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["COOL"] = 2] = "COOL";
     SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["PASSION"] = 4] = "PASSION";
-    SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["ALL"] = 7] = "ALL";
+    SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["ALL"] = 7] = "ALL"; // 全属性
 })(SKILL_TARGET_TYPE || (SKILL_TARGET_TYPE = {}));
-
 // スキル効果対象ステータス
 var SKILL_TARGET_PARAM;
 (function (SKILL_TARGET_PARAM) {
     SKILL_TARGET_PARAM[SKILL_TARGET_PARAM["ALL"] = 0] = "ALL";
     SKILL_TARGET_PARAM[SKILL_TARGET_PARAM["OFFENSE"] = 1] = "OFFENSE";
-    SKILL_TARGET_PARAM[SKILL_TARGET_PARAM["DEFENSE"] = 2] = "DEFENSE";
+    SKILL_TARGET_PARAM[SKILL_TARGET_PARAM["DEFENSE"] = 2] = "DEFENSE"; // 守
 })(SKILL_TARGET_PARAM || (SKILL_TARGET_PARAM = {}));
-
 // スキル入力モード
 var SKILL_INPUT_MODE;
 (function (SKILL_INPUT_MODE) {
@@ -1204,15 +1040,13 @@ var SKILL_INPUT_MODE;
     SKILL_INPUT_MODE[SKILL_INPUT_MODE["AUTO"] = 1] = "AUTO";
     SKILL_INPUT_MODE[SKILL_INPUT_MODE["AUTO_MEAN"] = 2] = "AUTO_MEAN";
 })(SKILL_INPUT_MODE || (SKILL_INPUT_MODE = {}));
-
 // 有効発動スキル
 var ENABLE_SKILL_TYPE;
 (function (ENABLE_SKILL_TYPE) {
     ENABLE_SKILL_TYPE[ENABLE_SKILL_TYPE["ALL"] = 0] = "ALL";
     ENABLE_SKILL_TYPE[ENABLE_SKILL_TYPE["OFFENSE"] = 1] = "OFFENSE";
-    ENABLE_SKILL_TYPE[ENABLE_SKILL_TYPE["DEFENSE"] = 2] = "DEFENSE";
+    ENABLE_SKILL_TYPE[ENABLE_SKILL_TYPE["DEFENSE"] = 2] = "DEFENSE"; // 守備時発動スキル
 })(ENABLE_SKILL_TYPE || (ENABLE_SKILL_TYPE = {}));
-
 var BaseLiveCalcViewModel = (function () {
     function BaseLiveCalcViewModel() {
         // 定数
@@ -1223,7 +1057,6 @@ var BaseLiveCalcViewModel = (function () {
         // スキル発動率
         this.SKILL_INVOCATION_RATE_LIST = [];
         var self = this;
-
         // 入力項目
         this.calc_type = ko.observable(0 /* NORMAL */);
         this.front_num = ko.observable(0);
@@ -1238,22 +1071,18 @@ var BaseLiveCalcViewModel = (function () {
         this.actual_status = ko.computed(function () {
             return [0, 0];
         });
-
         // セーブデータ関係
         this.save_data_id = ko.observable(1);
         this.save_data_title = ko.observable("");
-
         // コード関係
         this.code = ko.observable("");
         this.apply_code_url = ko.observable("");
-
         this.move_up = function () {
             var index = self.idol_list.indexOf(this);
             if (index > 0) {
                 self.idol_list.splice(index - 1, 2, self.idol_list()[index], self.idol_list()[index - 1]);
             }
         };
-
         this.move_down = function () {
             var index = self.idol_list.indexOf(this);
             if (index < self.idol_list().length - 1) {
@@ -1270,11 +1099,9 @@ var BaseLiveCalcViewModel = (function () {
     BaseLiveCalcViewModel.prototype.change_rival_back_num = function () {
         this.rival_back_num.valueHasMutated();
     };
-
     // アイドルリスト初期化
     BaseLiveCalcViewModel.prototype.init_list = function () {
         this.init_idol_list();
-
         // コードがあったら適用
         var param_list = Common.get_param_list();
         if (param_list["code"]) {
@@ -1282,28 +1109,23 @@ var BaseLiveCalcViewModel = (function () {
             this.apply_code();
         }
     };
-
     // アイドルリスト初期化
     BaseLiveCalcViewModel.prototype.init_idol_list = function () {
     };
-
     // 設定
     BaseLiveCalcViewModel.prototype.get_setting = function () {
         return {};
     };
     BaseLiveCalcViewModel.prototype.set_setting = function (setting) {
     };
-
     // アイドル設定取得
     BaseLiveCalcViewModel.prototype.get_idol_setting = function () {
         var setting = [];
         for (var i = 0; i < this.idol_list().length; i++) {
             setting.push(this.idol_list()[i].get_setting());
         }
-
         return setting;
     };
-
     // アイドル設定反映
     BaseLiveCalcViewModel.prototype.set_idol_setting = function (settings, max_num, use_tour_skill) {
         var deferred = jQuery.Deferred();
@@ -1314,14 +1136,12 @@ var BaseLiveCalcViewModel = (function () {
                 objects[key] = { type: settings[i]["type"], rarity: settings[i]["rarity"] };
             }
         }
-
         var keys = Object.keys(objects);
         var method_list = [];
         for (var i = 0; i < keys.length; i++) {
             var object = objects[keys[i]];
             method_list.push(Common.load_idol_list(parseInt(object["type"]), parseInt(object["rarity"])));
         }
-
         var self = this;
         jQuery.when.apply(null, method_list).done(function () {
             var idol_list = [];
@@ -1330,28 +1150,22 @@ var BaseLiveCalcViewModel = (function () {
                 idol.set_setting(settings[i]);
                 idol_list.push(idol);
             }
-
             self.idol_list(idol_list);
             deferred.resolve();
         });
-
         return deferred.promise();
     };
-
     // アピールボーナス設定取得
     BaseLiveCalcViewModel.prototype.get_appeal_bonus_setting = function () {
         var settings = [];
-
         for (var i = 0; i < this.appeal_bonus().length; i++) {
             var setting = {};
             setting["type"] = i.toString();
             setting["value"] = this.appeal_bonus()[i];
             settings.push(setting);
         }
-
         return settings;
     };
-
     // アピールボーナス設定反映
     BaseLiveCalcViewModel.prototype.set_appeal_bonus_setting = function (settings) {
         if (settings != undefined) {
@@ -1365,11 +1179,9 @@ var BaseLiveCalcViewModel = (function () {
             this.appeal_bonus(appeal_bonus);
         }
     };
-
     // ライバルユニット設定取得
     BaseLiveCalcViewModel.prototype.get_rival_member_setting = function () {
         var settings = {};
-
         settings["front"] = [];
         for (var i = 0; i < this.rival_front_num().length; i++) {
             var setting = {};
@@ -1377,7 +1189,6 @@ var BaseLiveCalcViewModel = (function () {
             setting["value"] = this.rival_front_num()[i];
             settings["front"].push(setting);
         }
-
         settings["back"] = [];
         for (var i = 0; i < this.rival_back_num().length; i++) {
             var setting = {};
@@ -1385,10 +1196,8 @@ var BaseLiveCalcViewModel = (function () {
             setting["value"] = this.rival_back_num()[i];
             settings["back"].push(setting);
         }
-
         return settings;
     };
-
     // ライバルユニット設定反映
     BaseLiveCalcViewModel.prototype.set_rival_member_setting = function (settings) {
         if (settings == undefined) {
@@ -1415,40 +1224,34 @@ var BaseLiveCalcViewModel = (function () {
             this.rival_back_num(rival_back_num);
         }
     };
-
     // 設定保存
     BaseLiveCalcViewModel.prototype.save_setting = function () {
         var id = this.save_data_id();
-
-        try  {
+        try {
             // タイトルをlocalStorageに保存
             var key = this.SAVE_DATA_KEY + "_title_" + id;
             var value = this.save_data_title();
             localStorage.setItem(key, value);
-
             // 設定をlocalStorageに保存
             var key = this.SAVE_DATA_KEY + "_" + id;
             var value = JSON.stringify(this.get_setting());
             localStorage.setItem(key, value);
-        } catch (e) {
+        }
+        catch (e) {
             console.log(e.message);
             alert("データ保存時にエラーが発生しました。");
         }
     };
-
     // 設定読込
     BaseLiveCalcViewModel.prototype.load_setting = function () {
         var id = this.save_data_id();
-
-        try  {
+        try {
             // localStorageからタイトル読み込み
             var key = this.SAVE_DATA_KEY + "_title_" + id;
             var title = localStorage.getItem(key);
-
             // localStorageから設定読み込み
             var key = this.SAVE_DATA_KEY + "_" + id;
             var value = localStorage.getItem(key);
-
             if (value != null) {
                 if (title == null) {
                     title = "";
@@ -1456,63 +1259,55 @@ var BaseLiveCalcViewModel = (function () {
                 var setting = JSON.parse(value);
                 this.save_data_title(title);
                 this.set_setting(setting);
-            } else {
+            }
+            else {
                 alert("データが保存されていません。");
             }
-        } catch (e) {
+        }
+        catch (e) {
             console.log(e.message);
             alert("データ読み込み時にエラーが発生しました。");
         }
     };
-
     // コード生成
     BaseLiveCalcViewModel.prototype.generate_code = function () {
         // 設定取得
         var setting = this.get_setting();
-
         // 設定データをJSON形式に変換
         var json = JSON.stringify(setting);
-
-        try  {
+        try {
             // コード化
             var code = Common.get_compress_data(json);
-
             var url = Common.get_page_url() + "?code=" + code;
-
             this.code(code);
             this.apply_code_url(url);
-        } catch (e) {
+        }
+        catch (e) {
             console.log(e.message);
             alert("コードの生成に失敗しました。");
         }
     };
-
     // コード適用
     BaseLiveCalcViewModel.prototype.apply_code = function () {
         var code = this.code();
-
-        try  {
+        try {
             // コードからJSONデータ復元
             var json = Common.get_decompress_data(code);
-
             // JSONデータから設定データ復元
             var setting = JSON.parse(json);
-
             var url = Common.get_page_url() + "?code=" + code;
-
             // 設定
             this.set_setting(setting);
             this.apply_code_url(url);
-        } catch (e) {
+        }
+        catch (e) {
             console.log(e.message);
             alert("コードの適用に失敗しました。");
         }
     };
-
     BaseLiveCalcViewModel.prototype.is_smartphone = function () {
         return Common.is_smartphone();
     };
-
     /******************************************************************************/
     // スキル関連
     /******************************************************************************/
@@ -1520,7 +1315,6 @@ var BaseLiveCalcViewModel = (function () {
     BaseLiveCalcViewModel.prototype.is_skill_input_type_manual = function () {
         return (parseInt(this.skill_input_type()) == 0 /* MANUAL */);
     };
-
     // スキル自動計算
     BaseLiveCalcViewModel.prototype.calc_skill_value = function () {
         if (!this.is_skill_input_type_manual()) {
@@ -1530,7 +1324,6 @@ var BaseLiveCalcViewModel = (function () {
                 idol.defense_skill(0);
                 idol.enable_skill(false);
             }
-
             // 発動スキル取得
             var self = this;
             jQuery.when(this.get_invoke_skill_list()).done(function (invoke_skill_list) {
@@ -1560,22 +1353,20 @@ var BaseLiveCalcViewModel = (function () {
             });
         }
     };
-
     // 発動スキル取得
     BaseLiveCalcViewModel.prototype.get_invoke_skill_list = function () {
         var front_num = parseInt(this.front_num());
-
         // 属性ごとのメンバー人数取得
         var member_num = [[0, 0, 0], [0, 0, 0]];
         for (var i = 0; i < this.idol_list().length; i++) {
             var type = this.idol_list()[i].type();
             if (i < front_num) {
                 member_num[0][type]++;
-            } else {
+            }
+            else {
                 member_num[1][type]++;
             }
         }
-
         // 属性ごとの相手メンバー人数取得
         var rival_member_num = [[0, 0, 0], [0, 0, 0]];
         for (var i = 0; i < this.rival_front_num().length; i++) {
@@ -1584,7 +1375,6 @@ var BaseLiveCalcViewModel = (function () {
         for (var i = 0; i < this.rival_back_num().length; i++) {
             rival_member_num[1][i] = parseInt(this.rival_back_num()[i]);
         }
-
         // 発動可能スキル
         var self = this;
         var deferred = jQuery.Deferred();
@@ -1602,7 +1392,6 @@ var BaseLiveCalcViewModel = (function () {
                         invoke_skill_list.push(skill);
                         skill_count++;
                     }
-
                     if (skill_input_type != 2 /* AUTO_MEAN */ && skill_count >= self.MAX_INVOKE_SKILL_NUM) {
                         break;
                     }
@@ -1610,14 +1399,11 @@ var BaseLiveCalcViewModel = (function () {
             }
             deferred.resolve(invoke_skill_list);
         });
-
         return deferred.promise();
     };
-
     // 発動可能なスキルかチェック
     BaseLiveCalcViewModel.prototype.check_skill_enable = function (idol, skill_data_list, skill_count, member_num, rival_member_num) {
         var enable_skill_type = parseInt(this.enable_skill_type());
-
         // 発動スキルを取得
         var enable = false;
         var skill = jQuery.extend(true, {}, skill_data_list[idol.skill_id()]);
@@ -1635,12 +1421,14 @@ var BaseLiveCalcViewModel = (function () {
                         // 自分スキルの適用
                         enable = true;
                         this.apply_skill_effect(idol, skill, skill_count);
-                    } else {
+                    }
+                    else {
                         // 対象範囲チェック
                         enable = this.check_skill_target(target_member, target_type, member_num);
                     }
                 }
-            } else {
+            }
+            else {
                 // 相手
                 // 有効スキルかチェック
                 if (enable_skill_type == 0 /* ALL */ || (enable_skill_type ^ target_param) > 0) {
@@ -1649,18 +1437,14 @@ var BaseLiveCalcViewModel = (function () {
                 }
             }
         }
-
         if (!enable) {
             skill = null;
         }
-
         return skill;
     };
-
     // スキルの対象範囲をチェック
     BaseLiveCalcViewModel.prototype.check_skill_target = function (target_member, target_type, member_num) {
         var enable_skill = false;
-
         switch (target_member) {
             case 1 /* FRONT */:
                 for (var i = 0; i < member_num[0].length; i++) {
@@ -1689,10 +1473,8 @@ var BaseLiveCalcViewModel = (function () {
                 }
                 break;
         }
-
         return enable_skill;
     };
-
     // フロントメンバーにスキル効果適用
     BaseLiveCalcViewModel.prototype.apply_skill_effect_front_member = function (invoke_skill, index) {
         var front_num = parseInt(this.front_num());
@@ -1700,11 +1482,9 @@ var BaseLiveCalcViewModel = (function () {
             this.apply_skill_effect(this.idol_list()[i], invoke_skill, index);
         }
     };
-
     // バックメンバーにスキル効果適用
     BaseLiveCalcViewModel.prototype.apply_skill_effect_back_member = function (invoke_skill, index) {
         var target_num = parseInt(invoke_skill["target_num"]);
-
         if (target_num == -1) {
             target_num = this.idol_list().length - parseInt(this.front_num());
         }
@@ -1715,16 +1495,13 @@ var BaseLiveCalcViewModel = (function () {
             }
         }
     };
-
     // スキル効果適用
     BaseLiveCalcViewModel.prototype.apply_skill_effect = function (idol, invoke_skill, index) {
         // スキルが効果適用可能かチェック
         if (!this.check_apply_skill(idol, invoke_skill)) {
             return false;
         }
-
         var result = false;
-
         var target_param = parseInt(invoke_skill["target_param"]);
         var skill_level = parseInt(invoke_skill["skill_level"]);
         var skill_value = 0;
@@ -1756,36 +1533,31 @@ var BaseLiveCalcViewModel = (function () {
         }
         idol.offense_skill(offense_skill);
         idol.defense_skill(defense_skill);
-
         return result;
     };
-
     // スキル効果適用可能チェック
     BaseLiveCalcViewModel.prototype.check_apply_skill = function (idol, invoke_skill) {
         var result = false;
-
         var type = parseInt(idol.type());
         var target_unit = parseInt(invoke_skill["target_unit"]);
         var target_member = parseInt(invoke_skill["target_member"]);
         var target_type = parseInt(invoke_skill["target_type"]);
-
         // スキルが効果適用可能かチェック
         if (target_unit == 0 /* OWN */) {
             if (target_member == 0 /* SELF */ || (target_type & (1 << type)) > 0) {
                 result = true;
             }
         }
-
         return result;
     };
     return BaseLiveCalcViewModel;
 })();
 /*!
-* THE IDOLM@STER CINDERELLA GIRLS Exertion Value Calculator for Idol Survival
-* Copyright (c) 2014 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
-* Released under the MIT license
-* http://opensource.org/licenses/mit-license.php
-*/
+ * THE IDOLM@STER CINDERELLA GIRLS Exertion Value Calculator for Idol Survival
+ * Copyright (c) 2014 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
+ * Released under the MIT license
+ * http://opensource.org/licenses/mit-license.php
+ */
 /// <reference path="live_calc.base.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -1800,11 +1572,8 @@ var ViewModel = (function (_super) {
         // 定数
         // セーブデータ関係
         this.SAVE_DATA_KEY = "imas_cg_survival_calc";
-
         var self = this;
-
         this.calc_type(1 /* SURVIVAL */);
-
         // 入力項目
         this.total_cost = ko.observable(0);
         this.use_cost_percent = ko.observable(100);
@@ -1813,24 +1582,20 @@ var ViewModel = (function (_super) {
         this.sort_type = ko.observable(0);
         this.add_idol = ko.observable(new UserIdol(false));
         this.add_idol_num = ko.observable(1);
-
         // 発揮値
         this.total_offense = ko.observable(0);
         this.actual_offense = ko.computed(function () {
             return self.calculation();
         });
-
         self.add = function () {
             var index = self.idol_list.indexOf(this);
             self.idol_list.splice(index + 1, 0, new UserIdol(false));
         };
-
         self.remove = function () {
             if (self.idol_list().length > 1) {
                 self.idol_list.remove(this);
             }
         };
-
         this.init_list();
     }
     // アイドルリスト初期化
@@ -1839,17 +1604,14 @@ var ViewModel = (function (_super) {
         idols.push(new UserIdol(false));
         this.idol_list(idols);
     };
-
     // 発揮値計算
     ViewModel.prototype.calculation = function () {
         // ソート
         this.sort_idol();
-
         var total_cost = parseInt(this.total_cost());
         var cost_cut = (total_cost > 0);
         var status_up = parseInt(this.status_up());
         var training_room_level = parseInt(this.training_room_level());
-
         // 使用コスト計算
         var use_cost_list = [];
         for (var i = 20; i <= 100; i = i + 20) {
@@ -1858,16 +1620,13 @@ var ViewModel = (function (_super) {
         var rest_cost = parseInt(this.total_cost());
         var ratio = parseInt(this.use_cost_percent()) / 100;
         var use_cost = Math.floor(rest_cost * ratio);
-
         // 合計発揮値計算
         var total_offense = 0;
         for (var i = 0; i < this.idol_list().length; i++) {
             var idol = this.idol_list()[i];
-
             // アイドルごとの発揮値計算
             idol.calculation_survival(cost_cut, rest_cost);
             total_offense += idol.actual_offense();
-
             // 文字色変更
             var class_name = "";
             if (cost_cut && rest_cost > 0) {
@@ -1883,38 +1642,30 @@ var ViewModel = (function (_super) {
                 class_name += " cost_over";
             }
             idol.style("numeric " + class_name);
-
             rest_cost -= parseInt(idol.cost());
             if (rest_cost < 0) {
                 rest_cost = 0;
             }
         }
         this.total_offense(Math.ceil(total_offense * 100) / 100);
-
         // 実発揮値計算
         var actual_offense = Math.ceil(total_offense);
-
         // 消費コスト補正
         var total_cost = total_cost - rest_cost;
         if (total_cost > use_cost) {
             actual_offense = actual_offense * (use_cost / total_cost);
             actual_offense = Math.ceil(actual_offense);
         }
-
         // 能力値上昇値計算
         var ratio = status_up / 100;
         var status_up_bonus = actual_offense * ratio;
-
         // トレーニングルームボーナス値計算
         ratio = training_room_level / 100;
         var training_room_bonus = Math.ceil(actual_offense * ratio) + Math.ceil(status_up_bonus * ratio);
-
         // ボーナス補正
         actual_offense = Math.ceil(actual_offense + status_up_bonus) + training_room_bonus;
-
         return actual_offense;
     };
-
     // ソート処理
     ViewModel.prototype.sort_idol = function () {
         if (this.auto_sort()) {
@@ -1925,37 +1676,31 @@ var ViewModel = (function (_super) {
                 var a_value = parseInt(a.offense());
                 var b_ratio = parseFloat(b.offense_per_cost());
                 var b_value = parseInt(b.offense());
-
                 if (a_ratio != b_ratio) {
                     // コスト比大きさでソート
                     result = (b_ratio > a_ratio) ? 1 : -1;
-                } else if (a_value != b_value) {
+                }
+                else if (a_value != b_value) {
                     // コスト比が同じ場合、ステータスの大きさでソート
                     result = (b_value > a_value) ? 1 : -1;
                 }
-
                 return result;
             });
             this.idol_list(idol_list);
         }
     };
-
     // 設定取得
     ViewModel.prototype.get_setting = function () {
         var setting = {};
-
         // 共通部分のパラメータ取得
         setting["user_cost"] = this.total_cost();
         setting["use_cost_percent"] = this.use_cost_percent();
         setting["status_up"] = this.status_up();
         setting["training_room_level"] = this.training_room_level();
-
         // アイドル個別のパラメータ取得
         setting["idol"] = this.get_idol_setting();
-
         return setting;
     };
-
     // 設定反映
     ViewModel.prototype.set_setting = function (setting) {
         // 共通部分のパラメータ設定
@@ -1963,28 +1708,23 @@ var ViewModel = (function (_super) {
         this.use_cost_percent(setting["use_cost_percent"]);
         this.status_up(setting["status_up"]);
         this.training_room_level(setting["training_room_level"]);
-
         // アイドル個別のパラメータ設定
         this.set_idol_setting(setting["idol"], -1, false);
     };
-
     // アイドル一括追加
     ViewModel.prototype.add_idols = function () {
         var setting = this.add_idol().get_setting();
         var num = parseInt(this.add_idol_num());
-
         var idol_list = this.idol_list();
         for (var i = 0; i < num; i++) {
             var idol = new UserIdol(false);
             idol.set_setting(setting);
             idol_list.push(idol);
         }
-
         this.idol_list.valueHasMutated();
     };
     return ViewModel;
 })(BaseLiveCalcViewModel);
-
 jQuery(function () {
     ko.applyBindings(new ViewModel());
 });
