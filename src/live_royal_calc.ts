@@ -5,6 +5,7 @@
  * http://opensource.org/licenses/mit-license.php
  */
 /// <reference path="live_tour_calc.base.ts" />
+/// <reference path="petit_idol.ts" />
 
 class ViewModel extends BaseLiveTourCalcViewModel {
 	// 定数
@@ -13,10 +14,13 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	GUEST_BATTLE_POINT_RATE_LIST: number[] = [0.5, 1, 1.6, 2.25, 3];	// ゲストLIVE時
 	// セーブデータ関係
 	SAVE_DATA_KEY: string = "imas_cg_live_royal_calc";
+	// ぷちアイドル最大数
+	PETIT_IDOL_NUM: number = 3;
 
 	// 入力項目
-	battle_point: KnockoutObservable<any>;
-	training_room_level: KnockoutObservable<any>;
+	battle_point: KnockoutObservable<string>;
+	training_room_level: KnockoutObservable<string>;
+	petit_idol_list: KnockoutObservableArray<UserPetitIdol>;
 
 	constructor() {
 		super();
@@ -27,7 +31,9 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.voltage_bonus(1);
 		this.calc_type(CALCULATION_TYPE.ROYAL);
 		// 入力項目
-		this.battle_point = ko.observable(2);
+		this.battle_point = ko.observable("2");
+		this.training_room_level = ko.observable("0");
+		this.petit_idol_list = ko.observableArray([]);
 		// 最大メンバー数
 		this.max_member_num = 20;
 		// 発揮値
@@ -39,12 +45,24 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	is_guest_live(): boolean { return (parseInt(this.calc_type()) == CALCULATION_TYPE.ROYAL_GUEST); }
 
 	// アイドルリスト初期化
+	init_petit_idol_list(): void {
+		var petit_idols: UserPetitIdol[] = [];
+		for(var i: number = 0; i < this.PETIT_IDOL_NUM; i++) {
+			var petit_idol: UserPetitIdol = new UserPetitIdol();
+			petit_idols.push(petit_idol);
+		}
+		this.petit_idol_list(petit_idols);
+	}
 	init_idol_list(): void {
 		var idols: UserIdol[] = [];
 		for(var i: number = 0; i < this.max_member_num; i++) {
 			idols.push(new UserIdol(false));
 		}
 		this.idol_list(idols);
+	}
+	init_list(): void {
+		this.init_petit_idol_list();
+		super.init_list();
 	}
 
 	// 発揮値計算
@@ -104,6 +122,20 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.front_defense(front_defense);
 		this.back_offense(back_offense);
 		this.back_defense(back_defense);
+
+		// ぷちデレラボーナス計算
+		var petit_idol_bonus: number = 0;
+		for(var i: number = 0; i < this.petit_idol_list().length; i++) {
+			var petit_idol: UserPetitIdol = this.petit_idol_list()[i];
+			petit_idol_bonus += petit_idol.status();
+		}
+		petit_idol_bonus = Math.ceil(petit_idol_bonus * battle_point_rate * voltage_bonus);
+		var petit_idol_damage: number = Math.floor(petit_idol_bonus * 0.2);
+		total_offense += petit_idol_bonus;
+		total_defense += petit_idol_bonus;
+		total_damage["min"] += petit_idol_damage;
+		total_damage["max"] += petit_idol_damage;
+		total_damage["avg"] += petit_idol_damage;
 
 		// 与ダメージ計算
 		this.total_damage_min(Math.ceil(total_damage["min"]));
@@ -244,6 +276,31 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		return result;
 	}
 
+	// ぷちアイドル設定取得
+	get_petit_idol_setting(): { [index: string]: string; }[] {
+		var setting: { [index: string]: string; }[] = [];
+		for(var i: number = 0; i < this.petit_idol_list().length; i++) {
+			setting.push(this.petit_idol_list()[i].get_setting());
+		}
+
+		return	setting;
+	}
+
+	// ぷちアイドル設定反映
+	set_petit_idol_setting(settings: { [index: string]: string; }[], max_num: number): void{
+		if(settings == null) {
+			return;
+		}
+		var petit_idols: UserPetitIdol[] = [];
+		for(var i: number = 0; i < settings.length && i != max_num; i++) {
+			var petit_idol: UserPetitIdol = new UserPetitIdol();
+			petit_idol.set_setting(settings[i]);
+			petit_idols.push(petit_idol);
+		}
+
+		this.petit_idol_list(petit_idols);
+	}
+
 	// 設定取得
 	get_setting(): { [index: string]: any; } {
 		var setting: { [index: string]: any; } = {};
@@ -261,6 +318,9 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 		// アイドル個別のパラメータ取得
 		setting["idol"] = this.get_idol_setting();
+
+		// ぷちアイドル個別のパラメータ取得
+		setting["petit_idol"] = this.get_petit_idol_setting();
 
 		return setting;
 	}
@@ -280,6 +340,9 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 		// アイドル個別のパラメータ設定
 		this.set_idol_setting(setting["idol"], this.max_member_num, false);
+
+		// ぷちアイドル個別のパラメータ取得
+		this.set_petit_idol_setting(setting["petit_idol"], this.PETIT_IDOL_NUM);
 	}
 }
 

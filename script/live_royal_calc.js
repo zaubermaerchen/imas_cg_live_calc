@@ -175,6 +175,8 @@ var UserIdol = (function () {
         // LIVEツアー係数
         this.LIVE_TOUR_NORMAL_LIVE_COEFFICIENT = 0.5; // 通常LIVE時
         this.LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT = 2; // 全力LIVE時
+        // LIVEロワイヤル係数
+        this.LIVE_ROYAL_DAMAGE_COEFFICIENT = 0.2; // ダメージ係数
         // ドリームLIVEフェス
         this.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT = 0.5; // 通常LIVE時
         this.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT = 2.5; // 全力LIVE時
@@ -783,7 +785,7 @@ var UserIdol = (function () {
     };
     // ダメージ計算
     UserIdol.prototype.calc_live_royal_damage = function () {
-        return Math.floor(this.actual_offense()) / 5;
+        return Math.floor(this.actual_offense()) * this.LIVE_ROYAL_DAMAGE_COEFFICIENT;
     };
     /******************************************************************************/
     // LIVEトライアル
@@ -1610,12 +1612,59 @@ var BaseLiveTourCalcViewModel = (function (_super) {
     return BaseLiveTourCalcViewModel;
 })(BaseLiveCalcViewModel);
 /*!
+ * Copyright (c) 2014 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
+ * Released under the MIT license
+ * http://opensource.org/licenses/mit-license.php
+ */
+/// <reference path="typings/knockout/knockout.d.ts" />
+var UserPetitIdol = (function () {
+    function UserPetitIdol() {
+        // ステータス
+        this.vocal = ko.observable(0);
+        this.dance = ko.observable(0);
+        this.visual = ko.observable(0);
+    }
+    // 総ステータス取得
+    UserPetitIdol.prototype.status = function () {
+        var status = 0;
+        var vocal = parseInt(this.vocal());
+        if (!isNaN(vocal)) {
+            status += vocal;
+        }
+        var dance = parseInt(this.dance());
+        if (!isNaN(dance)) {
+            status += dance;
+        }
+        var visual = parseInt(this.visual());
+        if (!isNaN(visual)) {
+            status += visual;
+        }
+        return status;
+    };
+    // 設定取得
+    UserPetitIdol.prototype.get_setting = function () {
+        var setting = {};
+        setting["vocal"] = this.vocal();
+        setting["dance"] = this.dance();
+        setting["visual"] = this.visual();
+        return setting;
+    };
+    // 設定反映
+    UserPetitIdol.prototype.set_setting = function (setting) {
+        this.vocal(setting["vocal"]);
+        this.dance(setting["dance"]);
+        this.visual(setting["visual"]);
+    };
+    return UserPetitIdol;
+})();
+/*!
  * THE IDOLM@STER CINDERELLA GIRLS Exertion Value Calculator for Idol Live Royal
  * Copyright (c) 2013 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
  */
 /// <reference path="live_tour_calc.base.ts" />
+/// <reference path="petit_idol.ts" />
 var ViewModel = (function (_super) {
     __extends(ViewModel, _super);
     function ViewModel() {
@@ -1626,12 +1675,16 @@ var ViewModel = (function (_super) {
         this.GUEST_BATTLE_POINT_RATE_LIST = [0.5, 1, 1.6, 2.25, 3]; // ゲストLIVE時
         // セーブデータ関係
         this.SAVE_DATA_KEY = "imas_cg_live_royal_calc";
+        // ぷちアイドル最大数
+        this.PETIT_IDOL_NUM = 3;
         var self = this;
         this.front_num(10);
         this.voltage_bonus(1);
         this.calc_type(6 /* ROYAL */);
         // 入力項目
-        this.battle_point = ko.observable(2);
+        this.battle_point = ko.observable("2");
+        this.training_room_level = ko.observable("0");
+        this.petit_idol_list = ko.observableArray([]);
         // 最大メンバー数
         this.max_member_num = 20;
         // 発揮値
@@ -1644,12 +1697,24 @@ var ViewModel = (function (_super) {
         return (parseInt(this.calc_type()) == 7 /* ROYAL_GUEST */);
     };
     // アイドルリスト初期化
+    ViewModel.prototype.init_petit_idol_list = function () {
+        var petit_idols = [];
+        for (var i = 0; i < this.PETIT_IDOL_NUM; i++) {
+            var petit_idol = new UserPetitIdol();
+            petit_idols.push(petit_idol);
+        }
+        this.petit_idol_list(petit_idols);
+    };
     ViewModel.prototype.init_idol_list = function () {
         var idols = [];
         for (var i = 0; i < this.max_member_num; i++) {
             idols.push(new UserIdol(false));
         }
         this.idol_list(idols);
+    };
+    ViewModel.prototype.init_list = function () {
+        this.init_petit_idol_list();
+        _super.prototype.init_list.call(this);
     };
     // 発揮値計算
     ViewModel.prototype.calculation = function () {
@@ -1704,6 +1769,19 @@ var ViewModel = (function (_super) {
         this.front_defense(front_defense);
         this.back_offense(back_offense);
         this.back_defense(back_defense);
+        // ぷちデレラボーナス計算
+        var petit_idol_bonus = 0;
+        for (var i = 0; i < this.petit_idol_list().length; i++) {
+            var petit_idol = this.petit_idol_list()[i];
+            petit_idol_bonus += petit_idol.status();
+        }
+        petit_idol_bonus = Math.ceil(petit_idol_bonus * battle_point_rate * voltage_bonus);
+        var petit_idol_damage = Math.floor(petit_idol_bonus * 0.2);
+        total_offense += petit_idol_bonus;
+        total_defense += petit_idol_bonus;
+        total_damage["min"] += petit_idol_damage;
+        total_damage["max"] += petit_idol_damage;
+        total_damage["avg"] += petit_idol_damage;
         // 与ダメージ計算
         this.total_damage_min(Math.ceil(total_damage["min"]));
         this.total_damage_max(Math.ceil(total_damage["max"]));
@@ -1832,6 +1910,27 @@ var ViewModel = (function (_super) {
         idol.defense_skill(defense_skill);
         return result;
     };
+    // ぷちアイドル設定取得
+    ViewModel.prototype.get_petit_idol_setting = function () {
+        var setting = [];
+        for (var i = 0; i < this.petit_idol_list().length; i++) {
+            setting.push(this.petit_idol_list()[i].get_setting());
+        }
+        return setting;
+    };
+    // ぷちアイドル設定反映
+    ViewModel.prototype.set_petit_idol_setting = function (settings, max_num) {
+        if (settings == null) {
+            return;
+        }
+        var petit_idols = [];
+        for (var i = 0; i < settings.length && i != max_num; i++) {
+            var petit_idol = new UserPetitIdol();
+            petit_idol.set_setting(settings[i]);
+            petit_idols.push(petit_idol);
+        }
+        this.petit_idol_list(petit_idols);
+    };
     // 設定取得
     ViewModel.prototype.get_setting = function () {
         var setting = {};
@@ -1847,6 +1946,8 @@ var ViewModel = (function (_super) {
         setting["rival_member"] = this.get_rival_member_setting();
         // アイドル個別のパラメータ取得
         setting["idol"] = this.get_idol_setting();
+        // ぷちアイドル個別のパラメータ取得
+        setting["petit_idol"] = this.get_petit_idol_setting();
         return setting;
     };
     // 設定反映
@@ -1863,6 +1964,8 @@ var ViewModel = (function (_super) {
         this.set_rival_member_setting(setting["rival_member"]);
         // アイドル個別のパラメータ設定
         this.set_idol_setting(setting["idol"], this.max_member_num, false);
+        // ぷちアイドル個別のパラメータ取得
+        this.set_petit_idol_setting(setting["petit_idol"], this.PETIT_IDOL_NUM);
     };
     return ViewModel;
 })(BaseLiveTourCalcViewModel);

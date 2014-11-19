@@ -20,6 +20,8 @@ class UserIdol {
 	// LIVEツアー係数
 	LIVE_TOUR_NORMAL_LIVE_COEFFICIENT: number = 0.5;	// 通常LIVE時
 	LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT: number = 2;	// 全力LIVE時
+	// LIVEロワイヤル係数
+	LIVE_ROYAL_DAMAGE_COEFFICIENT: number = 0.2; // ダメージ係数
 	// ドリームLIVEフェス
 	DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT: number = 0.5;		// 通常LIVE時
 	DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT: number = 2.5;	// 全力LIVE時
@@ -762,7 +764,7 @@ class UserIdol {
 
 	// ダメージ計算
 	calc_live_royal_damage(): number {
-		return Math.floor(this.actual_offense()) / 5;
+		return Math.floor(this.actual_offense()) * this.LIVE_ROYAL_DAMAGE_COEFFICIENT;
 	}
 
 	/******************************************************************************/
