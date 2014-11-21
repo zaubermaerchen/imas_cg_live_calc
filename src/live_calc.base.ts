@@ -5,6 +5,7 @@
  * http://opensource.org/licenses/mit-license.php
  */
 /// <reference path="typings/knockout/knockout.d.ts" />
+/// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 /// <reference path="common.ts" />
 /// <reference path="idol.model.ts" />
 
@@ -70,71 +71,72 @@ class BaseLiveCalcViewModel {
 	SKILL_INVOCATION_RATE_LIST: number[] = [];
 
 	// 入力項目
-	calc_type: KnockoutObservable<any>;
-	front_num: KnockoutObservable<any>;
-	producer_type: KnockoutObservable<any>;
-	appeal_bonus: KnockoutObservableArray<number>;
-	training_room_level: KnockoutObservable<any>;
-	idol_list: KnockoutObservableArray<any>;
-	skill_input_type: KnockoutObservable<any>;
-	enable_skill_type: KnockoutObservable<any>;
-	rival_front_num: KnockoutObservableArray<any>;
-	rival_back_num: KnockoutObservableArray<any>;
-	actual_status: KnockoutComputed<number[]>;
+	calc_type: string;
+	front_num: string;
+	producer_type: string;
+	appeal_bonus: number[];
+	training_room_level: string;
+	idol_list: UserIdol[];
+	skill_input_type: string;
+	enable_skill_type: string;
+	rival_front_num: string[];
+	rival_back_num: string[];
 
 	// セーブデータ関係
-	save_data_id: KnockoutObservable<any>;
-	save_data_title: KnockoutObservable<string>;
+	save_data_id: string;
+	save_data_title: string;
 
 	// コード関係
-	code: KnockoutObservable<string>;
-	apply_code_url: KnockoutObservable<string>;
+	code: string;
+	apply_code_url: string;
 
-	move_up: any;
-	move_down: any;
+	move_up: Function;
+	move_down: Function;
 
 	constructor() {
 		var self = this;
 
 		// 入力項目
-		this.calc_type = ko.observable(CALCULATION_TYPE.NORMAL);
-		this.front_num = ko.observable(0);
-		this.producer_type = ko.observable(-1);
-		this.appeal_bonus = ko.observableArray([0, 0, 0]);
-		this.training_room_level = ko.observable(0);
-		this.idol_list = ko.observableArray();
-		this.skill_input_type = ko.observable(0);
-		this.enable_skill_type = ko.observable(0);
-		this.rival_front_num = ko.observableArray([0, 0, 0]);
-		this.rival_back_num = ko.observableArray([0, 0, 0]);
-		this.actual_status = ko.computed(function () { return [0, 0]; });
+		this.calc_type = CALCULATION_TYPE.NORMAL.toString();
+		this.front_num = "0";
+		this.producer_type = "-1";
+		this.appeal_bonus = [0, 0, 0];
+		this.training_room_level = "0";
+		this.idol_list = [];
+		this.skill_input_type = "0";
+		this.enable_skill_type = "0";
+		this.rival_front_num = ["0", "0", "0"];
+		this.rival_back_num = ["0", "0", "0"];
 
 		// セーブデータ関係
-		this.save_data_id = ko.observable(1);
-		this.save_data_title = ko.observable("");
+		this.save_data_id = "1";
+		this.save_data_title = "";
 
 		// コード関係
-		this.code = ko.observable("");
-		this.apply_code_url = ko.observable("");
+		this.code = "";
+		this.apply_code_url = "";
 
 		this.move_up = function() {
 			var index: number = self.idol_list.indexOf(this);
 			if(index > 0) {
-				self.idol_list.splice(index - 1, 2, self.idol_list()[index], self.idol_list()[index - 1]);
+				self.idol_list.splice(index - 1, 2, self.idol_list[index], self.idol_list[index - 1]);
 			}
 		};
 
 		this.move_down = function() {
 			var index: number = self.idol_list.indexOf(this);
-			if(index < self.idol_list().length - 1) {
-				self.idol_list.splice(index, 2, self.idol_list()[index + 1], self.idol_list()[index]);
+			if(index < self.idol_list.length - 1) {
+				self.idol_list.splice(index, 2, self.idol_list[index + 1], self.idol_list[index]);
 			}
 		};
 	}
 
-	change_appeal_bonus(): void { this.appeal_bonus.valueHasMutated(); }
-	change_rival_front_num(): void { this.rival_front_num.valueHasMutated(); }
-	change_rival_back_num(): void { this.rival_back_num.valueHasMutated(); }
+	// 発揮値
+	actual_status(): number[] { return [0, 0]; }
+
+	change_appeal_bonus(): void { ko.valueHasMutated(this, "appeal_bonus"); }
+	change_rival_front_num(): void { ko.valueHasMutated(this, "rival_front_num"); }
+	change_rival_back_num(): void { ko.valueHasMutated(this, "rival_back_num"); }
 
 	// アイドルリスト初期化
 	init_list(): void {
@@ -143,7 +145,7 @@ class BaseLiveCalcViewModel {
 		// コードがあったら適用
 		var param_list: { [index: string]: string; } = Common.get_param_list();
 		if(param_list["code"]) {
-			this.code(param_list["code"]);
+			this.code = param_list["code"];
 			this.apply_code();
 		}
 	}
@@ -158,8 +160,8 @@ class BaseLiveCalcViewModel {
 	// アイドル設定取得
 	get_idol_setting(): { [index: string]: string; }[] {
 		var setting: { [index: string]: string; }[] = [];
-		for(var i: number = 0; i < this.idol_list().length; i++) {
-			setting.push(this.idol_list()[i].get_setting());
+		for(var i: number = 0; i < this.idol_list.length; i++) {
+			setting.push(this.idol_list[i].get_setting());
 		}
 
 		return	setting;
@@ -183,8 +185,7 @@ class BaseLiveCalcViewModel {
 			method_list.push(Common.load_idol_list(parseInt(object["type"]), parseInt(object["rarity"])));
 		}
 
-		var self = this;
-		jQuery.when.apply(null, method_list).done(function() {
+		jQuery.when.apply(null, method_list).done(() => {
 			var idol_list: UserIdol[] = [];
 			for(var i: number = 0; i < settings.length && i != max_num; i++) {
 				var idol: UserIdol = new UserIdol(use_tour_skill);
@@ -192,7 +193,7 @@ class BaseLiveCalcViewModel {
 				idol_list.push(idol);
 			}
 
-			self.idol_list(idol_list);
+			this.idol_list = idol_list;
 			deferred.resolve();
 		});
 
@@ -203,10 +204,10 @@ class BaseLiveCalcViewModel {
 	get_appeal_bonus_setting(): { [index: number]: string; }[] {
 		var settings: { [index: number]: string; }[] = [];
 
-		for(var i: number = 0; i < this.appeal_bonus().length; i++) {
+		for(var i: number = 0; i < this.appeal_bonus.length; i++) {
 			var setting: { [index: number]: string; } = {};
 			setting["type"] = i.toString();
-			setting["value"] = this.appeal_bonus()[i];
+			setting["value"] = this.appeal_bonus[i];
 			settings.push(setting);
 		}
 
@@ -216,14 +217,12 @@ class BaseLiveCalcViewModel {
 	// アピールボーナス設定反映
 	set_appeal_bonus_setting(settings: { [index: number]: string; }[]): void {
 		if(settings != undefined) {
-			var appeal_bonus = this.appeal_bonus();
 			for(var i: number = 0; i < settings.length; i++) {
 				if(settings[i] != undefined) {
 					var setting = settings[i];
-					appeal_bonus[setting["type"]] = setting["value"];
+					this.appeal_bonus[setting["type"]] = setting["value"];
 				}
 			}
-			this.appeal_bonus(appeal_bonus);
 		}
 	}
 
@@ -232,18 +231,18 @@ class BaseLiveCalcViewModel {
 		var settings: { [index: string]: { [index: number]: string; }[]} = {};
 
 		settings["front"] = [];
-		for(var i: number = 0; i < this.rival_front_num().length; i++) {
+		for(var i: number = 0; i < this.rival_front_num.length; i++) {
 			var setting: { [index: number]: string; } = {};
 			setting["type"] = i.toString();
-			setting["value"] = this.rival_front_num()[i];
+			setting["value"] = this.rival_front_num[i];
 			settings["front"].push(setting);
 		}
 
 		settings["back"] = [];
-		for(var i: number = 0; i < this.rival_back_num().length; i++) {
+		for(var i: number = 0; i < this.rival_back_num.length; i++) {
 			var setting: { [index: number]: string; } = {};
 			setting["type"] = i.toString();
-			setting["value"] = this.rival_back_num()[i];
+			setting["value"] = this.rival_back_num[i];
 			settings["back"].push(setting);
 		}
 
@@ -256,41 +255,33 @@ class BaseLiveCalcViewModel {
 			return;
 		}
 		if(settings["front"] != undefined) {
-			var rival_front_num = this.rival_front_num();
 			for(var i: number = 0; i < settings["front"].length; i++) {
 				if(settings["front"][i] != undefined) {
 					var setting = settings["front"][i];
-					rival_front_num[setting["type"]] = setting["value"];
+					this.rival_front_num[setting["type"]] = setting["value"];
 				}
 			}
-			this.rival_front_num(rival_front_num);
 		}
 		if(settings["back"] != undefined) {
-			var rival_back_num = this.rival_back_num();
 			for(var i: number = 0; i < settings["back"].length; i++) {
 				if(settings["back"][i] != undefined) {
 					var setting = settings["back"][i];
-					rival_front_num[setting["type"]] = setting["value"];
+					this.rival_back_num[setting["type"]] = setting["value"];
 				}
 			}
-			this.rival_back_num(rival_back_num);
 		}
 	}
 
 	// 設定保存
 	save_setting(): void {
-		var id: string = this.save_data_id();
-
 		try {
 			// タイトルをlocalStorageに保存
-			var key: string = this.SAVE_DATA_KEY + "_title_" + id;
-			var value: string = this.save_data_title();
-			localStorage.setItem(key, value);
+			var key: string = this.SAVE_DATA_KEY + "_title_" + this.save_data_id;
+			localStorage.setItem(key, this.save_data_title);
 
 			// 設定をlocalStorageに保存
-			var key: string = this.SAVE_DATA_KEY + "_" + id;
-			var value: string = JSON.stringify(this.get_setting());
-			localStorage.setItem(key, value);
+			key = this.SAVE_DATA_KEY + "_" + this.save_data_id;
+			localStorage.setItem(key, JSON.stringify(this.get_setting()));
 		} catch(e) {
 			console.log(e.message);
 			alert("データ保存時にエラーが発生しました。");
@@ -299,15 +290,13 @@ class BaseLiveCalcViewModel {
 
 	// 設定読込
 	load_setting(): void {
-		var id: string = this.save_data_id();
-
 		try {
 			// localStorageからタイトル読み込み
-			var key: string = this.SAVE_DATA_KEY + "_title_" + id;
+			var key: string = this.SAVE_DATA_KEY + "_title_" + this.save_data_id;
 			var title: string = localStorage.getItem(key);
 
 			// localStorageから設定読み込み
-			var key: string = this.SAVE_DATA_KEY + "_" + id;
+			key = this.SAVE_DATA_KEY + "_" + this.save_data_id;
 			var value: string = localStorage.getItem(key);
 
 			if(value != null) {
@@ -315,7 +304,7 @@ class BaseLiveCalcViewModel {
 					title = "";
 				}
 				var setting: { [index: string]: any; } = JSON.parse(value);
-				this.save_data_title(title);
+				this.save_data_title = title;
 				this.set_setting(setting);
 			} else {
 				alert("データが保存されていません。");
@@ -340,8 +329,8 @@ class BaseLiveCalcViewModel {
 
 			var url: string = Common.get_page_url() + "?code=" + code;
 
-			this.code(code);
-			this.apply_code_url(url);
+			this.code = code;
+			this.apply_code_url = url;
 		} catch(e) {
 			console.log(e.message);
 			alert("コードの生成に失敗しました。");
@@ -350,20 +339,18 @@ class BaseLiveCalcViewModel {
 
 	// コード適用
 	apply_code(): void {
-		var code: string = this.code();
-
 		try {
 			// コードからJSONデータ復元
-			var json: string = Common.get_decompress_data(code);
+			var json: string = Common.get_decompress_data(this.code);
 
 			// JSONデータから設定データ復元
 			var setting: { [index: string]: any; } = JSON.parse(json);
 
-			var url: string = Common.get_page_url() + "?code=" + code;
+			var url: string = Common.get_page_url() + "?code=" + this.code;
 
 			// 設定
 			this.set_setting(setting);
-			this.apply_code_url(url);
+			this.apply_code_url = url;
 		} catch(e) {
 			console.log(e.message);
 			alert("コードの適用に失敗しました。");
@@ -376,22 +363,21 @@ class BaseLiveCalcViewModel {
 	// スキル関連
 	/******************************************************************************/
 	// スキル入力モードがマニュアルか
-	is_skill_input_type_manual(): boolean { return (parseInt(this.skill_input_type()) == SKILL_INPUT_MODE.MANUAL); }
+	is_skill_input_type_manual(): boolean { return (parseInt(this.skill_input_type) == SKILL_INPUT_MODE.MANUAL); }
 
 	// スキル自動計算
 	calc_skill_value(): void {
 		if(!this.is_skill_input_type_manual()) {
 			// 初期化
-			for(var i: number = 0; i < this.idol_list().length; i++) {
-				var idol: UserIdol = this.idol_list()[i];
-				idol.offense_skill(0);
-				idol.defense_skill(0);
-				idol.enable_skill(false);
+			for(var i: number = 0; i < this.idol_list.length; i++) {
+				var idol: UserIdol = this.idol_list[i];
+				idol.offense_skill = "0";
+				idol.defense_skill = "0";
+				idol.enable_skill = false;
 			}
 
 			// 発動スキル取得
-			var self = this;
-			jQuery.when(this.get_invoke_skill_list()).done(function(invoke_skill_list: { [index: string]: string; }[]) {
+			jQuery.when(this.get_invoke_skill_list()).done((invoke_skill_list: { [index: string]: string; }[]) => {
 				// スキル効果適用
 				for(var i: number = 0; i < invoke_skill_list.length; i++) {
 					var invoke_skill: { [index: string]: string; } = invoke_skill_list[i];
@@ -403,16 +389,16 @@ class BaseLiveCalcViewModel {
 							break;
 						case SKILL_TARGET_MEMBER.FRONT:
 							// フロントメンバー
-							self.apply_skill_effect_front_member(invoke_skill, i);
+							this.apply_skill_effect_front_member(invoke_skill, i);
 							break;
 						case SKILL_TARGET_MEMBER.BACK:
 							// バックメンバー
-							self.apply_skill_effect_back_member(invoke_skill, i);
+							this.apply_skill_effect_back_member(invoke_skill, i);
 							break;
 						case SKILL_TARGET_MEMBER.ALL:
 							// 全メンバー
-							self.apply_skill_effect_front_member(invoke_skill, i);
-							self.apply_skill_effect_back_member(invoke_skill, i);
+							this.apply_skill_effect_front_member(invoke_skill, i);
+							this.apply_skill_effect_back_member(invoke_skill, i);
 							break;
 						default:
 							break;
@@ -424,12 +410,12 @@ class BaseLiveCalcViewModel {
 
 	// 発動スキル取得
 	get_invoke_skill_list(): JQueryPromise<any> {
-		var front_num: number = parseInt(this.front_num());
+		var front_num: number = parseInt(this.front_num);
 
 		// 属性ごとのメンバー人数取得
 		var member_num: number[][] = [[0, 0, 0], [0, 0, 0]];
-		for(var i: number = 0; i < this.idol_list().length; i++) {
-			var type = this.idol_list()[i].type();
+		for(var i: number = 0; i < this.idol_list.length; i++) {
+			var type: number = parseInt(this.idol_list[i].type);
 			if(i < front_num) {
 				member_num[0][type]++;
 			} else {
@@ -439,32 +425,31 @@ class BaseLiveCalcViewModel {
 
 		// 属性ごとの相手メンバー人数取得
 		var rival_member_num: number[][] = [[0, 0, 0], [0, 0, 0]];
-		for(var i: number = 0; i < this.rival_front_num().length; i++) {
-			rival_member_num[0][i] = parseInt(this.rival_front_num()[i]);
+		for(var i: number = 0; i < this.rival_front_num.length; i++) {
+			rival_member_num[0][i] = parseInt(this.rival_front_num[i]);
 		}
-		for(var i: number = 0; i < this.rival_back_num().length; i++) {
-			rival_member_num[1][i] = parseInt(this.rival_back_num()[i]);
+		for(var i: number = 0; i < this.rival_back_num.length; i++) {
+			rival_member_num[1][i] = parseInt(this.rival_back_num[i]);
 		}
 
 		// 発動可能スキル
-		var self = this;
 		var deferred: JQueryDeferred<any> = jQuery.Deferred();
-		jQuery.when(Common.load_skill_list()).done(function(skill_data_list: { [index: string]: { [index: string]: any; } }) {
+		jQuery.when(Common.load_skill_list()).done((skill_data_list: { [index: string]: { [index: string]: any; } }) => {
 			var invoke_skill_list: { [index: string]: string; }[] = [];
 			var skill_count: number = 0;
-			var skill_input_type: number = parseInt(self.skill_input_type());
-			for(var i: number = 0; i < self.idol_list().length && i < front_num; i++) {
-				var idol: UserIdol = self.idol_list()[i];
-				if(parseInt(idol.skill_id()) > 0 && parseInt(idol.skill_level()) > 0) {
+			var skill_input_type: number = parseInt(this.skill_input_type);
+			for(var i: number = 0; i < this.idol_list.length && i < front_num; i++) {
+				var idol: UserIdol = this.idol_list[i];
+				if(parseInt(idol.skill_id) > 0 && parseInt(idol.skill_level) > 0) {
 					// 発動スキルを取得
-					var skill: { [index: string]: string; } = self.check_skill_enable(idol, skill_data_list, skill_count, member_num, rival_member_num);
+					var skill: { [index: string]: string; } = this.check_skill_enable(idol, skill_data_list, skill_count, member_num, rival_member_num);
 					if(skill != null) {
-						idol.enable_skill(true);
+						idol.enable_skill = true;
 						invoke_skill_list.push(skill);
 						skill_count++;
 					}
 
-					if(skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && skill_count >= self.MAX_INVOKE_SKILL_NUM) {
+					if(skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && skill_count >= this.MAX_INVOKE_SKILL_NUM) {
 						break;
 					}
 				}
@@ -477,12 +462,12 @@ class BaseLiveCalcViewModel {
 
 	// 発動可能なスキルかチェック
 	check_skill_enable(idol: UserIdol, skill_data_list: { [index: string]: { [index: string]: any; } }, skill_count: number, member_num: number[][], rival_member_num: number[][]): { [index: string]: string; } {
-		var enable_skill_type = parseInt(this.enable_skill_type());
+		var enable_skill_type = parseInt(this.enable_skill_type);
 
 		// 発動スキルを取得
 		var enable: boolean = false;
-		var skill: { [index: string]: string; } = jQuery.extend(true, {}, skill_data_list[idol.skill_id()]);
-		skill["skill_level"] = idol.skill_level();
+		var skill: { [index: string]: string; } = jQuery.extend(true, {}, skill_data_list[idol.skill_id]);
+		skill["skill_level"] = idol.skill_level;
 		if(skill["skill_value_list"].length > 0) {
 			var target_param: number = parseInt(skill["target_param"]);
 			var target_unit: number = parseInt(skill["target_unit"]);
@@ -563,22 +548,23 @@ class BaseLiveCalcViewModel {
 
 	// フロントメンバーにスキル効果適用
 	apply_skill_effect_front_member(invoke_skill: { [index: string]: string; }, index: number): void {
-		var front_num: number = parseInt(this.front_num());
-		for(var i: number = 0; i < this.idol_list().length && i < front_num; i++) {
-			this.apply_skill_effect(this.idol_list()[i], invoke_skill, index);
+		var front_num: number = parseInt(this.front_num);
+		for(var i: number = 0; i < this.idol_list.length && i < front_num; i++) {
+			this.apply_skill_effect(this.idol_list[i], invoke_skill, index);
 		}
 	}
 
 	// バックメンバーにスキル効果適用
 	apply_skill_effect_back_member(invoke_skill: { [index: string]: string; }, index: number): void {
 		var target_num: number = parseInt(invoke_skill["target_num"]);
+		var front_num: number = parseInt(this.front_num);
 
 		if(target_num == -1) {
-			target_num = this.idol_list().length - parseInt(this.front_num());
+			target_num = this.idol_list.length - front_num;
 		}
 		var count: number = 0;
-		for(var i = this.front_num(); i < this.idol_list().length && count < target_num; i++) {
-			if(this.apply_skill_effect(this.idol_list()[i], invoke_skill, index)) {
+		for(var i: number = front_num; i < this.idol_list.length && count < target_num; i++) {
+			if(this.apply_skill_effect(this.idol_list[i], invoke_skill, index)) {
 				count++;
 			}
 		}
@@ -599,14 +585,14 @@ class BaseLiveCalcViewModel {
 		if(skill_level > 0) {
 			skill_value = parseInt(invoke_skill["skill_value_list"][skill_level - 1]);
 		}
-		if(parseInt(this.skill_input_type()) == SKILL_INPUT_MODE.AUTO_MEAN) {
+		if(parseInt(this.skill_input_type) == SKILL_INPUT_MODE.AUTO_MEAN) {
 			var rate = this.SKILL_INVOCATION_RATE_LIST[index];
 			if(rate != undefined) {
 				skill_value = skill_value * (rate / 100);
 			}
 		}
-		var offense_skill: number = parseFloat(idol.offense_skill());
-		var defense_skill: number = parseFloat(idol.defense_skill());
+		var offense_skill: number = parseFloat(idol.offense_skill);
+		var defense_skill: number = parseFloat(idol.defense_skill);
 		switch(target_param) {
 			case SKILL_TARGET_PARAM.ALL:
 				offense_skill += skill_value;
@@ -622,8 +608,8 @@ class BaseLiveCalcViewModel {
 				result = true;
 				break
 		}
-		idol.offense_skill(offense_skill);
-		idol.defense_skill(defense_skill);
+		idol.offense_skill = offense_skill.toString();
+		idol.defense_skill = defense_skill.toString();
 
 		return result;
 	}
@@ -632,7 +618,7 @@ class BaseLiveCalcViewModel {
 	check_apply_skill(idol: UserIdol, invoke_skill: { [index: string]: string; }): boolean {
 		var result: boolean = false;
 
-		var type: number = parseInt(idol.type());
+		var type: number = parseInt(idol.type);
 		var target_unit: number = parseInt(invoke_skill["target_unit"]);
 		var target_member: number = parseInt(invoke_skill["target_member"]);
 		var target_type: number = parseInt(invoke_skill["target_type"]);

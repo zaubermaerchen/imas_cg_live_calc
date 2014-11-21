@@ -68,7 +68,7 @@
 						<th>アピールボーナス</th>
 						<td>
 							キュート :
-							<select name="appeal_bonus_0" data-bind="value: appeal_bonus()[0], event: { change: change_appeal_bonus }">
+							<select name="appeal_bonus_0" data-bind="value: appeal_bonus[0], event: { change: change_appeal_bonus }">
 								<option value="0" selected="selected">0%</option>
 								<option value="1">1%</option>
 								<option value="2">2%</option>
@@ -77,7 +77,7 @@
 								<option value="5">5%</option>
 							</select>
 							クール :
-							<select name="appeal_bonus_1" data-bind="value: appeal_bonus()[1], event: { change: change_appeal_bonus }">
+							<select name="appeal_bonus_1" data-bind="value: appeal_bonus[1], event: { change: change_appeal_bonus }">
 								<option value="0" selected="selected">0%</option>
 								<option value="1">1%</option>
 								<option value="2">2%</option>
@@ -86,7 +86,7 @@
 								<option value="5">5%</option>
 							</select>
 							パッション :
-							<select name="appeal_bonus_2" data-bind="value: appeal_bonus()[2], event: { change: change_appeal_bonus }">
+							<select name="appeal_bonus_2" data-bind="value: appeal_bonus[2], event: { change: change_appeal_bonus }">
 								<option value="0" selected="selected">0%</option>
 								<option value="1">1%</option>
 								<option value="2">2%</option>
@@ -227,11 +227,11 @@
 							<option value="5">Sレア+</option>
 						</select><br />
 						<!-- ko if: $root.is_smartphone() -->
-						<select name="id" class="name" data-bind="value: id, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						<select name="id" class="name" data-bind="value: id, event: { change: change_idol }, options: select_idol_list(), optionsValue: 'id', optionsText: 'name'">
 						</select>
 						<!-- /ko -->
 						<!-- ko ifnot: $root.is_smartphone() -->
-						<select name="id" class="name" data-bind="value: id, select2: {}, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						<select name="id" class="name" data-bind="value: id, select2: {}, event: { change: change_idol }, options: select_idol_list(), optionsValue: 'id', optionsText: 'name'">
 						</select>
 						<!-- /ko -->
 					</td>
@@ -243,9 +243,9 @@
 						<input type="number" name="defense" class="status" value="0" data-bind="textInput: defense" /><br />
 					</td>
 					<td>
-						<span class="offense_per_cost" data-bind="text: offense_per_cost">0</span><br />
-						<span class="defense_per_cost" data-bind="text: defense_per_cost">0</span><br />
-						<span data-bind="text: status_per_cost">0</span><br />
+						<span class="offense_per_cost" data-bind="text: offense_per_cost()">0</span><br />
+						<span class="defense_per_cost" data-bind="text: defense_per_cost()">0</span><br />
+						<span data-bind="text: status_per_cost()">0</span><br />
 					</td>
 					<td>
 						<!-- ko if: $root.is_skill_input_type_manual() -->
@@ -255,8 +255,8 @@
 						<input type="number" name="defense_skill" class="skill" value="0" data-bind="textInput: defense_skill" />%<br />
 						<!-- /ko -->
 						<div style="text-align: left;" data-bind="ifnot: $root.is_skill_input_type_manual()">
-							<span class="skill_name" data-bind="text: skill_name, css: { disable: !enable_skill() }">無し</span><br />
-							<select name="skill_id" data-bind="value: skill_id, options: select_skill_list, optionsValue: 'id', optionsText: 'name'">
+							<span class="skill_name" data-bind="text: skill_name, css: { disable: !enable_skill }">無し</span><br />
+							<select name="skill_id" data-bind="value: skill_id, options: select_skill_list(), optionsValue: 'id', optionsText: 'name'">
 							</select>
 							<select name="skill_level" data-bind="value: skill_level">
 								<option value="0">無効</option>
@@ -327,11 +327,11 @@
 							<option value="5">Sレア+</option>
 						</select>
 						<!-- ko if: $root.is_smartphone() -->
-						<select name="id" class="name" data-bind="value: id, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						<select name="id" class="name" data-bind="value: id, event: { change: change_idol }, options: select_idol_list(), optionsValue: 'id', optionsText: 'name'">
 						</select>
 						<!-- /ko -->
 						<!-- ko ifnot: $root.is_smartphone() -->
-						<select name="id" class="name" data-bind="value: id, select2: {}, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						<select name="id" class="name" data-bind="value: id, select2: {}, event: { change: change_idol }, options: select_idol_list(), optionsValue: 'id', optionsText: 'name'">
 						</select>
 						<!-- /ko -->
 						<!-- /ko -->
@@ -387,8 +387,9 @@
 			<a href="live_calc.html" data-bind="attr: { href: apply_code_url }">Link</a>
 			<!-- /ko -->
 		</p>
-		<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+		<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 		<script src="script/knockout.js"></script>
+		<script src="script/knockout-es5.min.js"></script>
 		<script src="script/jquery-ui.min.js"></script>
 		<script src="script/knockout-sortable.min.js"></script>
 		<script src="script/zlib.min.js"></script>

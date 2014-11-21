@@ -5,15 +5,6 @@
 		<meta name="author" content="Mutsuki Kimuraya" />
 		<link rel="stylesheet" href="css/style.css" />
 		<link rel="stylesheet" href="css/select2.css" />
-		<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-		<script src="script/knockout.js"></script>
-		<script src="script/jquery-ui.min.js"></script>
-		<script src="script/knockout-sortable.min.js"></script>
-		<script src="script/zlib.min.js"></script>
-		<script src="script/select2.min.js"></script>
-		<script src="script/select2_locale_ja.js"></script>
-		<script src="script/knockout-select2.js"></script>
-		<script src="script/survival_calc.min.js"></script>
 		<title>発揮値計算機 for アイドルサバイバル</title>
 	</head>
 	<body>
@@ -74,7 +65,7 @@
 				</tr>
 				<tr>
 					<th colspan="6">実発揮値</th>
-					<td class="numeric" data-bind="text: actual_offense">0</td>
+					<td class="numeric" data-bind="text: actual_offense()">0</td>
 				</tr>
 			</tfoot>
 			<tbody id="idol_list" data-bind="sortable: idol_list">
@@ -97,7 +88,7 @@
 							<option value="4">Sレア</option>
 							<option value="5">Sレア+</option>
 						</select><br />
-						<select name="id" class="name" data-bind="value: id, select2: {}, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						<select name="id" class="name" data-bind="value: id, select2: {}, event: { change: change_idol }, options: select_idol_list(), optionsValue: 'id', optionsText: 'name'">
 						</select>
 					</td>
 					<td><input type="number" name="cost" value="0" data-bind="textInput: cost" /></td>
@@ -111,7 +102,7 @@
 							<option value="4">4倍</option>
 						</select>
 					</td>
-					<td class="numeric" data-bind="text: offense_per_cost">0</td>
+					<td class="numeric" data-bind="text: offense_per_cost()">0</td>
 					<td class="numeric" data-bind="text: actual_offense, css: style">0</td>
 					<td style="background-color : #ffffff;">
 						<button type="button" name="remove" class="control" data-bind="click: $root.remove">－</button><br />
@@ -141,11 +132,11 @@
 							<option value="5">Sレア+</option>
 						</select>
 						<!-- ko if: $root.is_smartphone() -->
-						<select name="id" class="name" data-bind="value: id, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						<select name="id" class="name" data-bind="value: id, event: { change: change_idol }, options: select_idol_list(), optionsValue: 'id', optionsText: 'name'">
 						</select>
 						<!-- /ko -->
 						<!-- ko ifnot: $root.is_smartphone() -->
-						<select name="id" class="name" data-bind="value: id, select2: {}, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						<select name="id" class="name" data-bind="value: id, select2: {}, event: { change: change_idol }, options: select_idol_list(), optionsValue: 'id', optionsText: 'name'">
 						</select>
 						<!-- /ko -->
 						<!-- /ko -->
@@ -197,5 +188,15 @@
 			<a href="live_calc.html" data-bind="attr: { href: apply_code_url }">Link</a>
 			<!-- /ko -->
 		</p>
+		<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+		<script src="script/knockout.js"></script>
+		<script src="script/knockout-es5.min.js"></script>
+		<script src="script/jquery-ui.min.js"></script>
+		<script src="script/knockout-sortable.min.js"></script>
+		<script src="script/zlib.min.js"></script>
+		<script src="script/select2.min.js"></script>
+		<script src="script/select2_locale_ja.js"></script>
+		<script src="script/knockout-select2.js"></script>
+		<script src="script/survival_calc.min.js"></script>
 	</body>
 </html>

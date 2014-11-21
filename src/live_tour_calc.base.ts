@@ -35,38 +35,38 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 	max_member_num: number;
 
 	// 入力項目
-	voltage_bonus: KnockoutObservable<any>;
+	voltage_bonus: string;
 
 	// 発揮値
-	front_offense: KnockoutObservable<number>;
-	front_defense: KnockoutObservable<number>;
-	back_offense: KnockoutObservable<number>;
-	back_defense: KnockoutObservable<number>;
+	front_offense: number;
+	front_defense: number;
+	back_offense: number;
+	back_defense: number;
 	// LIVE時の与ダメージ
-	total_damage_min: KnockoutObservable<number>;
-	total_damage_max: KnockoutObservable<number>;
-	total_damage_avg: KnockoutObservable<number>;
-	battle_damage_min: KnockoutObservable<number>;
-	battle_damage_max: KnockoutObservable<number>;
-	battle_damage_avg: KnockoutObservable<number>;
+	total_damage_min: number;
+	total_damage_max: number;
+	total_damage_avg: number;
+	battle_damage_min: number;
+	battle_damage_max: number;
+	battle_damage_avg: number;
 
 	constructor() {
 		super();
 
 		this.max_member_num = 0;
-		this.voltage_bonus = ko.observable(0);
+		this.voltage_bonus = "0";
 
 		// 発揮値
-		this.front_offense = ko.observable(0);
-		this.front_defense = ko.observable(0);
-		this.back_offense = ko.observable(0);
-		this.back_defense = ko.observable(0);
+		this.front_offense = 0;
+		this.front_defense = 0;
+		this.back_offense = 0;
+		this.back_defense = 0;
 		// LIVE時の与ダメージ
-		this.total_damage_min = ko.observable(0);
-		this.total_damage_max = ko.observable(0);
-		this.total_damage_avg = ko.observable(0);
-		this.battle_damage_min = ko.observable(0);
-		this.battle_damage_max = ko.observable(0);
-		this.battle_damage_avg = ko.observable(0);
+		this.total_damage_min = 0;
+		this.total_damage_max = 0;
+		this.total_damage_avg = 0;
+		this.battle_damage_min = 0;
+		this.battle_damage_max = 0;
+		this.battle_damage_avg = 0;
 	}
 }

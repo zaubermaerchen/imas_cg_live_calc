@@ -28,7 +28,7 @@
 						<th>アピールボーナス</th>
 						<td>
 							キュート :
-							<select name="appeal_bonus_0" data-bind="value: appeal_bonus()[0], event: { change: change_appeal_bonus }">
+							<select name="appeal_bonus_0" data-bind="value: appeal_bonus[0], event: { change: change_appeal_bonus }">
 								<option value="0" selected="selected">0%</option>
 								<option value="1">1%</option>
 								<option value="2">2%</option>
@@ -37,7 +37,7 @@
 								<option value="5">5%</option>
 							</select>
 							クール :
-							<select name="appeal_bonus_1" data-bind="value: appeal_bonus()[1], event: { change: change_appeal_bonus }">
+							<select name="appeal_bonus_1" data-bind="value: appeal_bonus[1], event: { change: change_appeal_bonus }">
 								<option value="0" selected="selected">0%</option>
 								<option value="1">1%</option>
 								<option value="2">2%</option>
@@ -46,7 +46,7 @@
 								<option value="5">5%</option>
 							</select>
 							パッション :
-							<select name="appeal_bonus_2" data-bind="value: appeal_bonus()[2], event: { change: change_appeal_bonus }">
+							<select name="appeal_bonus_2" data-bind="value: appeal_bonus[2], event: { change: change_appeal_bonus }">
 								<option value="0" selected="selected">0%</option>
 								<option value="1">1%</option>
 								<option value="2">2%</option>
@@ -119,17 +119,17 @@
 						<th>ライバルユニット</th>
 						<td>
 							キュート :
-							<select name="rival_front_num_0" data-bind="value: rival_front_num()[0], event: { change: change_rival_front_num }">
+							<select name="rival_front_num_0" data-bind="value: rival_front_num[0], event: { change: change_rival_front_num }">
 								<option value="0">0人</option>
 								<option value="1" selected="selected">1人</option>
 							</select>
 							クール :
-							<select name="rival_front_num_1" data-bind="value: rival_front_num()[1], event: { change: change_rival_front_num }">
+							<select name="rival_front_num_1" data-bind="value: rival_front_num[1], event: { change: change_rival_front_num }">
 								<option value="0">0人</option>
 								<option value="1" selected="selected">1人</option>
 							</select>
 							パッション :
-							<select name="rival_front_num_2" data-bind="value: rival_front_num()[2], event: { change: change_rival_front_num }">
+							<select name="rival_front_num_2" data-bind="value: rival_front_num[2], event: { change: change_rival_front_num }">
 								<option value="0">0人</option>
 								<option value="1" selected="selected">1人</option>
 							</select>
@@ -190,11 +190,11 @@
 							<option value="5">Sレア+</option>
 						</select><br />
 						<!-- ko if: $root.is_smartphone() -->
-						<select name="id" class="name" data-bind="value: id, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						<select name="id" class="name" data-bind="value: id, event: { change: change_idol }, options: select_idol_list(), optionsValue: 'id', optionsText: 'name'">
 						</select>
 						<!-- /ko -->
 						<!-- ko ifnot: $root.is_smartphone() -->
-						<select name="id" class="name" data-bind="value: id, select2: {}, event: { change: change_idol }, options: select_idol_list, optionsValue: 'id', optionsText: 'name'">
+						<select name="id" class="name" data-bind="value: id, select2: {}, event: { change: change_idol }, options: select_idol_list(), optionsValue: 'id', optionsText: 'name'">
 						</select>
 						<!-- /ko -->
 					</td>
@@ -221,8 +221,8 @@
 						<input type="number" name="defense_skill" class="skill" value="0" data-bind="textInput: defense_skill" />%<br />
 						<!-- /ko -->
 						<div style="text-align: left;" data-bind="ifnot: $root.is_skill_input_type_manual()">
-							<span class="skill_name" data-bind="text: skill_name, css: { disable: !enable_skill() }">無し</span><br />
-							<select name="skill_id" data-bind="value: skill_id, options: select_skill_list, optionsValue: 'id', optionsText: 'name'">
+							<span class="skill_name" data-bind="text: skill_name, css: { disable: !enable_skill }">無し</span><br />
+							<select name="skill_id" data-bind="value: skill_id, options: select_skill_list(), optionsValue: 'id', optionsText: 'name'">
 							</select>
 							<select name="skill_level" data-bind="value: skill_level">
 								<option value="0">無効</option>
@@ -241,8 +241,8 @@
 							</select>
 						</div>
 					</td>
-					<td class="numeric" data-bind="text: display_offense, css: style">0</td>
-					<td class="numeric" data-bind="text: display_defense, css: style">0</td>
+					<td class="numeric" data-bind="text: display_offense(), css: style">0</td>
+					<td class="numeric" data-bind="text: display_defense(), css: style">0</td>
 				</tr>
 			</tbody>
 		</table>
@@ -315,8 +315,9 @@
 			<li><strong>特技入力の期待値計算モードはスキルの発動率がそれぞれ100%、50%、25%、12.5%、6.25%と仮定した場合の数値です。</strong></li>
 			<li>与ダメージについてはイベントの特性上、完全な計算は不可能なので参考程度に留めておいてください。</li>
 		</ul>
-		<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+		<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 		<script src="script/knockout.js"></script>
+		<script src="script/knockout-es5.min.js"></script>
 		<script src="script/jquery-ui.min.js"></script>
 		<script src="script/knockout-sortable.min.js"></script>
 		<script src="script/zlib.min.js"></script>

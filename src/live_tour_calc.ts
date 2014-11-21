@@ -12,19 +12,19 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	SAVE_DATA_KEY: string = "imas_cg_live_tour_calc";
 
 	// 入力項目
-	status_up: KnockoutObservable<any>;
-	compatibility_type: KnockoutObservable<any>;
-	combo_level: KnockoutObservable<any>;
-	fever_bonus: KnockoutObservable<any>;
-	cheer_bonus: KnockoutObservable<any>;
+	status_up: string;
+	compatibility_type: string;
+	combo_level: string;
+	fever_bonus: string;
+	cheer_bonus: string;
 
 	// 全力LIVE時の与ダメージ
-	total_full_power_damage_min: KnockoutObservable<number>;
-	total_full_power_damage_max: KnockoutObservable<number>;
-	total_full_power_damage_avg: KnockoutObservable<number>;
-	battle_full_power_damage_min: KnockoutObservable<number>;
-	battle_full_power_damage_max: KnockoutObservable<number>;
-	battle_full_power_damage_avg: KnockoutObservable<number>;
+	total_full_power_damage_min: number;
+	total_full_power_damage_max: number;
+	total_full_power_damage_avg: number;
+	battle_full_power_damage_min: number;
+	battle_full_power_damage_max: number;
+	battle_full_power_damage_avg: number;
 
 	constructor() {
 		super();
@@ -34,38 +34,38 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		// 最大メンバー数
 		this.max_member_num = 20;
 
-		this.front_num(10);
-		this.voltage_bonus(0);
-		this.calc_type(CALCULATION_TYPE.LIVE_TOUR);
+		this.front_num = "10";
+		this.voltage_bonus = "0";
+		this.calc_type = CALCULATION_TYPE.LIVE_TOUR.toString();
 		// 入力値
-		this.status_up = ko.observable(0);
-		this.compatibility_type = ko.observable(-1);
-		this.combo_level = ko.observable(0);
-		this.fever_bonus = ko.observable(1);
-		this.cheer_bonus = ko.observable(0);
+		this.status_up = "0";
+		this.compatibility_type = "-1";
+		this.combo_level = "0";
+		this.fever_bonus = "1";
+		this.cheer_bonus = "0";
 		// 全力LIVE時の与ダメージ
-		this.total_full_power_damage_min = ko.observable(0);
-		this.total_full_power_damage_max = ko.observable(0);
-		this.total_full_power_damage_avg = ko.observable(0);
-		this.battle_full_power_damage_min = ko.observable(0);
-		this.battle_full_power_damage_max = ko.observable(0);
-		this.battle_full_power_damage_avg = ko.observable(0);
+		this.total_full_power_damage_min = 0;
+		this.total_full_power_damage_max = 0;
+		this.total_full_power_damage_avg = 0;
+		this.battle_full_power_damage_min = 0;
+		this.battle_full_power_damage_max = 0;
+		this.battle_full_power_damage_avg = 0;
 		// 発揮値
 		this.actual_status = ko.computed(function () { return self.calculation(); });
 
 		this.init_list();
 	}
 
-	is_live_tour(): boolean { return (parseInt(this.calc_type()) == CALCULATION_TYPE.LIVE_TOUR); }
-	is_dream_live_festival(): boolean { return (parseInt(this.calc_type()) == CALCULATION_TYPE.DREAM_LIVE_FESTIVAL); }
-	is_talk_battle(): boolean { return (parseInt(this.calc_type()) == CALCULATION_TYPE.TALK_BATTLE); }
+	is_live_tour(): boolean { return (parseInt(this.calc_type) == CALCULATION_TYPE.LIVE_TOUR); }
+	is_dream_live_festival(): boolean { return (parseInt(this.calc_type) == CALCULATION_TYPE.DREAM_LIVE_FESTIVAL); }
+	is_talk_battle(): boolean { return (parseInt(this.calc_type) == CALCULATION_TYPE.TALK_BATTLE); }
 
 	// アイドルリスト初期化
 	init_idol_list(): void {
 		var member_num: number = this.max_member_num;
 
 		var settings: { [index: string]: string; }[] = [];
-		var old_idols = this.idol_list();
+		var old_idols = this.idol_list;
 		for(var i = 0; i < old_idols.length; i++) {
 			settings.push(old_idols[i].get_setting());
 		}
@@ -78,7 +78,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 			}
 			idols.push(idol);
 		}
-		this.idol_list(idols);
+		this.idol_list = idols;
 	}
 
 	// 発揮値計算
@@ -86,16 +86,16 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		// スキル効果反映
 		this.calc_skill_value();
 
-		var calc_type: number = parseInt(this.calc_type());
-		var producer_type: number = parseInt(this.producer_type());
-		var voltage_bonus: number = parseInt(this.voltage_bonus());
-		var status_up: number = parseInt(this.status_up());
-		var compatibility_type: number = parseInt(this.compatibility_type());
-		var combo_level: number = parseInt(this.combo_level());
-		var training_room_level: number = parseInt(this.training_room_level());
-		var fever_bonus: number = parseInt(this.fever_bonus());
-		var cheer_bonus: number = parseInt(this.cheer_bonus());
-		var front_num: number = parseInt(this.front_num());
+		var calc_type: number = parseInt(this.calc_type);
+		var producer_type: number = parseInt(this.producer_type);
+		var voltage_bonus: number = parseInt(this.voltage_bonus);
+		var status_up: number = parseInt(this.status_up);
+		var compatibility_type: number = parseInt(this.compatibility_type);
+		var combo_level: number = parseInt(this.combo_level);
+		var training_room_level: number = parseInt(this.training_room_level);
+		var fever_bonus: number = parseInt(this.fever_bonus);
+		var cheer_bonus: number = parseInt(this.cheer_bonus);
+		var front_num: number = parseInt(this.front_num);
 
 		// 総発揮値計算
 		var total_offense: number = 0;
@@ -106,8 +106,8 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		var back_defense: number = 0;
 		var total_damage: { [index: string]: number; } = { min : 0, max : 0, avg : 0 };
 		var total_full_power_damage: { [index: string]: number; } = { min : 0, max : 0, avg : 0 };
-		for(var i: number = 0; i < this.idol_list().length; i++) {
-			var idol: UserIdol = this.idol_list()[i];
+		for(var i: number = 0; i < this.idol_list.length; i++) {
+			var idol: UserIdol = this.idol_list[i];
 			var member_type: boolean = (i < front_num);
 
 			// アイドルごとの発揮値・与ダメージ計算
@@ -116,25 +116,25 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 			switch(calc_type) {
 				case CALCULATION_TYPE.DREAM_LIVE_FESTIVAL:
 					// ドリームLIVEフェス
-					idol.calculation_dream_live_festival(member_type, producer_type, this.appeal_bonus(), combo_level, fever_bonus, training_room_level);
+					idol.calculation_dream_live_festival(member_type, producer_type, this.appeal_bonus, combo_level, fever_bonus, training_room_level);
 					normal_damage  = idol.calc_dream_live_festival_damage(false);
 					full_power_damage = idol.calc_dream_live_festival_damage(true);
 					break;
 				case CALCULATION_TYPE.TALK_BATTLE:
 					// トークバトル
-					idol.calculation_talk_battle(member_type, producer_type, this.appeal_bonus(), combo_level, cheer_bonus, training_room_level);
+					idol.calculation_talk_battle(member_type, producer_type, this.appeal_bonus, combo_level, cheer_bonus, training_room_level);
 					normal_damage  = idol.calc_talk_battle_damage(false);
 					full_power_damage = idol.calc_talk_battle_damage(true);
 					break;
 				default:
 					// LIVEツアー
-					idol.calculation_live_tour(member_type, producer_type, this.appeal_bonus(), voltage_bonus, status_up, compatibility_type, training_room_level);
+					idol.calculation_live_tour(member_type, producer_type, this.appeal_bonus, voltage_bonus, status_up, compatibility_type, training_room_level);
 					normal_damage  = idol.calc_live_tour_damage(false);
 					full_power_damage = idol.calc_live_tour_damage(true);
 					break;
 			}
-			var offense: number = idol.actual_offense();
-			var defense: number = idol.actual_defense();
+			var offense: number = idol.actual_offense;
+			var defense: number = idol.actual_defense;
 			if(member_type) {
 				front_offense += offense;
 				front_defense += defense;
@@ -153,28 +153,28 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 			total_full_power_damage["avg"] += Math.ceil(full_power_damage * this.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
 
 			// 色設定
-			idol.style("numeric " + (member_type ? "front" : "back"));
+			idol.style = "numeric " + (member_type ? "front" : "back");
 		}
-		this.front_offense(Math.ceil(front_offense));
-		this.front_defense(Math.ceil(front_defense));
-		this.back_offense(Math.ceil(back_offense));
-		this.back_defense(Math.ceil(back_defense));
+		this.front_offense = Math.ceil(front_offense);
+		this.front_defense = Math.ceil(front_defense);
+		this.back_offense = Math.ceil(back_offense);
+		this.back_defense = Math.ceil(back_defense);
 
 		// 通常LIVE時の与ダメージ計算
-		this.total_damage_min(Math.ceil(total_damage["min"]));
-		this.total_damage_max(Math.ceil(total_damage["max"]));
-		this.total_damage_avg(Math.ceil(total_damage["avg"]));
-		this.battle_damage_min(this.total_damage_min() * this.TOTAL_DAMAGE_COEFFICIENT);
-		this.battle_damage_max(this.total_damage_max() * this.TOTAL_DAMAGE_COEFFICIENT);
-		this.battle_damage_avg(this.total_damage_avg() * this.TOTAL_DAMAGE_COEFFICIENT);
+		this.total_damage_min = Math.ceil(total_damage["min"]);
+		this.total_damage_max = Math.ceil(total_damage["max"]);
+		this.total_damage_avg = Math.ceil(total_damage["avg"]);
+		this.battle_damage_min = this.total_damage_min * this.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_damage_max = this.total_damage_max * this.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_damage_avg = this.total_damage_avg* this.TOTAL_DAMAGE_COEFFICIENT;
 
 		// 全力LIVE時の与ダメージ計算
-		this.total_full_power_damage_min(Math.ceil(total_full_power_damage["min"]));
-		this.total_full_power_damage_max(Math.ceil(total_full_power_damage["max"]));
-		this.total_full_power_damage_avg(Math.ceil(total_full_power_damage["avg"]));
-		this.battle_full_power_damage_min(this.total_full_power_damage_min() * this.TOTAL_DAMAGE_COEFFICIENT);
-		this.battle_full_power_damage_max(this.total_full_power_damage_max() * this.TOTAL_DAMAGE_COEFFICIENT);
-		this.battle_full_power_damage_avg(this.total_full_power_damage_avg() * this.TOTAL_DAMAGE_COEFFICIENT);
+		this.total_full_power_damage_min = Math.ceil(total_full_power_damage["min"]);
+		this.total_full_power_damage_max = Math.ceil(total_full_power_damage["max"]);
+		this.total_full_power_damage_avg = Math.ceil(total_full_power_damage["avg"]);
+		this.battle_full_power_damage_min = this.total_full_power_damage_min * this.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_full_power_damage_max = this.total_full_power_damage_max * this.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_full_power_damage_avg = this.total_full_power_damage_avg * this.TOTAL_DAMAGE_COEFFICIENT;
 
 		return [Math.ceil(total_offense), Math.ceil(total_defense)];
 	}
@@ -184,18 +184,18 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		var setting: { [index: string]: any; } = {};
 
 		// 共通部分のパラメータ取得
-		setting["producer_type"] = this.producer_type();
-		setting["voltage_bonus"] = this.voltage_bonus();
-		setting["status_up"] = this.status_up();
+		setting["producer_type"] = this.producer_type;
+		setting["voltage_bonus"] = this.voltage_bonus;
+		setting["status_up"] = this.status_up;
 		setting["appeal_bonus"] = this.get_appeal_bonus_setting();
-		setting["compatibility_type"] = this.compatibility_type();
-		setting["combo_level"] = this.combo_level();
-		setting["training_room_level"] = this.training_room_level();
-		setting["fever_bonus"] = this.fever_bonus();
-		setting["cheer_bonus"] = this.cheer_bonus();
-		setting["calc_type"] = this.calc_type();
-		setting["skill_input_type"] = this.skill_input_type();
-		setting["enable_skill_type"] = this.enable_skill_type();
+		setting["compatibility_type"] = this.compatibility_type;
+		setting["combo_level"] = this.combo_level;
+		setting["training_room_level"] = this.training_room_level;
+		setting["fever_bonus"] = this.fever_bonus;
+		setting["cheer_bonus"] = this.cheer_bonus;
+		setting["calc_type"] = this.calc_type;
+		setting["skill_input_type"] = this.skill_input_type;
+		setting["enable_skill_type"] = this.enable_skill_type;
 		setting["rival_member"] = this.get_rival_member_setting();
 
 		// アイドル個別のパラメータ取得
@@ -207,22 +207,22 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	// 設定反映
 	set_setting(setting: { [index: string]: any; }) {
 		// 共通部分のパラメータ設定
-		this.producer_type(setting["producer_type"]);
+		this.producer_type = setting["producer_type"];
 		if(setting["voltage_bonus"]) {
-			this.voltage_bonus(setting["voltage_bonus"]);
+			this.voltage_bonus = setting["voltage_bonus"];
 		}
-		this.status_up(setting["status_up"]);
+		this.status_up = setting["status_up"];
 		this.set_appeal_bonus_setting(setting["appeal_bonus"]);
-		this.compatibility_type(setting["compatibility_type"]);
-		this.combo_level(setting["combo_level"]);
-		this.training_room_level(setting["training_room_level"]);
-		this.fever_bonus(setting["fever_bonus"]);
+		this.compatibility_type = setting["compatibility_type"];
+		this.combo_level = setting["combo_level"];
+		this.training_room_level = setting["training_room_level"];
+		this.fever_bonus = setting["fever_bonus"];
 		if(setting["cheer_bonus"]) {
-			this.cheer_bonus(setting["cheer_bonus"]);
+			this.cheer_bonus = setting["cheer_bonus"];
 		}
-		this.calc_type(setting["calc_type"]);
-		this.skill_input_type(setting["skill_input_type"]);
-		this.enable_skill_type(setting["enable_skill_type"]);
+		this.calc_type = setting["calc_type"];
+		this.skill_input_type = setting["skill_input_type"];
+		this.enable_skill_type = setting["enable_skill_type"];
 		this.set_rival_member_setting(setting["rival_member"]);
 
 		// アイドル個別のパラメータ設定
@@ -259,7 +259,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 				idol_list.push(idol);
 			}
 
-			self.idol_list(idol_list);
+			self.idol_list = idol_list;
 			deferred.resolve();
 		});
 
@@ -268,12 +268,11 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 	// 発動可能なスキルかチェック
 	check_skill_enable(idol: UserIdol, skill_data_list: { [index: string]: { [index: string]: any; } }, skill_count: number, member_num: number[][], rival_member_num: number[][]): { [index: string]: any; } {
-		var enable_skill_type: number = parseInt(this.enable_skill_type());
-		console.log("rerer" + rival_member_num[0][0]);
+		var enable_skill_type: number = parseInt(this.enable_skill_type);
 		// 発動スキルを取得
 		var enable: boolean = false;
-		var skill: { [index: string]: any; } = jQuery.extend(true, {}, skill_data_list[idol.skill_id()]);
-		skill["skill_level"] = parseInt(idol.skill_level());
+		var skill: { [index: string]: any; } = jQuery.extend(true, {}, skill_data_list[idol.skill_id]);
+		skill["skill_level"] = parseInt(idol.skill_level);
 		if(skill["skill_value_list"].length > 0) {
 			var target_param: number = parseInt(skill["target_param"]);
 			var target_unit: number = parseInt(skill["target_unit"]);
@@ -329,7 +328,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	check_apply_skill(idol: UserIdol, invoke_skill: { [index: string]: string; }): boolean {
 		var result: boolean = false;
 
-		var type: number = parseInt(idol.type());
+		var type: number = parseInt(idol.type);
 		var target_unit: number = parseInt(invoke_skill["target_unit"]);
 		var target_member: number = parseInt(invoke_skill["target_member"]);
 		var target_type: number = parseInt(invoke_skill["target_type"]);
@@ -361,14 +360,14 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		if(skill_level > 0) {
 			skill_value = parseInt(invoke_skill["skill_value_list"][skill_level - 1]);
 		}
-		if(parseInt(this.skill_input_type()) == SKILL_INPUT_MODE.AUTO_MEAN) {
+		if(parseInt(this.skill_input_type) == SKILL_INPUT_MODE.AUTO_MEAN) {
 			var rate = this.SKILL_INVOCATION_RATE_LIST[index];
 			if(rate != undefined) {
 				skill_value = skill_value * (rate / 100);
 			}
 		}
-		var offense_skill: number = parseFloat(idol.offense_skill());
-		var defense_skill: number = parseFloat(idol.defense_skill());
+		var offense_skill: number = parseFloat(idol.offense_skill);
+		var defense_skill: number = parseFloat(idol.defense_skill);
 
 		if(this.is_talk_battle()) {
 			skill_value = 1 + (skill_value / 100);
@@ -409,8 +408,8 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 			}
 		}
 
-		idol.offense_skill(offense_skill);
-		idol.defense_skill(defense_skill);
+		idol.offense_skill = offense_skill.toString();
+		idol.defense_skill = defense_skill.toString();
 
 		return result;
 	}

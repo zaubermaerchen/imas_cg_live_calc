@@ -4,32 +4,35 @@
  * http://opensource.org/licenses/mit-license.php
  */
 /// <reference path="typings/knockout/knockout.d.ts" />
+/// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 
 class UserPetitIdol {
 	// ステータス
-	vocal: KnockoutObservable<any>;
-	dance: KnockoutObservable<any>;
-	visual: KnockoutObservable<any>;
+	vocal: string;
+	dance: string;
+	visual: string;
 
 	constructor() {
 		// ステータス
-		this.vocal = ko.observable(0);
-		this.dance = ko.observable(0);
-		this.visual = ko.observable(0);
+		this.vocal = "0";
+		this.dance = "0";
+		this.visual = "0";
+
+		ko.track(this);
 	}
 
 	// 総ステータス取得
 	status(): number {
 		var status: number = 0;
-		var vocal: number = parseInt(this.vocal());
+		var vocal: number = parseInt(this.vocal);
 		if(!isNaN(vocal)) {
 			status += vocal;
 		}
-		var dance: number = parseInt(this.dance());
+		var dance: number = parseInt(this.dance);
 		if(!isNaN(dance)) {
 			status += dance;
 		}
-		var visual: number = parseInt(this.visual());
+		var visual: number = parseInt(this.visual);
 		if(!isNaN(visual)) {
 			status += visual;
 		}
@@ -39,17 +42,17 @@ class UserPetitIdol {
 	// 設定取得
 	get_setting(): { [index: string]: any; } {
 		var setting: { [index: string]: any; } = {};
-		setting["vocal"] = this.vocal();
-		setting["dance"] = this.dance();
-		setting["visual"] = this.visual();
+		setting["vocal"] = this.vocal;
+		setting["dance"] = this.dance;
+		setting["visual"] = this.visual;
 
 		return setting;
 	}
 
 	// 設定反映
 	set_setting(setting: { [index: string]: any; }): void {
-		this.vocal(setting["vocal"]);
-		this.dance(setting["dance"]);
-		this.visual(setting["visual"]);
+		this.vocal = setting["vocal"];
+		this.dance = setting["dance"];
+		this.visual = setting["visual"];
 	}
 }

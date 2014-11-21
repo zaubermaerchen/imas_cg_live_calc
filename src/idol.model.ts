@@ -4,126 +4,117 @@
  * http://opensource.org/licenses/mit-license.php
  */
 /// <reference path="typings/knockout/knockout.d.ts" />
+/// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 /// <reference path="common.ts" />
 
 class UserIdol {
 	// 定数
-	TRAINER_COST: number = 999;
+	static TRAINER_COST: number = 999;
 	// 属性一致ボーナス係数
-	PRODUCER_TYPE_COEFFICIENT: number = 0.05;
+	static PRODUCER_TYPE_COEFFICIENT: number = 0.05;
 	// 施設ボーナス係数
-	INSTITUTION_COEFFICIENT: number =  0.05;
+	static INSTITUTION_COEFFICIENT: number =  0.05;
 	// バックメンバー係数
-	BACK_MEMBER_COEFFICIENT: number = 0.8;
+	static BACK_MEMBER_COEFFICIENT: number = 0.8;
 	// 相性ボーナス係数
-	COMPATIBILITY_BONUS_COEFFICIENT: number = 0.2;
+	static COMPATIBILITY_BONUS_COEFFICIENT: number = 0.2;
 	// LIVEツアー係数
-	LIVE_TOUR_NORMAL_LIVE_COEFFICIENT: number = 0.5;	// 通常LIVE時
-	LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT: number = 2;	// 全力LIVE時
+	static LIVE_TOUR_NORMAL_LIVE_COEFFICIENT: number = 0.5;	// 通常LIVE時
+	static LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT: number = 2;	// 全力LIVE時
 	// LIVEロワイヤル係数
-	LIVE_ROYAL_DAMAGE_COEFFICIENT: number = 0.2; // ダメージ係数
+	static LIVE_ROYAL_DAMAGE_COEFFICIENT: number = 0.2; // ダメージ係数
 	// ドリームLIVEフェス
-	DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT: number = 0.5;		// 通常LIVE時
-	DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT: number = 2.5;	// 全力LIVE時
-	DREAM_LIVE_FESTIVAL_COMBO_LEVEL_COEFFICIENT: number = 125;		// コンボLV係数
+	static DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT: number = 0.5;		// 通常LIVE時
+	static DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT: number = 2.5;	// 全力LIVE時
+	static DREAM_LIVE_FESTIVAL_COMBO_LEVEL_COEFFICIENT: number = 125;		// コンボLV係数
 	// トークバトル
-	TALK_BATTLE_FULL_POWER_LIVE_COEFFICIENT: number = 5;		// 全力LIVE時
-	TALK_BATTLE_COMBO_LEVEL_COEFFICIENT: number = 50;           // コンボLV係数
+	static TALK_BATTLE_FULL_POWER_LIVE_COEFFICIENT: number = 5;		// 全力LIVE時
+	static TALK_BATTLE_COMBO_LEVEL_COEFFICIENT: number = 50;           // コンボLV係数
 
 	// ステータス
-	id: KnockoutObservable<any>;
-	type: KnockoutObservable<any>;
-	rarity: KnockoutObservable<any>;
-	cost: KnockoutObservable<any>;
-	offense: KnockoutObservable<any>;
-	defense: KnockoutObservable<any>;
-	event_power: KnockoutObservable<any>;
+	id: string;
+	type: string;
+	rarity: string;
+	cost: string;
+	offense: string;
+	defense: string;
+	event_power: string;
 
 	// スキル
-	offense_skill: KnockoutObservable<any>;
-	defense_skill: KnockoutObservable<any>;
-	skill_id: KnockoutObservable<any>;
-	skill_level: KnockoutObservable<any>;
-	skill_name: KnockoutObservable<string>;
-	is_festival: KnockoutObservable<boolean>;
-	is_survival: KnockoutObservable<boolean>;
-	use_tour_skill: KnockoutObservable<boolean>;
-	enable_skill: KnockoutObservable<boolean>;
+	offense_skill: string;
+	defense_skill: string;
+	skill_id: string;
+	skill_level: string;
+	skill_name: string;
+	is_festival: boolean;
+	is_survival: boolean;
+	use_tour_skill: boolean;
+	enable_skill: boolean;
 
 	// 発揮値
-	actual_offense: KnockoutObservable<number>;
-	actual_defense: KnockoutObservable<number>;
-	display_offense: KnockoutComputed<number>;
-	display_defense: KnockoutComputed<number>;
-	style: KnockoutObservable<string>;
+	actual_offense: number;
+	actual_defense: number;
+	style: string;
 
-	// コスト比
-	offense_per_cost: KnockoutComputed<any>;
-	defense_per_cost: KnockoutComputed<any>;
-	status_per_cost: KnockoutComputed<any>;
-
-	// アイドル選択リスト
-	idol_data_list: KnockoutObservableArray<any>;
-	select_idol_list: KnockoutComputed<any>;
-
-	// スキル選択リスト
-	skill_data_list: KnockoutObservableArray<any>;
-	select_skill_list: KnockoutComputed<any>;
+	// アイドル・スキル選択リスト
+	idol_data_list: any[];
+	skill_data_list: any[];
 
 	constructor(use_tour_skill: boolean) {
-		var self = this;
-
 		// ステータス
-		this.id = ko.observable(0);
-		this.type = ko.observable(0);
-		this.rarity = ko.observable(0);
-		this.cost = ko.observable(0);
-		this.offense = ko.observable(0);
-		this.defense = ko.observable(0);
-		this.event_power = ko.observable(1);
+		this.id = "0";
+		this.type = "0";
+		this.rarity = "0";
+		this.cost = "0";
+		this.offense = "0";
+		this.defense = "0";
+		this.event_power = "1";
 
 		// スキル
-		this.offense_skill = ko.observable(0);
-		this.defense_skill = ko.observable(0);
-		this.skill_id = ko.observable(0);
-		this.skill_level = ko.observable(10);
-		this.skill_name = ko.observable("無し");
-		this.is_festival = ko.observable(false);
-		this.is_survival = ko.observable(false);
-		this.use_tour_skill = ko.observable(use_tour_skill);
-		this.enable_skill = ko.observable(false);
+		this.offense_skill = "0";
+		this.defense_skill = "0";
+		this.skill_id = "0";
+		this.skill_level = "10";
+		this.skill_name = "無し";
+		this.is_festival = false;
+		this.is_survival = false;
+		this.use_tour_skill = use_tour_skill;
+		this.enable_skill = false;
 
 		// 発揮値
-		this.actual_offense = ko.observable(0);
-		this.actual_defense = ko.observable(0);
-		this.display_offense = ko.computed(function () { return Math.ceil(self.actual_offense()); });
-		this.display_defense = ko.computed(function () { return Math.ceil(self.actual_defense()); });
-		this.style = ko.observable("numeric");
+		this.actual_offense = 0;
+		this.actual_defense = 0;
+		this.style = "numeric";
 
-		// コスト比
-		this.offense_per_cost = ko.computed(function () { return self.calc_cost_ratio(self.offense()); });
-		this.defense_per_cost = ko.computed(function () { return self.calc_cost_ratio(self.defense()); });
-		this.status_per_cost = ko.computed(function () { return self.calc_cost_ratio(self.status()); });
-
-		// アイドル選択リスト
-		this.idol_data_list = ko.observableArray();
-		this.select_idol_list = ko.computed(function () { return self.idol_data_list(); });
-
-		// スキル選択リスト
-		this.skill_data_list = ko.observableArray();
-		this.select_skill_list = ko.computed(function () { return self.skill_data_list(); });
+		// アイドル・スキル選択リスト
+		this.idol_data_list = [];
+		this.skill_data_list = [];
 
 		this.set_idol_list();
 		this.set_skill_list();
+
+		ko.track(this);
 	}
 
 	// 総ステータス取得
-	status(): number { return parseInt(this.offense()) + parseInt(this.defense()); }
+	display_offense() : number { return Math.ceil(this.actual_offense); }
+	display_defense() : number { return Math.ceil(this.actual_defense); }
+	status(): number { return parseInt(this.offense) + parseInt(this.defense); }
+
+	// コスト比
+	offense_per_cost() : number { return this.calc_cost_ratio(parseInt(this.offense)); }
+	defense_per_cost() : number { return this.calc_cost_ratio(parseInt(this.defense)); }
+	status_per_cost() : number { return this.calc_cost_ratio(this.status()); }
+
+	// アイドル・スキル選択リスト
+	select_idol_list() { return this.idol_data_list; }
+	select_skill_list() { return this.skill_data_list; }
+
 
 	// 実コスト取得
 	get_cost(): number {
-		var cost: number = parseInt(this.cost());
-		if(this.is_festival() && cost == this.TRAINER_COST) {
+		var cost: number = parseInt(this.cost);
+		if(this.is_festival && cost == UserIdol.TRAINER_COST) {
 			cost = 5;
 		}
 
@@ -133,7 +124,7 @@ class UserIdol {
 	// コスト比計算
 	calc_cost_ratio(status: number): number {
 		// コスト取得
-		var cost: number = parseInt(this.cost());
+		var cost: number = parseInt(this.cost);
 		var ratio: number = 0;
 		if(cost > 0) {
 			ratio = Math.round(status / cost * 100) / 100;
@@ -163,21 +154,20 @@ class UserIdol {
 
 	// アイドルリスト設定
 	set_idol_list(): JQueryPromise<any> {
-		var self = this;
 		var deferred: JQueryDeferred<any> = jQuery.Deferred();
-		var type: number = self.type();
-		var rarity: number = self.rarity();
-		jQuery.when(self.load_idol_list(type, rarity)).done(function(list: { [index: string]: { [index: string]: any; } }) {
-			self.set_select_idol_list(list);
+		var type: number = parseInt(this.type);
+		var rarity: number = parseInt(this.rarity);
+		jQuery.when(this.load_idol_list(type, rarity)).done((list: { [index: string]: { [index: string]: any; } }) => {
+			this.set_select_idol_list(list);
 
-			self.id(0);
-			self.cost(0);
-			self.offense(0);
-			self.defense(0);
-			self.offense_skill(0);
-			self.defense_skill(0);
-			self.skill_level(10);
-			self.set_skill_info(null);
+			this.id = "0";
+			this.cost = "0";
+			this.offense = "0";
+			this.defense = "0";
+			this.offense_skill = "0";
+			this.defense_skill = "0";
+			this.skill_level = "10";
+			this.set_skill_info(null);
 
 			deferred.resolve();
 		});
@@ -198,14 +188,13 @@ class UserIdol {
 			}
 		}
 
-		this.idol_data_list(idol_list);
+		this.idol_data_list = idol_list;
 	}
 
 	// スキルリスト設定
 	set_skill_list(): JQueryPromise<any> {
-		var self = this;
 		var deferred: JQueryDeferred<any> = jQuery.Deferred();
-		jQuery.when(Common.load_skill_list()).done(function(list: { [index: string]: { [index: string]: any; } }) {
+		jQuery.when(Common.load_skill_list()).done((list: { [index: string]: { [index: string]: any; } }) => {
 			var skill_list: { [index: string]: any; }[] = [];
 
 			skill_list.push({ "id": 0, "name": "-"});
@@ -218,7 +207,7 @@ class UserIdol {
 				}
 			}
 
-			self.skill_data_list(skill_list);
+			this.skill_data_list = skill_list;
 
 			deferred.resolve();
 		});
@@ -228,106 +217,101 @@ class UserIdol {
 
 	// アイドル選択時
 	change_idol(): void {
-		var self = this;
-		var type: number = parseInt(self.type());
-		var rarity: number = parseInt(self.rarity());
-		var id: number = parseInt(self.id());
-		self.offense_skill(0);
-		self.defense_skill(0);
-		if(id != 0) {
-			jQuery.when(self.load_idol_list(type, rarity)).done(function(idol_list: { [index: string]: { [index: string]: any; } }) {
-				var idol_data: { [index: string]: any; } = idol_list[id];
-
+		var type: number = parseInt(this.type);
+		var rarity: number = parseInt(this.rarity);
+		var id: number = parseInt(this.id);
+		this.offense_skill = "0";
+		this.defense_skill = "0";
+		if(!isNaN(id) && id != 0) {
+			jQuery.when(this.load_idol_list(type, rarity)).done((idol_list: { [index: string]: { [index: string]: any; } }) => {
+				var idol_data: { [index: string]: any; } = idol_list[this.id];
 				// ステータス設定
-				self.cost(idol_data["cost"]);
-				self.offense(idol_data["max_offense"]);
-				self.defense(idol_data["max_defense"]);
-				self.set_skill_info(idol_data);
+				this.cost = idol_data["cost"];
+				this.offense = idol_data["max_offense"];
+				this.defense = idol_data["max_defense"];
+				this.set_skill_info(idol_data);
 			});
 		} else {
-			self.cost(0);
-			self.offense(0);
-			self.defense(0);
-			self.set_skill_info(null);
+			this.cost = "0";
+			this.offense = "0";
+			this.defense = "0";
+			this.set_skill_info(null);
 		}
 	}
 
 	// スキル情報設定
 	set_skill_info(data: { [index: string]: any; }): void {
-		var skill_id: number = 0;
+		var skill_id: string = "0";
 		var skill_name: string = "無し";
 
 		if(data != null) {
-			skill_id = parseInt(data["skill_id"]);
-			if(this.use_tour_skill()) {
-				skill_id = parseInt(data["live_tour_skill_id"]);
+			skill_id = data["skill_id"];
+			if(this.use_tour_skill) {
+				skill_id = data["live_tour_skill_id"];
 			}
 			if(data["skill_name"] != undefined && data["skill_name"] != "") {
 				skill_name = data["skill_name"];
 			}
 		}
-		this.skill_name(skill_name);
-		this.skill_id(skill_id);
+		this.skill_name = skill_name;
+		this.skill_id = skill_id;
 	}
 
 	// 設定取得
-	get_setting(): { [index: string]: any; } {
-		var setting: { [index: string]: any; } = {};
-		setting["type"] = this.type();
-		setting["rarity"] = this.rarity();
-		setting["id"] = this.id();
-		setting["cost"] = this.cost();
-		setting["offense"] = this.offense();
-		setting["defense"] = this.defense();
-		setting["event_power"] = this.event_power();
-		setting["offense_skill"] = this.offense_skill();
-		setting["defense_skill"] = this.defense_skill();
-		setting["skill_id"] = this.skill_id();
-		setting["skill_level"] = this.skill_level();
+	get_setting(): { [index: string]: string; } {
+		var setting: { [index: string]: string; } = {};
+		setting["type"] = this.type;
+		setting["rarity"] = this.rarity;
+		setting["id"] = this.id;
+		setting["cost"] = this.cost;
+		setting["offense"] = this.offense;
+		setting["defense"] = this.defense;
+		setting["event_power"] = this.event_power;
+		setting["offense_skill"] = this.offense_skill;
+		setting["defense_skill"] = this.defense_skill;
+		setting["skill_id"] = this.skill_id;
+		setting["skill_level"] = this.skill_level;
 
 		return setting;
 	}
 
 	// 設定反映
-	set_setting(setting: { [index: string]: any; }): void {
-		var self = this;
+	set_setting(setting: { [index: string]: string; }): void {
+		this.type = setting["type"];
+		this.rarity = setting["rarity"];
+		jQuery.when(this.load_idol_list(parseInt(setting["type"]), parseInt(setting["rarity"]))).done((idol_list: { [index: string]: { [index: string]: string; } }) => {
+			this.set_select_idol_list(idol_list);
 
-		self.type(setting["type"]);
-		self.rarity(setting["rarity"]);
-		jQuery.when(self.load_idol_list(parseInt(setting["type"]), parseInt(setting["rarity"]))).done(function(idol_list: { [index: string]: { [index: string]: any; } }) {
-			self.set_select_idol_list(idol_list);
-
-			self.id(setting["id"]);
+			this.id = setting["id"];
 			if(setting["cost"] != null) {
-				self.cost(setting["cost"]);
+				this.cost = setting["cost"];
 			}
-			self.offense(setting["offense"]);
-			self.defense(setting["defense"]);
-			self.event_power(setting["event_power"]);
-			self.offense_skill(setting["offense_skill"]);
-			self.defense_skill(setting["defense_skill"]);
-			self.set_skill_setting(idol_list[setting["id"]], setting["skill_id"], setting["skill_level"]);
+			this.offense = setting["offense"];
+			this.defense = setting["defense"];
+			this.event_power = setting["event_power"];
+			this.offense_skill = setting["offense_skill"];
+			this.defense_skill = setting["defense_skill"];
+			this.set_skill_setting(idol_list[setting["id"]], setting["skill_id"], setting["skill_level"]);
 		});
 	}
 
 	set_skill_setting(idol_data: { [index: string]: any; }, skill_id: any, skill_level: any): void {
 		this.set_skill_info(idol_data);
-		this.skill_level(skill_level);
+		this.skill_level = skill_level;
 
-		var self = this;
-		jQuery.when(Common.load_skill_list()).done(function(skill_list: { [index: string]: { [index: string]: any; } }) {
+		jQuery.when(Common.load_skill_list()).done((skill_list: { [index: string]: { [index: string]: any; } }) => {
 			if (skill_list.hasOwnProperty(skill_id)) {
-				self.skill_id(skill_id);
+				this.skill_id = skill_id;
 			}
 		});
 	}
 
 	// プロデューサー+アピールボーナスの補正値取得
 	get_type_ratio(producer_type: number, appeal_bonus_list: any[]): number {
-		var type: number = parseInt(this.type());
+		var type: number = parseInt(this.type);
 		var ratio: number = 0;
 		if(type == producer_type) {
-			ratio += this.PRODUCER_TYPE_COEFFICIENT;
+			ratio += UserIdol.PRODUCER_TYPE_COEFFICIENT;
 		} else {
 			// プロデューサーとタイプが不一致の場合のみアピールボーナス補正値取得
 			ratio += (parseInt(appeal_bonus_list[type]) / 100);
@@ -354,10 +338,10 @@ class UserIdol {
 		var actual_offense: number = 0;
 		var actual_defense: number = 0;
 		if(!cost_cut || rest_cost >= 1) {
-			var offense: number = parseInt(this.offense());
-			var defense: number = parseInt(this.defense());
-			var offense_skill: number = parseFloat(this.offense_skill());
-			var defense_skill: number = parseFloat(this.defense_skill());
+			var offense: number = parseInt(this.offense);
+			var defense: number = parseInt(this.defense);
+			var offense_skill: number = parseFloat(this.offense_skill);
+			var defense_skill: number = parseFloat(this.defense_skill);
 			if(member_type) {
 				// フロント
 				actual_offense = this.calc_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
@@ -368,15 +352,15 @@ class UserIdol {
 				actual_defense = this.calc_back_status(defense, defense_skill, cost_cut, rest_cost);
 			}
 		}
-		this.actual_offense(actual_offense);
-		this.actual_defense(actual_defense);
+		this.actual_offense = actual_offense;
+		this.actual_defense = actual_defense;
 	}
 
 	calculation_festivalS(cost_cut: boolean, rest_cost: number, member_type: boolean, producer_type: number, appeal_bonus_list: any[], institution_list: any[], status_up: number, training_room_level: number, high_tension: boolean, groove_type: number): void {
-		var offense: number = parseInt(this.offense());
-		var defense: number = parseInt(this.defense());
-		var offense_skill: number = parseFloat(this.offense_skill());
-		var defense_skill: number = parseFloat(this.defense_skill());
+		var offense: number = parseInt(this.offense);
+		var defense: number = parseInt(this.defense);
+		var offense_skill: number = parseFloat(this.offense_skill);
+		var defense_skill: number = parseFloat(this.defense_skill);
 		var actual_offense: number = 0;
 		var actual_defense: number = 0;
 		if(member_type) {
@@ -388,8 +372,8 @@ class UserIdol {
 			actual_offense = this.calc_back_status(offense, offense_skill, cost_cut, rest_cost);
 			actual_defense = this.calc_back_status(defense, defense_skill, cost_cut, rest_cost);
 		}
-		this.actual_offense(actual_offense);
-		this.actual_defense(actual_defense);
+		this.actual_offense = actual_offense;
+		this.actual_defense = actual_defense;
 	}
 
 	// フロントメンバー発揮値計算
@@ -400,17 +384,17 @@ class UserIdol {
 		}
 
 		// 施設補正
-		var type = parseInt(this.type());
+		var type = parseInt(this.type);
 		for(var i = 0; i < institution_list.length; i++) {
 			if(type == institution_list[i]) {
-				status = Math.ceil(status * (1 + this.INSTITUTION_COEFFICIENT));
+				status = Math.ceil(status * (1 + UserIdol.INSTITUTION_COEFFICIENT));
 				break;
 			}
 		}
 
 		// ボーナス補正計算
 		var ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + (status_up + skill) / 100;
-		if(this.is_festival()) {
+		if(this.is_festival) {
 			ratio += training_room_level / 100;
 			if(high_tension) {
 				ratio += 0.1;
@@ -427,7 +411,7 @@ class UserIdol {
 		var cost: number = this.get_cost();
 
 		// バックメンバー補正
-		var base_status: number = Math.ceil(status * this.BACK_MEMBER_COEFFICIENT);
+		var base_status: number = Math.ceil(status * UserIdol.BACK_MEMBER_COEFFICIENT);
 		var actual_status: number = base_status;
 
 		// コスト補正
@@ -436,7 +420,7 @@ class UserIdol {
 		}
 
 		// スキル補正計算
-		if(!this.is_festival() || (!cost_cut || rest_cost >= cost)) {
+		if(!this.is_festival || (!cost_cut || rest_cost >= cost)) {
 			var ratio: number = (skill) / 100;
 			actual_status = Math.floor(actual_status) + Math.ceil(base_status * ratio * 10) / 10;
 			//actual_status = Math.floor(actual_status) + Math.round(base_status * ratio);
@@ -453,10 +437,10 @@ class UserIdol {
 		}
 
 		// 施設補正
-		var type = parseInt(this.type());
+		var type = parseInt(this.type);
 		for(var i = 0; i < institution_list.length; i++) {
 			if(type == institution_list[i]) {
-				status = Math.ceil(status * (1 + this.INSTITUTION_COEFFICIENT));
+				status = Math.ceil(status * (1 +UserIdol.INSTITUTION_COEFFICIENT));
 				break;
 			}
 		}
@@ -493,27 +477,27 @@ class UserIdol {
 	/******************************************************************************/
 	// 発揮値計算
 	calculation_survival(cost_cut: boolean, rest_cost: number): void {
-		this.is_survival(true);
+		this.is_survival = true;
 
 		// サバイバルパワー補正
-		var status: number = Math.floor(parseInt(this.offense()) * parseFloat(this.event_power()));
+		var status: number = Math.floor(parseInt(this.offense) * parseFloat(this.event_power));
 
 		// コスト補正
 		if(cost_cut) {
 			status = this.get_cost_corrected_status(status, this.get_cost(), rest_cost);
 		}
 
-		this.actual_offense(status);
+		this.actual_offense = status;
 	}
 
 	/******************************************************************************/
 	// LIVEツアー
 	/******************************************************************************/
 	calculation_live_tour(member_type: boolean, producer_type: number, appeal_bonus_list: any[], voltage_bonus: number, status_up: number, compatibility_type: number, training_room_level: number): void {
-		var offense: number = parseInt(this.offense());
-		var defense: number = parseInt(this.defense());
-		var offense_skill: number = parseFloat(this.offense_skill());
-		var defense_skill: number = parseFloat(this.defense_skill());
+		var offense: number = parseInt(this.offense);
+		var defense: number = parseInt(this.defense);
+		var offense_skill: number = parseFloat(this.offense_skill);
+		var defense_skill: number = parseFloat(this.defense_skill);
 		var actual_offense: number = 0;
 		var actual_defense: number = 0;
 		if(member_type) {
@@ -525,14 +509,14 @@ class UserIdol {
 			actual_offense = this.calc_live_tour_back_status(offense, offense_skill, voltage_bonus);
 			actual_defense = this.calc_live_tour_back_status(defense , defense_skill, voltage_bonus);
 		}
-		this.actual_offense(actual_offense);
-		this.actual_defense(actual_defense);
+		this.actual_offense = actual_offense;
+		this.actual_defense = actual_defense;
 	}
 
 	// 発揮値計算
 	calc_live_tour_status(status: number, skill: number, producer_type: number, appeal_bonus_list: any[], status_up: number, compatibility_type: number): number {
 		// スターダムパワー補正
-		var actual_status: number = Math.floor(status * parseFloat(this.event_power()));
+		var actual_status: number = Math.floor(status * parseFloat(this.event_power));
 
 		// プロデューサー+アピールボーナス+スキル補正計算
 		var ratio: number = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + skill / 100;
@@ -545,8 +529,8 @@ class UserIdol {
 
 		// 相性ボーナス
 		ratio = 1;
-		if(parseInt(this.type()) == compatibility_type) {
-			ratio += this.COMPATIBILITY_BONUS_COEFFICIENT;
+		if(parseInt(this.type) == compatibility_type) {
+			ratio += UserIdol.COMPATIBILITY_BONUS_COEFFICIENT;
 		}
 		actual_status = actual_status * ratio;
 
@@ -555,7 +539,7 @@ class UserIdol {
 
 	calc_live_tour_front_status(status: number, skill: number, producer_type: number, appeal_bonus_list: any[], voltage_bonus: number, status_up: number, compatibility_type: number, training_room_level: number): number {
 		// スターダムパワー補正
-		var actual_status: number = Math.floor(status * parseFloat(this.event_power()));
+		var actual_status: number = Math.floor(status * parseFloat(this.event_power));
 
 		// ボーナス補正計算
 		var ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + (skill + training_room_level) / 100;
@@ -571,8 +555,8 @@ class UserIdol {
 
 		// 相性ボーナス
 		ratio = 1;
-		if(parseInt(this.type()) == compatibility_type) {
-			ratio += this.COMPATIBILITY_BONUS_COEFFICIENT;
+		if(parseInt(this.type) == compatibility_type) {
+			ratio += UserIdol.COMPATIBILITY_BONUS_COEFFICIENT;
 		}
 		actual_status = actual_status * ratio;
 
@@ -581,10 +565,10 @@ class UserIdol {
 
 	calc_live_tour_back_status(status: number, skill: number, voltage_bonus: number): number {
 		// スターダムパワー補正
-		var actual_status: number = Math.floor(status * parseFloat(this.event_power()));
+		var actual_status: number = Math.floor(status * parseFloat(this.event_power));
 
 		// バックメンバー補正
-		actual_status = Math.ceil(actual_status * this.BACK_MEMBER_COEFFICIENT);
+		actual_status = Math.ceil(actual_status * UserIdol.BACK_MEMBER_COEFFICIENT);
 
 		// スキル・ボルテージボーナス補正計算
 		var ratio = 1 + (skill + voltage_bonus) / 100;
@@ -595,14 +579,14 @@ class UserIdol {
 
 	// ダメージ計算
 	calc_live_tour_damage(full_power: boolean): number {
-		var damage: number = Math.floor(this.actual_offense());
+		var damage: number = Math.floor(this.actual_offense);
 
 		if(full_power) {
 			// フルパワー
-			damage = damage * this.LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT;
+			damage = damage * UserIdol.LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT;
 		} else {
 			// LP1
-			damage = damage * this.LIVE_TOUR_NORMAL_LIVE_COEFFICIENT;
+			damage = damage * UserIdol.LIVE_TOUR_NORMAL_LIVE_COEFFICIENT;
 		}
 
 		damage = damage/ 5;
@@ -614,10 +598,10 @@ class UserIdol {
 	// ドリームLIVEフェス
 	/******************************************************************************/
 	calculation_dream_live_festival(member_type: boolean, producer_type: number, appeal_bonus_list: any[], combo_level: number, fever_bonus: number, training_room_level: number): void {
-		var offense: number = parseInt(this.offense());
-		var defense: number = parseInt(this.defense());
-		var offense_skill: number = parseFloat(this.offense_skill());
-		var defense_skill: number = parseFloat(this.defense_skill());
+		var offense: number = parseInt(this.offense);
+		var defense: number = parseInt(this.defense);
+		var offense_skill: number = parseFloat(this.offense_skill);
+		var defense_skill: number = parseFloat(this.defense_skill);
 		var actual_offense: number = 0;
 		var actual_defense: number = 0;
 		if(member_type) {
@@ -629,13 +613,13 @@ class UserIdol {
 			actual_offense = this.calc_dream_live_festival_back_status(offense, offense_skill, fever_bonus);
 			actual_defense = this.calc_dream_live_festival_back_status(defense , defense_skill, fever_bonus);
 		}
-		this.actual_offense(actual_offense);
-		this.actual_defense(actual_defense);
+		this.actual_offense = actual_offense;
+		this.actual_defense = actual_defense;
 	}
 
 	calc_dream_live_festival_front_status(status: number, skill: number, producer_type: number, appeal_bonus_list: any[], combo_level: number, fever_bonus: number, training_room_level: number): number {
 		// スターダムパワー補正
-		var actual_status: number = Math.floor(status * parseFloat(this.event_power()));
+		var actual_status: number = Math.floor(status * parseFloat(this.event_power));
 
 		// フィーバー補正
 		var ratio: number = 1 + fever_bonus / 100;
@@ -647,7 +631,7 @@ class UserIdol {
 
 		// コンボボーナス
 		ratio = 1;
-		ratio += (Math.sqrt(this.DREAM_LIVE_FESTIVAL_COMBO_LEVEL_COEFFICIENT * combo_level)) / 100;
+		ratio += (Math.sqrt(UserIdol.DREAM_LIVE_FESTIVAL_COMBO_LEVEL_COEFFICIENT * combo_level)) / 100;
 		actual_status = Math.ceil(actual_status * ratio);
 
 		return actual_status;
@@ -655,10 +639,10 @@ class UserIdol {
 
 	calc_dream_live_festival_back_status(status: number, skill: number, fever_bonus: number): number {
 		// スターダムパワー補正
-		var actual_status: number = Math.floor(status * parseFloat(this.event_power()));
+		var actual_status: number = Math.floor(status * parseFloat(this.event_power));
 
 		// バックメンバー補正
-		actual_status = Math.ceil(actual_status * this.BACK_MEMBER_COEFFICIENT);
+		actual_status = Math.ceil(actual_status * UserIdol.BACK_MEMBER_COEFFICIENT);
 
 		// フィーバー補正
 		var ratio: number = 1 + fever_bonus / 100;
@@ -673,14 +657,14 @@ class UserIdol {
 
 	// 与ダメージ計算
 	calc_dream_live_festival_damage(full_power: boolean): number {
-		var damage: number = Math.floor(this.actual_offense());
+		var damage: number = Math.floor(this.actual_offense);
 
 		if(full_power) {
 			// フルパワー
-			damage = damage * this.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT;
+			damage = damage * UserIdol.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT;
 		} else {
 			// LP1
-			damage = damage * this.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT;
+			damage = damage * UserIdol.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT;
 		}
 
 		damage = damage / 5;
@@ -693,10 +677,10 @@ class UserIdol {
 	/******************************************************************************/
 	calculation_live_royal(member_type: boolean, enable_royal_power: boolean, producer_type: number, appeal_bonus_list: any[], voltage_bonus: number, battle_point_rate: number, training_room_level: number): void {
 		// 位置補正
-		var offense: number = parseInt(this.offense());
-		var defense: number = parseInt(this.defense());
-		var offense_skill: number = parseFloat(this.offense_skill());
-		var defense_skill: number = parseFloat(this.defense_skill());
+		var offense: number = parseInt(this.offense);
+		var defense: number = parseInt(this.defense);
+		var offense_skill: number = parseFloat(this.offense_skill);
+		var defense_skill: number = parseFloat(this.defense_skill);
 		var actual_offense: number = 0;
 		var actual_defense: number = 0;
 		if(member_type) {
@@ -709,8 +693,8 @@ class UserIdol {
 			actual_defense = this.calc_live_royal_back_status(defense, defense_skill, enable_royal_power, voltage_bonus, battle_point_rate);
 		}
 
-		this.actual_offense(actual_offense);
-		this.actual_defense(actual_defense);
+		this.actual_offense = actual_offense;
+		this.actual_defense = actual_defense;
 	}
 
 	// フロントメンバー発揮値計算
@@ -718,7 +702,7 @@ class UserIdol {
 		// ロワイヤルパワー補正
 		var event_power: number = 1;
 		if(enable_royal_power) {
-			event_power = parseFloat(this.event_power());
+			event_power = parseFloat(this.event_power);
 		}
 		var actual_status: number = Math.ceil(status * event_power);
 
@@ -741,12 +725,12 @@ class UserIdol {
 		// ロワイヤルパワー補正
 		var event_power: number = 1;
 		if(enable_royal_power) {
-			event_power = parseFloat(this.event_power());
+			event_power = parseFloat(this.event_power);
 		}
 		var actual_status: number = Math.ceil(status * event_power);
 
 		// バックメンバー補正
-		actual_status = Math.ceil(actual_status * this.BACK_MEMBER_COEFFICIENT);
+		actual_status = Math.ceil(actual_status * UserIdol.BACK_MEMBER_COEFFICIENT);
 
 		// ボルテージボーナス
 		actual_status = actual_status * voltage_bonus;
@@ -764,7 +748,7 @@ class UserIdol {
 
 	// ダメージ計算
 	calc_live_royal_damage(): number {
-		return Math.floor(this.actual_offense()) * this.LIVE_ROYAL_DAMAGE_COEFFICIENT;
+		return Math.floor(this.actual_offense) * UserIdol.LIVE_ROYAL_DAMAGE_COEFFICIENT;
 	}
 
 	/******************************************************************************/
@@ -772,10 +756,10 @@ class UserIdol {
 	/******************************************************************************/
 	calculation_live_trial(cost_cut: boolean, rest_cost: number, member_type: boolean, producer_type: number): void {
 		// 位置補正
-		var offense: number = parseInt(this.offense());
-		var defense: number = parseInt(this.defense());
-		var offense_skill: number = parseFloat(this.offense_skill());
-		var defense_skill: number = parseFloat(this.defense_skill());
+		var offense: number = parseInt(this.offense);
+		var defense: number = parseInt(this.defense);
+		var offense_skill: number = parseFloat(this.offense_skill);
+		var defense_skill: number = parseFloat(this.defense_skill);
 		var actual_offense: number = 0;
 		var actual_defense: number = 0;
 		if(member_type) {
@@ -788,8 +772,8 @@ class UserIdol {
 			actual_defense = this.calc_live_trial_back_status(defense, defense_skill, cost_cut, rest_cost);
 		}
 
-		this.actual_offense(actual_offense);
-		this.actual_defense(actual_defense);
+		this.actual_offense = actual_offense;
+		this.actual_defense = actual_defense;
 	}
 
 	// フロントメンバー発揮値計算
@@ -804,8 +788,8 @@ class UserIdol {
 
 		// プロデューサー+スキル補正計算
 		var ratio: number = 1;
-		if(parseInt(this.type()) == producer_type) {
-			ratio += this.PRODUCER_TYPE_COEFFICIENT;
+		if(parseInt(this.type) == producer_type) {
+			ratio += UserIdol.PRODUCER_TYPE_COEFFICIENT;
 		}
 		ratio += (skill) / 100;
 		status = Math.ceil(status * ratio);
@@ -819,14 +803,14 @@ class UserIdol {
 		var cost: number = this.get_cost();
 
 		// バックメンバー補正
-		var base_status: number = Math.floor(status * this.BACK_MEMBER_COEFFICIENT);
+		var base_status: number = Math.floor(status * UserIdol.BACK_MEMBER_COEFFICIENT);
 		var calc_status: number = base_status;
 
 		// コスト補正
 		if(cost_cut) {
 			calc_status = this.get_cost_corrected_status(calc_status, cost, rest_cost);
 			if(cost > rest_cost) {
-				calc_status = calc_status * this.BACK_MEMBER_COEFFICIENT;
+				calc_status = calc_status * UserIdol.BACK_MEMBER_COEFFICIENT;
 			}
 		}
 
@@ -843,10 +827,10 @@ class UserIdol {
 	// トークバトル
 	/******************************************************************************/
 	calculation_talk_battle(member_type: boolean, producer_type: number, appeal_bonus_list: any[], combo_level: number, cheer_bonus: number, training_room_level: number): void {
-		var offense: number = parseInt(this.offense());
-		var defense: number = parseInt(this.defense());
-		var offense_skill: number = parseFloat(this.offense_skill());
-		var defense_skill: number = parseFloat(this.defense_skill());
+		var offense: number = parseInt(this.offense);
+		var defense: number = parseInt(this.defense);
+		var offense_skill: number = parseFloat(this.offense_skill);
+		var defense_skill: number = parseFloat(this.defense_skill);
 		var actual_offense: number = 0;
 		var actual_defense: number = 0;
 		if(member_type) {
@@ -858,13 +842,13 @@ class UserIdol {
 			actual_offense = this.calc_talk_battle_back_status(offense, offense_skill, combo_level, cheer_bonus);
 			actual_defense = this.calc_talk_battle_back_status(defense , defense_skill, combo_level, cheer_bonus);
 		}
-		this.actual_offense(actual_offense);
-		this.actual_defense(actual_defense);
+		this.actual_offense = actual_offense;
+		this.actual_defense = actual_defense;
 	}
 
 	calc_talk_battle_front_status(status: number, skill: number, producer_type: number, appeal_bonus_list: any[], combo_level: number, cheer_bonus: number, training_room_level: number): number {
 		// トークパワー補正
-		var actual_status: number = Math.floor(status * parseFloat(this.event_power()));
+		var actual_status: number = Math.floor(status * parseFloat(this.event_power));
 
 		// プロデューサー+アピールボーナス計算
 		var ratio: number = 1 + this.get_type_ratio(producer_type, appeal_bonus_list);
@@ -879,7 +863,7 @@ class UserIdol {
 		actual_status = Math.round(actual_status * ratio);
 
 		// コンボボーナス
-		ratio = 1 + (Math.sqrt(this.TALK_BATTLE_COMBO_LEVEL_COEFFICIENT * combo_level)) / 100;
+		ratio = 1 + (Math.sqrt(UserIdol.TALK_BATTLE_COMBO_LEVEL_COEFFICIENT * combo_level)) / 100;
 		actual_status = Math.round(actual_status * ratio);
 
 		// 応援ボーナス
@@ -891,17 +875,17 @@ class UserIdol {
 
 	calc_talk_battle_back_status(status: number, skill: number, combo_level: number, cheer_bonus: number): number {
 		// トークパワー補正
-		var actual_status: number = Math.floor(status * parseFloat(this.event_power()));
+		var actual_status: number = Math.floor(status * parseFloat(this.event_power));
 
 		// バックメンバー補正
-		actual_status = Math.ceil(actual_status * this.BACK_MEMBER_COEFFICIENT);
+		actual_status = Math.ceil(actual_status * UserIdol.BACK_MEMBER_COEFFICIENT);
 
 		// スキル補正計算
 		var ratio = 1 + skill / 100;
 		actual_status = Math.round(actual_status * ratio);
 
 		// コンボボーナス
-		ratio = 1 + (Math.sqrt(this.TALK_BATTLE_COMBO_LEVEL_COEFFICIENT * combo_level)) / 100;
+		ratio = 1 + (Math.sqrt(UserIdol.TALK_BATTLE_COMBO_LEVEL_COEFFICIENT * combo_level)) / 100;
 		actual_status = Math.round(actual_status * ratio);
 
 		// 応援ボーナス
@@ -913,11 +897,11 @@ class UserIdol {
 
 	// ダメージ計算
 	calc_talk_battle_damage(full_power: boolean): number {
-		var damage: number = Math.floor(this.actual_offense());
+		var damage: number = Math.floor(this.actual_offense);
 
 		if(full_power) {
 			// 全力トーク
-			damage = damage * this.TALK_BATTLE_FULL_POWER_LIVE_COEFFICIENT;
+			damage = damage * UserIdol.TALK_BATTLE_FULL_POWER_LIVE_COEFFICIENT;
 		}
 
 		damage = damage / 5;
@@ -929,10 +913,10 @@ class UserIdol {
 	// アイドルチャレンジ
 	/******************************************************************************/
 	calculation_challenge(member_type: boolean, producer_type: number, appeal_bonus_list: any[], unit_type: number, fever_bonus: number, training_room_level: number): void {
-		var offense: number = parseInt(this.offense());
-		var defense: number = parseInt(this.defense());
-		var offense_skill: number = parseFloat(this.offense_skill());
-		var defense_skill: number = parseFloat(this.defense_skill());
+		var offense: number = parseInt(this.offense);
+		var defense: number = parseInt(this.defense);
+		var offense_skill: number = parseFloat(this.offense_skill);
+		var defense_skill: number = parseFloat(this.defense_skill);
 		var actual_offense: number = 0;
 		var actual_defense: number = 0;
 		if(member_type) {
@@ -944,14 +928,14 @@ class UserIdol {
 			actual_offense = this.calc_challenge_back_status(offense, offense_skill, unit_type);
 			actual_defense = this.calc_challenge_back_status(defense , defense_skill, unit_type);
 		}
-		this.actual_offense(actual_offense);
-		this.actual_defense(actual_defense);
+		this.actual_offense = actual_offense;
+		this.actual_defense = actual_defense;
 	}
 
 	calc_challenge_front_status(status: number, skill: number, producer_type: number, appeal_bonus_list: any[], unit_type: number, fever_bonus: number, training_room_level: number): number {
 		// チャレンジパワー・ユニットタイプ補正
-		var ratio: number = parseFloat(this.event_power());
-		if(parseInt(this.type()) == unit_type) {
+		var ratio: number = parseFloat(this.event_power);
+		if(parseInt(this.type) == unit_type) {
 			ratio *= 2
 		}
 		var actual_status: number = Math.floor(status * ratio);
@@ -977,14 +961,14 @@ class UserIdol {
 
 	calc_challenge_back_status(status: number, skill: number, unit_type: number): number {
 		// チャレンジパワー・ユニットタイプ補正
-		var ratio: number = parseFloat(this.event_power());
-		if(parseInt(this.type()) == unit_type) {
+		var ratio: number = parseFloat(this.event_power);
+		if(parseInt(this.type) == unit_type) {
 			ratio *= 2
 		}
 		var actual_status: number = Math.floor(status * ratio);
 
 		// バックメンバー補正
-		actual_status = Math.ceil(actual_status * this.BACK_MEMBER_COEFFICIENT);
+		actual_status = Math.ceil(actual_status * UserIdol.BACK_MEMBER_COEFFICIENT);
 
 		// スキル補正計算
 		ratio = 1 + skill / 100;
@@ -995,6 +979,6 @@ class UserIdol {
 
 	// ダメージ計算
 	calc_challenge_damage(): number {
-		return Math.floor(this.actual_offense()) / 5;
+		return Math.floor(this.actual_offense) / 5;
 	}
 }
