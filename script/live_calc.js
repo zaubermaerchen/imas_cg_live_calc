@@ -1173,14 +1173,18 @@ var BaseLiveCalcViewModel = (function () {
     };
     // アピールボーナス設定反映
     BaseLiveCalcViewModel.prototype.set_appeal_bonus_setting = function (settings) {
-        if (settings != undefined) {
-            for (var i = 0; i < settings.length; i++) {
-                if (settings[i] != undefined) {
-                    var setting = settings[i];
-                    this.appeal_bonus[setting["type"]] = setting["value"];
-                }
+        if (settings == undefined) {
+            return;
+        }
+        var appeal_bonus = this.appeal_bonus;
+        for (var i = 0; i < settings.length; i++) {
+            if (settings[i] != undefined) {
+                var setting = settings[i];
+                appeal_bonus[setting["type"]] = setting["value"];
             }
         }
+        this.appeal_bonus = appeal_bonus;
+        this.change_appeal_bonus();
     };
     // ライバルユニット設定取得
     BaseLiveCalcViewModel.prototype.get_rival_member_setting = function () {
@@ -1207,20 +1211,26 @@ var BaseLiveCalcViewModel = (function () {
             return;
         }
         if (settings["front"] != undefined) {
+            var rival_front_num = this.rival_front_num;
             for (var i = 0; i < settings["front"].length; i++) {
                 if (settings["front"][i] != undefined) {
                     var setting = settings["front"][i];
-                    this.rival_front_num[setting["type"]] = setting["value"];
+                    rival_front_num[setting["type"]] = setting["value"];
                 }
             }
+            this.rival_front_num = rival_front_num;
+            this.change_rival_front_num();
         }
         if (settings["back"] != undefined) {
+            var rival_back_num = this.rival_back_num;
             for (var i = 0; i < settings["back"].length; i++) {
                 if (settings["back"][i] != undefined) {
                     var setting = settings["back"][i];
-                    this.rival_back_num[setting["type"]] = setting["value"];
+                    rival_back_num[setting["type"]] = setting["value"];
                 }
             }
+            this.rival_back_num = rival_back_num;
+            this.change_rival_back_num();
         }
     };
     // 設定保存
