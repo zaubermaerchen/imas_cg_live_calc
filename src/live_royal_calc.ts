@@ -10,32 +10,27 @@
 class ViewModel extends BaseLiveTourCalcViewModel {
 	// 定数
 	// バトルポイント係数
-	BATTLE_POINT_RATE_LIST: number[] = [0.8, 1, 1.5, 2, 2.5];			// ロワイヤルLIVE時
-	GUEST_BATTLE_POINT_RATE_LIST: number[] = [0.5, 1, 1.6, 2.25, 3];	// ゲストLIVE時
+	static BATTLE_POINT_RATE_LIST: number[] = [0.8, 1, 1.5, 2, 2.5];		// ロワイヤルLIVE時
+	static GUEST_BATTLE_POINT_RATE_LIST: number[] = [0.5, 1, 1.6, 2.25, 3];	// ゲストLIVE時
 	// セーブデータ関係
 	SAVE_DATA_KEY: string = "imas_cg_live_royal_calc";
 	// ぷちアイドル最大数
-	PETIT_IDOL_NUM: number = 3;
+	static PETIT_IDOL_NUM: number = 3;
 
 	// 入力項目
 	battle_point: string;
-	training_room_level: string;
 	petit_idol_list: UserPetitIdol[];
 
 	constructor() {
 		super();
 
-		this.front_num = "10";
-		this.voltage_bonus = "1";
 		this.calc_type = CALCULATION_TYPE.ROYAL.toString();
-		// 入力項目
 		this.battle_point = "2";
-		this.training_room_level = "0";
 		this.petit_idol_list = [];
-		// 最大メンバー数
-		this.max_member_num = 20;
 
 		this.init_list();
+
+		ko.track(this);
 	}
 	// 発揮値
 	actual_status(): number[] { return this.calculation(); }
@@ -45,18 +40,11 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	// アイドルリスト初期化
 	init_petit_idol_list(): void {
 		var petit_idols: UserPetitIdol[] = [];
-		for(var i: number = 0; i < this.PETIT_IDOL_NUM; i++) {
+		for(var i: number = 0; i < ViewModel.PETIT_IDOL_NUM; i++) {
 			var petit_idol: UserPetitIdol = new UserPetitIdol();
 			petit_idols.push(petit_idol);
 		}
 		this.petit_idol_list = petit_idols;
-	}
-	init_idol_list(): void {
-		var idols: UserIdol[] = [];
-		for(var i: number = 0; i < this.max_member_num; i++) {
-			idols.push(new UserIdol(false));
-		}
-		this.idol_list = idols;
 	}
 	init_list(): void {
 		this.init_petit_idol_list();
@@ -69,9 +57,9 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.calc_skill_value();
 
 		var battle_point: number = parseInt(this.battle_point);
-		var battle_point_rate: number = this.BATTLE_POINT_RATE_LIST[battle_point - 1];
+		var battle_point_rate: number = ViewModel.BATTLE_POINT_RATE_LIST[battle_point - 1];
 		if(this.is_guest_live()) {
-			battle_point_rate = this.GUEST_BATTLE_POINT_RATE_LIST[battle_point - 1];
+			battle_point_rate = ViewModel.GUEST_BATTLE_POINT_RATE_LIST[battle_point - 1];
 		}
 		var front_num: number = parseInt(this.front_num);
 		var producer_type: number = parseInt(this.producer_type);
@@ -146,62 +134,92 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		return [total_offense, total_defense];
 	}
 
-	// 発動可能なスキルかチェック
-	check_skill_enable(idol: UserIdol, skill_data_list: { [index: string]: { [index: string]: any; } }, skill_count: number, member_num: number[][], rival_member_num: number[][]): { [index: string]: any; } {
-		var enable_skill_type: number = parseInt(this.enable_skill_type);
-
-		// 発動スキルを取得
-		var enable: boolean = false;
-		var skill: { [index: string]: any; } = jQuery.extend(true, {}, skill_data_list[idol.skill_id]);
-		skill["skill_level"] = parseInt(idol.skill_level);
-		if(skill["skill_value_list"].length > 0) {
-			var target_param: number = parseInt(skill["target_param"]);
-			var target_unit: number = parseInt(skill["target_unit"]);
-			var target_member: number = parseInt(skill["target_member"]);
-			var target_type: number = parseInt(skill["target_type"]);
-			if(target_unit == SKILL_TARGET_UNIT.OWN) {
-				// 自分
-				// 有効スキルかチェック
-				if(enable_skill_type == ENABLE_SKILL_TYPE.ALL || target_param == SKILL_TARGET_PARAM.ALL ||
-					enable_skill_type == target_param) {
-					if(target_member == SKILL_TARGET_MEMBER.SELF) {
-						// 自分スキルの適用
-						enable = true;
-						this.apply_skill_effect(idol, skill, skill_count);
-					} else {
-						// 対象範囲チェック
-						enable = this.check_skill_target(target_member, target_type, member_num);
-					}
-				}
-			} else {
-				// 相手
-				// 有効スキルかチェック
-				if(enable_skill_type == ENABLE_SKILL_TYPE.ALL || (enable_skill_type ^ target_param) > 0) {
-					if(target_member == SKILL_TARGET_MEMBER.FRONT || target_member == SKILL_TARGET_MEMBER.ALL) {
-						enable = true;
-						if(this.is_guest_live()) {
-							if(this.check_skill_target(target_member, target_type, rival_member_num)) {
-								switch (target_param) {
-									case SKILL_TARGET_PARAM.OFFENSE:
-										target_param = SKILL_TARGET_PARAM.DEFENSE;
-										break;
-									case SKILL_TARGET_PARAM.DEFENSE:
-										target_param = SKILL_TARGET_PARAM.OFFENSE;
-										break;
-								}
-								skill["target_member"] = SKILL_TARGET_MEMBER.FRONT;
-								skill["target_param"] = target_param;
-							} else {
-								skill["skill_level"] = 0;
-							}
-						}
-					}
-				}
-			}
+	/******************************************************************************/
+	// 設定関連
+	/******************************************************************************/
+	// ぷちアイドル設定取得
+	get_petit_idol_setting(): { [index: string]: string; }[] {
+		var setting: { [index: string]: string; }[] = [];
+		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
+			setting.push(this.petit_idol_list[i].get_setting());
 		}
 
-		if(!enable) {
-			skill = null;
+		return	setting;
+	}
+
+	// ぷちアイドル設定反映
+	set_petit_idol_setting(settings: { [index: string]: string; }[], max_num: number): void{
+		if(settings == null) {
+			return;
+		}
+		var petit_idols: UserPetitIdol[] = [];
+		for(var i: number = 0; i < settings.length && i != max_num; i++) {
+			var petit_idol: UserPetitIdol = new UserPetitIdol();
+			petit_idol.set_setting(settings[i]);
+			petit_idols.push(petit_idol);
+		}
+
+		this.petit_idol_list = petit_idols;
+	}
+
+	// 設定取得
+	get_setting(): { [index: string]: any; } {
+		var setting: { [index: string]: any; } = super.get_setting();
+
+		setting["battle_point"] = this.battle_point;
+		setting["voltage_bonus"] = this.voltage_bonus;
+
+		// ぷちアイドル個別のパラメータ取得
+		setting["petit_idol"] = this.get_petit_idol_setting();
+
+		return setting;
+	}
+
+	// 設定反映
+	set_setting(setting: { [index: string]: any; }): void {
+		super.set_setting(setting);
+
+		this.battle_point = setting["battle_point"];
+		this.voltage_bonus = setting["voltage_bonus"];
+
+		// ぷちアイドル個別のパラメータ取得
+		this.set_petit_idol_setting(setting["petit_idol"], ViewModel.PETIT_IDOL_NUM);
+	}
+
+	/******************************************************************************/
+	// スキル関連
+	/******************************************************************************/
+	check_target_rival_unit_skill_enable(skill: { [index: string]: any; }, rival_member_num: number[][]): { [index: string]: any; } {
+		var enable_skill_type: number = parseInt(this.enable_skill_type);
+		var target_param: number = parseInt(skill["target_param"]);
+		var target_member: number = parseInt(skill["target_member"]);
+		var target_type: number = parseInt(skill["target_type"]);
+
+		// 有効スキルかチェック
+		if(enable_skill_type != ENABLE_SKILL_TYPE.ALL && (enable_skill_type ^ target_param) == 0) {
+			return null;
+		}
+		if(target_member != SKILL_TARGET_MEMBER.FRONT && target_member != SKILL_TARGET_MEMBER.ALL) {
+			return null;
+		}
+
+		if(!this.is_guest_live()) {
+			return skill;
+		}
+
+		if(this.check_skill_target(target_member, target_type, rival_member_num)) {
+			switch (target_param) {
+				case SKILL_TARGET_PARAM.OFFENSE:
+					target_param = SKILL_TARGET_PARAM.DEFENSE;
+					break;
+				case SKILL_TARGET_PARAM.DEFENSE:
+					target_param = SKILL_TARGET_PARAM.OFFENSE;
+					break;
+			}
+			skill["target_member"] = SKILL_TARGET_MEMBER.FRONT;
+			skill["target_param"] = target_param;
+		} else {
+			skill["skill_level"] = 0;
 		}
 
 		return skill;
@@ -230,118 +248,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		return result;
 	}
 
-	// スキル効果適用
-	apply_skill_effect(idol: UserIdol, invoke_skill: { [index: string]: string; }, index: number): boolean {
-		// スキルが効果適用可能かチェック
-		if(!this.check_apply_skill(idol, invoke_skill)) {
-			return false;
-		}
-
-		var result: boolean = false;
-
-		var target_param: number = parseInt(invoke_skill["target_param"]);
-		var skill_level: number = parseInt(invoke_skill["skill_level"]);
-		var skill_value: number = 0;
-		if(skill_level > 0) {
-			skill_value = parseInt(invoke_skill["skill_value_list"][skill_level - 1]);
-		}
-		if(parseInt(this.skill_input_type) == SKILL_INPUT_MODE.AUTO_MEAN) {
-			var rate = this.SKILL_INVOCATION_RATE_LIST[index];
-			if(rate != undefined) {
-				skill_value = skill_value * (rate / 100);
-			}
-		}
-		var offense_skill: number = parseFloat(idol.offense_skill);
-		var defense_skill: number = parseFloat(idol.defense_skill);
-		switch(target_param) {
-			case SKILL_TARGET_PARAM.ALL:
-				offense_skill += skill_value;
-				defense_skill += skill_value;
-				result = true;
-				break;
-			case SKILL_TARGET_PARAM.OFFENSE:
-				offense_skill += skill_value;
-				result = true;
-				break;
-			case SKILL_TARGET_PARAM.DEFENSE:
-				defense_skill += skill_value;
-				result = true;
-				break
-		}
-		idol.offense_skill = offense_skill.toString();
-		idol.defense_skill = defense_skill.toString();
-
-		return result;
-	}
-
-	// ぷちアイドル設定取得
-	get_petit_idol_setting(): { [index: string]: string; }[] {
-		var setting: { [index: string]: string; }[] = [];
-		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
-			setting.push(this.petit_idol_list[i].get_setting());
-		}
-
-		return	setting;
-	}
-
-	// ぷちアイドル設定反映
-	set_petit_idol_setting(settings: { [index: string]: string; }[], max_num: number): void{
-		if(settings == null) {
-			return;
-		}
-		var petit_idols: UserPetitIdol[] = [];
-		for(var i: number = 0; i < settings.length && i != max_num; i++) {
-			var petit_idol: UserPetitIdol = new UserPetitIdol();
-			petit_idol.set_setting(settings[i]);
-			petit_idols.push(petit_idol);
-		}
-
-		this.petit_idol_list = petit_idols;
-	}
-
-	// 設定取得
-	get_setting(): { [index: string]: any; } {
-		var setting: { [index: string]: any; } = {};
-
-		// 共通部分のパラメータ取得
-		setting["battle_point"] = this.battle_point;
-		setting["producer_type"] = this.producer_type;
-		setting["appeal_bonus"] = this.get_appeal_bonus_setting();
-		setting["training_room_level"] = this.training_room_level;
-		setting["voltage_bonus"] = this.voltage_bonus;
-		setting["calc_type"] = this.calc_type;
-		setting["skill_input_type"] = this.skill_input_type;
-		setting["enable_skill_type"] = this.enable_skill_type;
-		setting["rival_member"] = this.get_rival_member_setting();
-
-		// アイドル個別のパラメータ取得
-		setting["idol"] = this.get_idol_setting();
-
-		// ぷちアイドル個別のパラメータ取得
-		setting["petit_idol"] = this.get_petit_idol_setting();
-
-		return setting;
-	}
-
-	// 設定反映
-	set_setting(setting: { [index: string]: any; }): void {
-		// 共通部分のパラメータ設定
-		this.battle_point = setting["battle_point"];
-		this.producer_type = setting["producer_type"];
-		this.set_appeal_bonus_setting(setting["appeal_bonus"]);
-		this.training_room_level = setting["training_room_level"];
-		this.voltage_bonus = setting["voltage_bonus"];
-		this.calc_type = setting["calc_type"];
-		this.skill_input_type = setting["skill_input_type"];
-		this.enable_skill_type = setting["enable_skill_type"];
-		this.set_rival_member_setting(setting["rival_member"]);
-
-		// アイドル個別のパラメータ設定
-		this.set_idol_setting(setting["idol"], this.max_member_num, false);
-
-		// ぷちアイドル個別のパラメータ取得
-		this.set_petit_idol_setting(setting["petit_idol"], this.PETIT_IDOL_NUM);
-	}
 }
 
 jQuery(function() {
