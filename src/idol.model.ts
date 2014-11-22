@@ -57,8 +57,8 @@ class UserIdol {
 	style: string;
 
 	// アイドル・スキル選択リスト
-	idol_data_list: any[];
-	skill_data_list: any[];
+	idol_data_list: { [index: string]: string; }[];
+	skill_data_list: { [index: string]: string; }[];
 
 	constructor(use_tour_skill: boolean) {
 		// ステータス
@@ -107,8 +107,8 @@ class UserIdol {
 	status_per_cost() : number { return this.calc_cost_ratio(this.status()); }
 
 	// アイドル・スキル選択リスト
-	select_idol_list() { return this.idol_data_list; }
-	select_skill_list() { return this.skill_data_list; }
+	select_idol_list() : { [index: string]: string; }[] { return this.idol_data_list; }
+	select_skill_list() : { [index: string]: string; }[] { return this.skill_data_list; }
 
 
 	// 実コスト取得
@@ -157,7 +157,7 @@ class UserIdol {
 		var deferred: JQueryDeferred<any> = jQuery.Deferred();
 		var type: number = parseInt(this.type);
 		var rarity: number = parseInt(this.rarity);
-		jQuery.when(this.load_idol_list(type, rarity)).done((list: { [index: string]: { [index: string]: any; } }) => {
+		jQuery.when(this.load_idol_list(type, rarity)).done((list: { [index: string]: { [index: string]: string; } }) => {
 			this.set_select_idol_list(list);
 
 			this.id = "0";
@@ -175,14 +175,14 @@ class UserIdol {
 		return deferred.promise();
 	}
 
-	set_select_idol_list(list: { [index: string]: { [index: string]: any; } }): void {
-		var idol_list: { [index: string]: any; }[] = [];
+	set_select_idol_list(list: { [index: string]: { [index: string]: string; } }): void {
+		var idol_list: { [index: string]: string; }[] = [];
 
-		idol_list.push({ "id": 0, "name": "-"});
+		idol_list.push({ "id": "0", "name": "-"});
 
 		for(var key in list) {
 			if (list.hasOwnProperty(key)) {
-				var data: { [index: string]: any; } = list[key];
+				var data: { [index: string]: string; } = list[key];
 
 				idol_list.push({ "id": data["idol_id"], "name": data["name"]});
 			}
@@ -195,9 +195,9 @@ class UserIdol {
 	set_skill_list(): JQueryPromise<any> {
 		var deferred: JQueryDeferred<any> = jQuery.Deferred();
 		jQuery.when(Common.load_skill_list()).done((list: { [index: string]: { [index: string]: any; } }) => {
-			var skill_list: { [index: string]: any; }[] = [];
+			var skill_list: { [index: string]: string; }[] = [];
 
-			skill_list.push({ "id": 0, "name": "-"});
+			skill_list.push({ "id": "0", "name": "-"});
 
 			for(var key in list) {
 				if (list.hasOwnProperty(key)) {
@@ -223,8 +223,8 @@ class UserIdol {
 		this.offense_skill = "0";
 		this.defense_skill = "0";
 		if(!isNaN(id) && id != 0) {
-			jQuery.when(this.load_idol_list(type, rarity)).done((idol_list: { [index: string]: { [index: string]: any; } }) => {
-				var idol_data: { [index: string]: any; } = idol_list[this.id];
+			jQuery.when(this.load_idol_list(type, rarity)).done((idol_list: { [index: string]: { [index: string]: string; } }) => {
+				var idol_data: { [index: string]: string; } = idol_list[this.id];
 				// ステータス設定
 				this.cost = idol_data["cost"];
 				this.offense = idol_data["max_offense"];
@@ -240,7 +240,7 @@ class UserIdol {
 	}
 
 	// スキル情報設定
-	set_skill_info(data: { [index: string]: any; }): void {
+	set_skill_info(data: { [index: string]: string; }): void {
 		var skill_id: string = "0";
 		var skill_name: string = "無し";
 
@@ -307,7 +307,7 @@ class UserIdol {
 	}
 
 	// プロデューサー+アピールボーナスの補正値取得
-	get_type_ratio(producer_type: number, appeal_bonus_list: any[]): number {
+	get_type_ratio(producer_type: number, appeal_bonus_list: string[]): number {
 		var type: number = parseInt(this.type);
 		var ratio: number = 0;
 		if(type == producer_type) {
@@ -320,10 +320,10 @@ class UserIdol {
 		return ratio;
 	}
 
-	load_idol_list(type: number, rarity: number): JQueryPromise<any> {
+	load_idol_list(type: number, rarity: number): JQueryPromise<{ [index: string]: { [index: string]: string; } }> {
 		var fields: string[] = ["type", "rarity", "name", "cost", "max_offense", "max_defense", "skill_name", "skill_id", "live_tour_skill_id"];
-		var deferred: JQueryDeferred<any> = jQuery.Deferred();
-		jQuery.when(Common.load_idol_list(type, rarity, fields)).done(function(response: { [index: string]: { [index: string]: any; } }) {
+		var deferred: JQueryDeferred<{ [index: string]: { [index: string]: string; } }> = jQuery.Deferred();
+		jQuery.when(Common.load_idol_list(type, rarity, fields)).done(function(response: { [index: string]: { [index: string]: string; } }) {
 			deferred.resolve(response);
 		});
 
@@ -334,7 +334,7 @@ class UserIdol {
 	// 通常・フェスティバル
 	/******************************************************************************/
 	// 攻発揮値計算
-	calculation(cost_cut: boolean, rest_cost: number, member_type: boolean, producer_type: number, appeal_bonus_list: any[], institution_list: any[], status_up: number, training_room_level: number, high_tension: boolean): void {
+	calculation(cost_cut: boolean, rest_cost: number, member_type: boolean, producer_type: number, appeal_bonus_list: string[], institution_list: string[], status_up: number, training_room_level: number, high_tension: boolean): void {
 		var actual_offense: number = 0;
 		var actual_defense: number = 0;
 		if(!cost_cut || rest_cost >= 1) {
@@ -356,7 +356,7 @@ class UserIdol {
 		this.actual_defense = actual_defense;
 	}
 
-	calculation_festivalS(cost_cut: boolean, rest_cost: number, member_type: boolean, producer_type: number, appeal_bonus_list: any[], institution_list: any[], status_up: number, training_room_level: number, high_tension: boolean, groove_type: number): void {
+	calculation_festivalS(cost_cut: boolean, rest_cost: number, member_type: boolean, producer_type: number, appeal_bonus_list: string[], institution_list: string[], status_up: number, training_room_level: number, high_tension: boolean, groove_type: number): void {
 		var offense: number = parseInt(this.offense);
 		var defense: number = parseInt(this.defense);
 		var offense_skill: number = parseFloat(this.offense_skill);
@@ -377,7 +377,7 @@ class UserIdol {
 	}
 
 	// フロントメンバー発揮値計算
-	calc_front_status(status: number, skill: number, cost_cut: boolean, rest_cost: number, producer_type: number, appeal_bonus_list: any[], institution_list: any[], status_up: number, training_room_level: number, high_tension: boolean): number {
+	calc_front_status(status: number, skill: number, cost_cut: boolean, rest_cost: number, producer_type: number, appeal_bonus_list: string[], institution_list: string[], status_up: number, training_room_level: number, high_tension: boolean): number {
 		// コスト補正
 		if(cost_cut) {
 			status = this.get_cost_corrected_status(status, this.get_cost(), rest_cost);
@@ -386,7 +386,7 @@ class UserIdol {
 		// 施設補正
 		var type = parseInt(this.type);
 		for(var i = 0; i < institution_list.length; i++) {
-			if(type == institution_list[i]) {
+			if(type == parseInt(institution_list[i])) {
 				status = Math.ceil(status * (1 + UserIdol.INSTITUTION_COEFFICIENT));
 				break;
 			}
@@ -430,7 +430,7 @@ class UserIdol {
 	}
 
 	// フェスフロントメンバー発揮値計算
-	calc_festivalS_front_status(status: number, skill: number, cost_cut: boolean, rest_cost: number, producer_type: number, appeal_bonus_list: any[], institution_list: any[], status_up: number, training_room_level: number, high_tension: boolean , groove_type: number): number {
+	calc_festivalS_front_status(status: number, skill: number, cost_cut: boolean, rest_cost: number, producer_type: number, appeal_bonus_list: string[], institution_list: string[], status_up: number, training_room_level: number, high_tension: boolean , groove_type: number): number {
 		// コスト補正
 		if(cost_cut) {
 			status = this.get_cost_corrected_status(status, this.get_cost(), rest_cost);
@@ -439,7 +439,7 @@ class UserIdol {
 		// 施設補正
 		var type = parseInt(this.type);
 		for(var i = 0; i < institution_list.length; i++) {
-			if(type == institution_list[i]) {
+			if(type == parseInt(institution_list[i])) {
 				status = Math.ceil(status * (1 +UserIdol.INSTITUTION_COEFFICIENT));
 				break;
 			}
@@ -493,7 +493,7 @@ class UserIdol {
 	/******************************************************************************/
 	// LIVEツアー
 	/******************************************************************************/
-	calculation_live_tour(member_type: boolean, producer_type: number, appeal_bonus_list: any[], voltage_bonus: number, status_up: number, compatibility_type: number, training_room_level: number): void {
+	calculation_live_tour(member_type: boolean, producer_type: number, appeal_bonus_list: string[], voltage_bonus: number, status_up: number, compatibility_type: number, training_room_level: number): void {
 		var offense: number = parseInt(this.offense);
 		var defense: number = parseInt(this.defense);
 		var offense_skill: number = parseFloat(this.offense_skill);
@@ -514,7 +514,7 @@ class UserIdol {
 	}
 
 	// 発揮値計算
-	calc_live_tour_status(status: number, skill: number, producer_type: number, appeal_bonus_list: any[], status_up: number, compatibility_type: number): number {
+	calc_live_tour_status(status: number, skill: number, producer_type: number, appeal_bonus_list: string[], status_up: number, compatibility_type: number): number {
 		// スターダムパワー補正
 		var actual_status: number = Math.floor(status * parseFloat(this.event_power));
 
@@ -537,7 +537,7 @@ class UserIdol {
 		return actual_status;
 	}
 
-	calc_live_tour_front_status(status: number, skill: number, producer_type: number, appeal_bonus_list: any[], voltage_bonus: number, status_up: number, compatibility_type: number, training_room_level: number): number {
+	calc_live_tour_front_status(status: number, skill: number, producer_type: number, appeal_bonus_list: string[], voltage_bonus: number, status_up: number, compatibility_type: number, training_room_level: number): number {
 		// スターダムパワー補正
 		var actual_status: number = Math.floor(status * parseFloat(this.event_power));
 
@@ -597,7 +597,7 @@ class UserIdol {
 	/******************************************************************************/
 	// ドリームLIVEフェス
 	/******************************************************************************/
-	calculation_dream_live_festival(member_type: boolean, producer_type: number, appeal_bonus_list: any[], combo_level: number, fever_bonus: number, training_room_level: number): void {
+	calculation_dream_live_festival(member_type: boolean, producer_type: number, appeal_bonus_list: string[], combo_level: number, fever_bonus: number, training_room_level: number): void {
 		var offense: number = parseInt(this.offense);
 		var defense: number = parseInt(this.defense);
 		var offense_skill: number = parseFloat(this.offense_skill);
@@ -617,7 +617,7 @@ class UserIdol {
 		this.actual_defense = actual_defense;
 	}
 
-	calc_dream_live_festival_front_status(status: number, skill: number, producer_type: number, appeal_bonus_list: any[], combo_level: number, fever_bonus: number, training_room_level: number): number {
+	calc_dream_live_festival_front_status(status: number, skill: number, producer_type: number, appeal_bonus_list: string[], combo_level: number, fever_bonus: number, training_room_level: number): number {
 		// スターダムパワー補正
 		var actual_status: number = Math.floor(status * parseFloat(this.event_power));
 
@@ -675,7 +675,7 @@ class UserIdol {
 	/******************************************************************************/
 	// LIVEロワイヤル
 	/******************************************************************************/
-	calculation_live_royal(member_type: boolean, enable_royal_power: boolean, producer_type: number, appeal_bonus_list: any[], voltage_bonus: number, battle_point_rate: number, training_room_level: number): void {
+	calculation_live_royal(member_type: boolean, enable_royal_power: boolean, producer_type: number, appeal_bonus_list: string[], voltage_bonus: number, battle_point_rate: number, training_room_level: number): void {
 		// 位置補正
 		var offense: number = parseInt(this.offense);
 		var defense: number = parseInt(this.defense);
@@ -698,7 +698,7 @@ class UserIdol {
 	}
 
 	// フロントメンバー発揮値計算
-	calc_live_royal_front_status(status: number, skill: number, enable_royal_power: boolean, producer_type: number, appeal_bonus_list: any[], voltage_bonus: number, battle_point_rate: number, training_room_level: number): number {
+	calc_live_royal_front_status(status: number, skill: number, enable_royal_power: boolean, producer_type: number, appeal_bonus_list: string[], voltage_bonus: number, battle_point_rate: number, training_room_level: number): number {
 		// ロワイヤルパワー補正
 		var event_power: number = 1;
 		if(enable_royal_power) {
@@ -826,7 +826,7 @@ class UserIdol {
 	/******************************************************************************/
 	// トークバトル
 	/******************************************************************************/
-	calculation_talk_battle(member_type: boolean, producer_type: number, appeal_bonus_list: any[], combo_level: number, cheer_bonus: number, training_room_level: number): void {
+	calculation_talk_battle(member_type: boolean, producer_type: number, appeal_bonus_list: string[], combo_level: number, cheer_bonus: number, training_room_level: number): void {
 		var offense: number = parseInt(this.offense);
 		var defense: number = parseInt(this.defense);
 		var offense_skill: number = parseFloat(this.offense_skill);
@@ -846,7 +846,7 @@ class UserIdol {
 		this.actual_defense = actual_defense;
 	}
 
-	calc_talk_battle_front_status(status: number, skill: number, producer_type: number, appeal_bonus_list: any[], combo_level: number, cheer_bonus: number, training_room_level: number): number {
+	calc_talk_battle_front_status(status: number, skill: number, producer_type: number, appeal_bonus_list: string[], combo_level: number, cheer_bonus: number, training_room_level: number): number {
 		// トークパワー補正
 		var actual_status: number = Math.floor(status * parseFloat(this.event_power));
 
@@ -912,7 +912,7 @@ class UserIdol {
 	/******************************************************************************/
 	// アイドルチャレンジ
 	/******************************************************************************/
-	calculation_challenge(member_type: boolean, producer_type: number, appeal_bonus_list: any[], unit_type: number, fever_bonus: number, training_room_level: number): void {
+	calculation_challenge(member_type: boolean, producer_type: number, appeal_bonus_list: string[], unit_type: number, fever_bonus: number, training_room_level: number): void {
 		var offense: number = parseInt(this.offense);
 		var defense: number = parseInt(this.defense);
 		var offense_skill: number = parseFloat(this.offense_skill);
@@ -932,7 +932,7 @@ class UserIdol {
 		this.actual_defense = actual_defense;
 	}
 
-	calc_challenge_front_status(status: number, skill: number, producer_type: number, appeal_bonus_list: any[], unit_type: number, fever_bonus: number, training_room_level: number): number {
+	calc_challenge_front_status(status: number, skill: number, producer_type: number, appeal_bonus_list: string[], unit_type: number, fever_bonus: number, training_room_level: number): number {
 		// チャレンジパワー・ユニットタイプ補正
 		var ratio: number = parseFloat(this.event_power);
 		if(parseInt(this.type) == unit_type) {

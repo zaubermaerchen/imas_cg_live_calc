@@ -23,8 +23,8 @@ class ViewModel extends BaseLiveCalcViewModel {
 	// 発揮値
 	total_offense: number;
 
-	add: any;
-	remove: any;
+	add: Function;
+	remove: Function;
 
 	constructor() {
 		super();

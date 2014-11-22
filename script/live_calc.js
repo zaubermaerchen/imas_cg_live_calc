@@ -9,6 +9,7 @@ var Common = (function () {
     }
     // アイドルリスト読込
     Common.load_idol_list = function (type, rarity, fields) {
+        var _this = this;
         if (fields === void 0) { fields = []; }
         var key = this.IDOL_LIST_KEY_BASE;
         if (type == -1 && rarity == -1) {
@@ -23,7 +24,6 @@ var Common = (function () {
             }
         }
         var data = this.cache_data[key];
-        var self = this;
         var deferred = jQuery.Deferred();
         if (data != null) {
             deferred.resolve(JSON.parse(data));
@@ -40,7 +40,7 @@ var Common = (function () {
                 post_data["fields"] = fields.join(" ");
             }
             jQuery.post(this.IDOL_DATA_API_URL, post_data, function (response) {
-                self.cache_data[key] = JSON.stringify(response);
+                _this.cache_data[key] = JSON.stringify(response);
                 deferred.resolve(response);
             }, "json");
         }
@@ -48,16 +48,16 @@ var Common = (function () {
     };
     // スキルリスト読込
     Common.load_skill_list = function () {
+        var _this = this;
         var key = this.SKILL_LIST_KEY;
         var data = this.cache_data[key];
-        var self = this;
         var deferred = jQuery.Deferred();
         if (data != null) {
             deferred.resolve(JSON.parse(data));
         }
         else {
             jQuery.post(this.SKILL_DATA_API_URL, function (response) {
-                self.cache_data[key] = JSON.stringify(response);
+                _this.cache_data[key] = JSON.stringify(response);
                 deferred.resolve(response);
             }, "json");
         }
@@ -277,7 +277,7 @@ var UserIdol = (function () {
     };
     UserIdol.prototype.set_select_idol_list = function (list) {
         var idol_list = [];
-        idol_list.push({ "id": 0, "name": "-" });
+        idol_list.push({ "id": "0", "name": "-" });
         for (var key in list) {
             if (list.hasOwnProperty(key)) {
                 var data = list[key];
@@ -292,7 +292,7 @@ var UserIdol = (function () {
         var deferred = jQuery.Deferred();
         jQuery.when(Common.load_skill_list()).done(function (list) {
             var skill_list = [];
-            skill_list.push({ "id": 0, "name": "-" });
+            skill_list.push({ "id": "0", "name": "-" });
             for (var key in list) {
                 if (list.hasOwnProperty(key)) {
                     var data = list[key];
@@ -466,7 +466,7 @@ var UserIdol = (function () {
         // 施設補正
         var type = parseInt(this.type);
         for (var i = 0; i < institution_list.length; i++) {
-            if (type == institution_list[i]) {
+            if (type == parseInt(institution_list[i])) {
                 status = Math.ceil(status * (1 + UserIdol.INSTITUTION_COEFFICIENT));
                 break;
             }
@@ -509,7 +509,7 @@ var UserIdol = (function () {
         // 施設補正
         var type = parseInt(this.type);
         for (var i = 0; i < institution_list.length; i++) {
-            if (type == institution_list[i]) {
+            if (type == parseInt(institution_list[i])) {
                 status = Math.ceil(status * (1 + UserIdol.INSTITUTION_COEFFICIENT));
                 break;
             }
@@ -1065,7 +1065,7 @@ var BaseLiveCalcViewModel = (function () {
         this.calc_type = 0 /* NORMAL */.toString();
         this.front_num = "0";
         this.producer_type = "-1";
-        this.appeal_bonus = [0, 0, 0];
+        this.appeal_bonus = ["0", "0", "0"];
         this.training_room_level = "0";
         this.idol_list = [];
         this.skill_input_type = "0";
@@ -1784,7 +1784,7 @@ var ViewModel = (function (_super) {
     };
     // ソート処理
     ViewModel.prototype.sort_idol = function () {
-        var self = this;
+        var _this = this;
         if (this.auto_sort) {
             // ソート対象を設定
             var front_num = parseInt(this.front_num);
@@ -1797,7 +1797,7 @@ var ViewModel = (function (_super) {
                 var a_value = parseInt(a.offense);
                 var b_ratio = b.offense_per_cost();
                 var b_value = parseInt(b.offense);
-                switch (parseInt(self.sort_type)) {
+                switch (parseInt(_this.sort_type)) {
                     case 0:
                         // 攻コスト比
                         a_ratio = a.offense_per_cost();

@@ -24,13 +24,11 @@ class ViewModel extends BaseLiveCalcViewModel {
 	back_offense: number;
 	back_defense: number;
 
-	add: any;
-	remove: any;
+	add: Function;
+	remove: Function;
 
 	constructor() {
 		super();
-
-		var self = this;
 
 		this.calc_type = CALCULATION_TYPE.SESSION.toString();
 		// 入力項目
@@ -48,11 +46,12 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.back_offense  = 0;
 		this.back_defense = 0;
 
+
+		var self = this;
 		self.add = function() {
 			var index:number = self.idol_list.indexOf(this);
 			self.idol_list.splice(index + 1, 0, new UserIdol(false));
 		};
-
 		self.remove = function() {
 			if(self.idol_list.length > 1) {
 				self.idol_list.remove(this);

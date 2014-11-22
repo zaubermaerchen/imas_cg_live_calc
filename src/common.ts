@@ -20,7 +20,7 @@ class Common {
 	static cache_data: { [index: string]: any; } = {};
 
 	// アイドルリスト読込
-	static load_idol_list(type: number, rarity: number, fields: string[] = []): JQueryPromise<any> {
+	static load_idol_list(type: number, rarity: number, fields: string[] = []): JQueryPromise<{ [index: string]: { [index: string]: string; } }> {
 		var key:string = this.IDOL_LIST_KEY_BASE;
 		if(type == -1 && rarity == -1) {
 			key += "_all";
@@ -34,8 +34,7 @@ class Common {
 		}
 		var data:string = this.cache_data[key];
 
-		var self = this;
-		var deferred: JQueryDeferred<any> = jQuery.Deferred();
+		var deferred: JQueryDeferred<{ [index: string]: { [index: string]: string; } }> = jQuery.Deferred();
 		if(data != null) {
 			deferred.resolve(JSON.parse(data));
 		} else {
@@ -49,8 +48,8 @@ class Common {
 			if(fields.length > 0) {
 				post_data["fields"] = fields.join(" ");
 			}
-			jQuery.post(this.IDOL_DATA_API_URL, post_data, function(response: { [index: string]: any; }) {
-				self.cache_data[key] = JSON.stringify(response);
+			jQuery.post(this.IDOL_DATA_API_URL, post_data, (response: { [index: string]: { [index: string]: string; } }) => {
+				this.cache_data[key] = JSON.stringify(response);
 				deferred.resolve(response);
 			}, "json");
 		}
@@ -58,17 +57,16 @@ class Common {
 		return deferred.promise();
 	}
 	// スキルリスト読込
-	static load_skill_list(): JQueryPromise<any> {
+	static load_skill_list(): JQueryPromise<{ [index: string]: any; }> {
 		var key:string = this.SKILL_LIST_KEY;
 		var data:string = this.cache_data[key];
 
-		var self = this;
-		var deferred: JQueryDeferred<any> = jQuery.Deferred();
+		var deferred: JQueryDeferred<{ [index: string]: any; }> = jQuery.Deferred();
 		if(data != null) {
 			deferred.resolve(JSON.parse(data));
 		} else {
-			jQuery.post(this.SKILL_DATA_API_URL, function(response: { [index: string]: any; }) {
-				self.cache_data[key] = JSON.stringify(response);
+			jQuery.post(this.SKILL_DATA_API_URL, (response: { [index: string]: any; }) => {
+				this.cache_data[key] = JSON.stringify(response);
 				deferred.resolve(response);
 			}, "json");
 		}

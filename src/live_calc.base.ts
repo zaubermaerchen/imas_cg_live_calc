@@ -74,7 +74,7 @@ class BaseLiveCalcViewModel {
 	calc_type: string;
 	front_num: string;
 	producer_type: string;
-	appeal_bonus: number[];
+	appeal_bonus: string[];
 	training_room_level: string;
 	idol_list: UserIdol[];
 	skill_input_type: string;
@@ -100,7 +100,7 @@ class BaseLiveCalcViewModel {
 		this.calc_type = CALCULATION_TYPE.NORMAL.toString();
 		this.front_num = "0";
 		this.producer_type = "-1";
-		this.appeal_bonus = [0, 0, 0];
+		this.appeal_bonus = ["0", "0", "0"];
 		this.training_room_level = "0";
 		this.idol_list = [];
 		this.skill_input_type = "0";
@@ -409,7 +409,7 @@ class BaseLiveCalcViewModel {
 	}
 
 	// 発動スキル取得
-	get_invoke_skill_list(): JQueryPromise<any> {
+	get_invoke_skill_list(): JQueryPromise<{ [index: string]: string; }[]> {
 		var front_num: number = parseInt(this.front_num);
 
 		// 属性ごとのメンバー人数取得
@@ -433,7 +433,7 @@ class BaseLiveCalcViewModel {
 		}
 
 		// 発動可能スキル
-		var deferred: JQueryDeferred<any> = jQuery.Deferred();
+		var deferred: JQueryDeferred<{ [index: string]: string; }[]> = jQuery.Deferred();
 		jQuery.when(Common.load_skill_list()).done((skill_data_list: { [index: string]: { [index: string]: any; } }) => {
 			var invoke_skill_list: { [index: string]: string; }[] = [];
 			var skill_count: number = 0;

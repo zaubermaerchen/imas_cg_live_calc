@@ -40,8 +40,8 @@ class UserPetitIdol {
 	}
 
 	// 設定取得
-	get_setting(): { [index: string]: any; } {
-		var setting: { [index: string]: any; } = {};
+	get_setting(): { [index: string]: string; } {
+		var setting: { [index: string]: string; } = {};
 		setting["vocal"] = this.vocal;
 		setting["dance"] = this.dance;
 		setting["visual"] = this.visual;
@@ -50,7 +50,7 @@ class UserPetitIdol {
 	}
 
 	// 設定反映
-	set_setting(setting: { [index: string]: any; }): void {
+	set_setting(setting: { [index: string]: string; }): void {
 		this.vocal = setting["vocal"];
 		this.dance = setting["dance"];
 		this.visual = setting["visual"];

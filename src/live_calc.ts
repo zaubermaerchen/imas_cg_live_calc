@@ -218,14 +218,13 @@ class ViewModel extends BaseLiveCalcViewModel {
 
 	// ソート処理
 	sort_idol(): void {
-		var self = this;
 		if(this.auto_sort) {
 			// ソート対象を設定
 			var front_num: number = parseInt(this.front_num);
 			var untarget_idol_list: UserIdol[] = this.idol_list.slice(0, front_num);
 			var target_idol_list: UserIdol[] = this.idol_list.slice(front_num);
 
-			target_idol_list.sort(function(a: UserIdol, b: UserIdol) {
+			target_idol_list.sort((a: UserIdol, b: UserIdol) => {
 				var result: number = 0;
 
 				// ソート条件ステータスを設定
@@ -233,7 +232,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 				var a_value: number = parseInt(a.offense);
 				var b_ratio: number = b.offense_per_cost();
 				var b_value: number = parseInt(b.offense);
-				switch (parseInt(self.sort_type)) {
+				switch (parseInt(this.sort_type)) {
 					case 0:
 						// 攻コスト比
 						a_ratio = a.offense_per_cost();
@@ -265,7 +264,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 	}
 
 	// 発動スキル取得
-	get_invoke_skill_list(): JQueryPromise<any> {
+	get_invoke_skill_list(): JQueryPromise<{ [index: string]: string; }[]> {
 		var front_num = parseInt(this.front_num);
 
 		// 使用コスト計算
@@ -291,7 +290,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		var rival_member_num: number[][] = [[0, 0, 0], [0, 0, 0]];
 
 		// 発動可能スキル
-		var deferred: JQueryDeferred<any> = jQuery.Deferred();
+		var deferred: JQueryDeferred<{ [index: string]: string; }[]> = jQuery.Deferred();
 		jQuery.when(Common.load_skill_list()).done((skill_data_list: { [index: string]: { [index: string]: any; } }) => {
 			var invoke_skill_list: { [index: string]: string; }[] = [];
 			var skill_input_type: number = parseInt(this.skill_input_type);
@@ -323,7 +322,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 
 	// アイドル一括追加
 	add_idols(): void {
-		var setting: { [index: string]: any; } = this.add_idol.get_setting();
+		var setting: { [index: string]: string; } = this.add_idol.get_setting();
 		var num: number = parseInt(this.add_idol_num);
 
 		var idol_list = this.idol_list;
