@@ -9,7 +9,6 @@
 class ViewModel extends BaseLiveTourCalcViewModel {
 	// 定数
 	// セーブデータ関係
-	SAVE_DATA_KEY: string = "imas_cg_challenge_calc";
 	static USE_CP_COEFFICIENT: { [index: string]: number; } = {
 		"CP1": 1,
 		"CP2": 2.5,
@@ -21,6 +20,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	status_up: string;
 	unit_type: string;
 	fever_bonus: string;
+
 	// スコア
 	turn_score: { [index: string]: number; }[];
 	lesson_score: { [index: string]: number; }[];
@@ -28,14 +28,12 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	constructor() {
 		super();
 
-		// 最大メンバー数
-		this.max_member_num = 20;
-
-		this.calc_type = CALCULATION_TYPE.CHALLENGE.toString();
 		// 入力値
+		this.calc_type = CALCULATION_TYPE.CHALLENGE.toString();
 		this.status_up = "0";
 		this.unit_type = "-1";
 		this.fever_bonus = "1";
+
 		// スコア
 		this.turn_score = [
 			{ min : 0, max : 0, avg : 0 },
@@ -47,6 +45,9 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 			{ min : 0, max : 0, avg : 0 },
 			{ min : 0, max : 0, avg : 0 }
 		];
+
+		// セーブデータ関係
+		this.save_data_key = "imas_cg_challenge_calc";
 
 		this.init_list();
 
@@ -100,9 +101,9 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 			for(var key in ViewModel.USE_CP_COEFFICIENT) {
 				var _score: number = score * ViewModel.USE_CP_COEFFICIENT[key];
-				total_score[key]["min"] += Math.ceil(_score * this.DAMAGE_COEFFICIENT["MIN"] * 10) / 10;
-				total_score[key]["max"] += Math.ceil(_score * this.DAMAGE_COEFFICIENT["MAX"] * 10) / 10;
-				total_score[key]["avg"] += Math.ceil(_score * this.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
+				total_score[key]["min"] += Math.ceil(_score * ViewModel.DAMAGE_COEFFICIENT["MIN"] * 10) / 10;
+				total_score[key]["max"] += Math.ceil(_score * ViewModel.DAMAGE_COEFFICIENT["MAX"] * 10) / 10;
+				total_score[key]["avg"] += Math.ceil(_score * ViewModel.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
 			}
 
 			// 色設定
@@ -125,7 +126,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 					_score += ViewModel.SCORE_OFFSET;
 				}
 				_turn_score[key2] = _score;
-				_lesson_score[key2] = _score * this.TOTAL_DAMAGE_COEFFICIENT;
+				_lesson_score[key2] = _score * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
 			}
 			turn_score.push(_turn_score);
 			lesson_score.push(_lesson_score);

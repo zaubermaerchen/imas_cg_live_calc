@@ -8,16 +8,6 @@
 /// <reference path="petit_idol.ts" />
 
 class ViewModel extends BaseLiveCalcViewModel {
-	// 定数
-	// セーブデータ関係
-	SAVE_DATA_KEY: string = "imas_cg_live_calc";
-	// 最大スキル発動個数
-	MAX_INVOKE_SKILL_NUM: number = 3;
-	// スキル発動率
-	SKILL_INVOCATION_RATE_LIST: number[] = [100, 50, 37.5, 28.125, 21.09375];
-	// ぷちアイドル最大数
-	PETIT_IDOL_NUM: number = 3;
-
 	// 入力項目
 	rest_cost: string;
 	total_cost: string;
@@ -31,6 +21,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 	sort_type: string;
 	add_idol: UserIdol;
 	add_idol_num: string;
+
 	// 発揮値
 	front_offense: number;
 	front_defense: number;
@@ -43,8 +34,8 @@ class ViewModel extends BaseLiveCalcViewModel {
 	constructor() {
 		super();
 
-		this.calc_type = CALCULATION_TYPE.NORMAL.toString();
 		// 入力項目
+		this.calc_type = CALCULATION_TYPE.NORMAL.toString();
 		this.rest_cost = "0";
 		this.total_cost = "0";
 		this.use_cost_percent = "100";
@@ -59,11 +50,18 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.add_idol = new UserIdol(false);
 		this.add_idol_num = "1";
 
+		// 特技関係
+		this.max_skill_invoke = 3;
+		this.skill_invocation_rate_list = [100, 50, 37.5, 28.125, 21.09375];
+
 		// 発揮値
 		this.front_offense = 0;
 		this.front_defense = 0;
 		this.back_offense  = 0;
 		this.back_defense = 0;
+
+		// セーブデータ関係
+		this.save_data_key = "imas_cg_live_calc";
 
 		var self = this;
 		this.add = function() {
@@ -86,7 +84,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 	// アイドルリスト初期化
 	init_petit_idol_list(): void {
 		var petit_idols: UserPetitIdol[] = [];
-		for(var i: number = 0; i < this.PETIT_IDOL_NUM; i++) {
+		for(var i: number = 0; i < ViewModel.PETIT_IDOL_NUM; i++) {
 			var petit_idol: UserPetitIdol = new UserPetitIdol();
 			petit_idols.push(petit_idol);
 		}
@@ -309,7 +307,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 
 					rest_cost -= idol.get_cost();
 
-					if(skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && skill_count >= this.MAX_INVOKE_SKILL_NUM) {
+					if(skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && skill_count >= this.max_skill_invoke) {
 						break;
 					}
 				}
@@ -415,7 +413,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		});
 
 		// ぷちアイドル個別のパラメータ取得
-		this.set_petit_idol_setting(setting["petit_idol"], this.PETIT_IDOL_NUM);
+		this.set_petit_idol_setting(setting["petit_idol"], ViewModel.PETIT_IDOL_NUM);
 	}
 }
 

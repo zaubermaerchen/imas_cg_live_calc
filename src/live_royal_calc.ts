@@ -12,10 +12,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	// バトルポイント係数
 	static BATTLE_POINT_RATE_LIST: number[] = [0.8, 1, 1.5, 2, 2.5];		// ロワイヤルLIVE時
 	static GUEST_BATTLE_POINT_RATE_LIST: number[] = [0.5, 1, 1.6, 2.25, 3];	// ゲストLIVE時
-	// セーブデータ関係
-	SAVE_DATA_KEY: string = "imas_cg_live_royal_calc";
-	// ぷちアイドル最大数
-	static PETIT_IDOL_NUM: number = 3;
 
 	// 入力項目
 	battle_point: string;
@@ -24,9 +20,13 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	constructor() {
 		super();
 
+		// 入力値
 		this.calc_type = CALCULATION_TYPE.ROYAL.toString();
 		this.battle_point = "2";
 		this.petit_idol_list = [];
+
+		// セーブデータ関係
+		this.save_data_key = "imas_cg_live_royal_calc";
 
 		this.init_list();
 
@@ -96,9 +96,9 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 			// 与ダメージ計算
 			if(is_guest_live) {
 				var damage: number = idol.calc_live_royal_damage();
-				total_damage["min"] += Math.ceil(damage  * this.DAMAGE_COEFFICIENT["MIN"] * 10) / 10;
-				total_damage["max"] += Math.ceil(damage  * this.DAMAGE_COEFFICIENT["MAX"] * 10) / 10;
-				total_damage["avg"] += Math.ceil(damage  * this.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
+				total_damage["min"] += Math.ceil(damage  * ViewModel.DAMAGE_COEFFICIENT["MIN"] * 10) / 10;
+				total_damage["max"] += Math.ceil(damage  * ViewModel.DAMAGE_COEFFICIENT["MAX"] * 10) / 10;
+				total_damage["avg"] += Math.ceil(damage  * ViewModel.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
 			}
 
 			// 色設定
@@ -127,9 +127,9 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.total_damage_min = Math.ceil(total_damage["min"]);
 		this.total_damage_max = Math.ceil(total_damage["max"]);
 		this.total_damage_avg = Math.ceil(total_damage["avg"]);
-		this.battle_damage_min = this.total_damage_min * this.TOTAL_DAMAGE_COEFFICIENT;
-		this.battle_damage_max = this.total_damage_max * this.TOTAL_DAMAGE_COEFFICIENT;
-		this.battle_damage_avg = this.total_damage_avg * this.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_damage_min = this.total_damage_min * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_damage_max = this.total_damage_max * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_damage_avg = this.total_damage_avg * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
 
 		return [total_offense, total_defense];
 	}
@@ -190,36 +190,16 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	// スキル関連
 	/******************************************************************************/
 	check_target_rival_unit_skill_enable(skill: { [index: string]: any; }, rival_member_num: number[][]): { [index: string]: any; } {
+		if(this.is_guest_live()) {
+			return super.check_target_rival_unit_skill_enable(skill, rival_member_num);
+		}
+
 		var enable_skill_type: number = parseInt(this.enable_skill_type);
 		var target_param: number = parseInt(skill["target_param"]);
-		var target_member: number = parseInt(skill["target_member"]);
-		var target_type: number = parseInt(skill["target_type"]);
 
 		// 有効スキルかチェック
 		if(enable_skill_type != ENABLE_SKILL_TYPE.ALL && (enable_skill_type ^ target_param) == 0) {
 			return null;
-		}
-		if(target_member != SKILL_TARGET_MEMBER.FRONT && target_member != SKILL_TARGET_MEMBER.ALL) {
-			return null;
-		}
-
-		if(!this.is_guest_live()) {
-			return skill;
-		}
-
-		if(this.check_skill_target(target_member, target_type, rival_member_num)) {
-			switch (target_param) {
-				case SKILL_TARGET_PARAM.OFFENSE:
-					target_param = SKILL_TARGET_PARAM.DEFENSE;
-					break;
-				case SKILL_TARGET_PARAM.DEFENSE:
-					target_param = SKILL_TARGET_PARAM.OFFENSE;
-					break;
-			}
-			skill["target_member"] = SKILL_TARGET_MEMBER.FRONT;
-			skill["target_param"] = target_param;
-		} else {
-			skill["skill_level"] = 0;
 		}
 
 		return skill;
@@ -227,6 +207,10 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 	// スキル効果適用可能チェック
 	check_apply_skill(idol: UserIdol, invoke_skill: { [index: string]: string; }): boolean {
+		if(this.is_guest_live()) {
+			return super.check_apply_skill(idol, invoke_skill);
+		}
+
 		var result: boolean = false;
 
 		var type: number = parseInt(idol.type);
@@ -237,10 +221,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		// スキルが効果適用可能かチェック
 		if(target_unit == SKILL_TARGET_UNIT.OWN) {
 			if(target_member == SKILL_TARGET_MEMBER.SELF || (target_type & (1 << type)) > 0) {
-				result = true;
-			}
-		} else if(target_unit == SKILL_TARGET_UNIT.RIVAL) {
-			if(this.is_guest_live()) {
 				result = true;
 			}
 		}

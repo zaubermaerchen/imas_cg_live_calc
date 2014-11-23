@@ -7,10 +7,6 @@
 /// <reference path="live_tour_calc.base.ts" />
 
 class ViewModel extends BaseLiveTourCalcViewModel {
-	// 定数
-	// セーブデータ関係
-	SAVE_DATA_KEY: string = "imas_cg_live_tour_calc";
-
 	// 入力項目
 	status_up: string;
 	compatibility_type: string;
@@ -29,14 +25,15 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	constructor() {
 		super();
 
+		// 入力値
 		this.voltage_bonus = "0";
 		this.calc_type = CALCULATION_TYPE.LIVE_TOUR.toString();
-		// 入力値
 		this.status_up = "0";
 		this.compatibility_type = "-1";
 		this.combo_level = "0";
 		this.fever_bonus = "1";
 		this.cheer_bonus = "0";
+
 		// 全力LIVE時の与ダメージ
 		this.total_full_power_damage_min = 0;
 		this.total_full_power_damage_max = 0;
@@ -44,6 +41,9 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.battle_full_power_damage_min = 0;
 		this.battle_full_power_damage_max = 0;
 		this.battle_full_power_damage_avg = 0;
+
+		// セーブデータ関係
+		this.save_data_key = "imas_cg_live_tour_calc";
 
 		this.init_list();
 
@@ -121,12 +121,12 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 			total_offense += offense;
 			total_defense += defense;
 
-			total_damage["min"] += Math.ceil(normal_damage * this.DAMAGE_COEFFICIENT["MIN"] * 10) / 10;
-			total_damage["max"] += Math.ceil(normal_damage * this.DAMAGE_COEFFICIENT["MAX"] * 10) / 10;
-			total_damage["avg"] += Math.ceil(normal_damage * this.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
-			total_full_power_damage["min"] += Math.ceil(full_power_damage * this.DAMAGE_COEFFICIENT["MIN"] * 10) / 10;
-			total_full_power_damage["max"] += Math.ceil(full_power_damage * this.DAMAGE_COEFFICIENT["MAX"] * 10) / 10;
-			total_full_power_damage["avg"] += Math.ceil(full_power_damage * this.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
+			total_damage["min"] += Math.ceil(normal_damage * ViewModel.DAMAGE_COEFFICIENT["MIN"] * 10) / 10;
+			total_damage["max"] += Math.ceil(normal_damage * ViewModel.DAMAGE_COEFFICIENT["MAX"] * 10) / 10;
+			total_damage["avg"] += Math.ceil(normal_damage * ViewModel.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
+			total_full_power_damage["min"] += Math.ceil(full_power_damage * ViewModel.DAMAGE_COEFFICIENT["MIN"] * 10) / 10;
+			total_full_power_damage["max"] += Math.ceil(full_power_damage * ViewModel.DAMAGE_COEFFICIENT["MAX"] * 10) / 10;
+			total_full_power_damage["avg"] += Math.ceil(full_power_damage * ViewModel.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
 
 			// 色設定
 			idol.style = "numeric " + (member_type ? "front" : "back");
@@ -140,17 +140,17 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.total_damage_min = Math.ceil(total_damage["min"]);
 		this.total_damage_max = Math.ceil(total_damage["max"]);
 		this.total_damage_avg = Math.ceil(total_damage["avg"]);
-		this.battle_damage_min = this.total_damage_min * this.TOTAL_DAMAGE_COEFFICIENT;
-		this.battle_damage_max = this.total_damage_max * this.TOTAL_DAMAGE_COEFFICIENT;
-		this.battle_damage_avg = this.total_damage_avg* this.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_damage_min = this.total_damage_min * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_damage_max = this.total_damage_max * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_damage_avg = this.total_damage_avg* ViewModel.TOTAL_DAMAGE_COEFFICIENT;
 
 		// 全力LIVE時の与ダメージ計算
 		this.total_full_power_damage_min = Math.ceil(total_full_power_damage["min"]);
 		this.total_full_power_damage_max = Math.ceil(total_full_power_damage["max"]);
 		this.total_full_power_damage_avg = Math.ceil(total_full_power_damage["avg"]);
-		this.battle_full_power_damage_min = this.total_full_power_damage_min * this.TOTAL_DAMAGE_COEFFICIENT;
-		this.battle_full_power_damage_max = this.total_full_power_damage_max * this.TOTAL_DAMAGE_COEFFICIENT;
-		this.battle_full_power_damage_avg = this.total_full_power_damage_avg * this.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_full_power_damage_min = this.total_full_power_damage_min * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_full_power_damage_max = this.total_full_power_damage_max * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
+		this.battle_full_power_damage_avg = this.total_full_power_damage_avg * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
 
 		return [Math.ceil(total_offense), Math.ceil(total_defense)];
 	}

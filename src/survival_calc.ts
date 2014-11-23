@@ -7,10 +7,6 @@
 /// <reference path="live_calc.base.ts" />
 
 class ViewModel extends BaseLiveCalcViewModel {
-	// 定数
-	// セーブデータ関係
-	SAVE_DATA_KEY: string = "imas_cg_survival_calc";
-
 	// 入力項目
 	total_cost: string;
 	use_cost_percent: string;
@@ -42,6 +38,9 @@ class ViewModel extends BaseLiveCalcViewModel {
 
 		// 発揮値
 		this.total_offense = 0;
+
+		// セーブデータ関係
+		this.save_data_key = "imas_cg_survival_calc";
 
 		var self = this;
 		this.add = function() {

@@ -7,10 +7,6 @@
 /// <reference path="live_calc.base.ts" />
 
 class ViewModel extends BaseLiveCalcViewModel {
-	// 定数
-	// セーブデータ関係
-	SAVE_DATA_KEY: string = "imas_cg_live_calc2";
-
 	// 入力項目
 	total_cost: string;
 	use_cost_percent: string;
@@ -30,8 +26,8 @@ class ViewModel extends BaseLiveCalcViewModel {
 	constructor() {
 		super();
 
-		this.calc_type = CALCULATION_TYPE.SESSION.toString();
 		// 入力項目
+		this.calc_type = CALCULATION_TYPE.SESSION.toString();
 		this.total_cost = "0";
 		this.use_cost_percent = "100";
 		this.front_num = "5";
@@ -46,6 +42,8 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.back_offense  = 0;
 		this.back_defense = 0;
 
+		// セーブデータ関係
+		this.save_data_key = "imas_cg_live_calc";
 
 		var self = this;
 		self.add = function() {
