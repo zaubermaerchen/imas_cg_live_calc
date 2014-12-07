@@ -153,6 +153,9 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 		// アイドル個別のパラメータ取得
 		setting["idol"] = this.get_idol_setting();
 
+		// ぷちアイドル個別のパラメータ取得
+		setting["petit_idol"] = this.get_petit_idol_setting();
+
 		return setting;
 	}
 
@@ -169,6 +172,9 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 
 		// アイドル個別のパラメータ設定
 		this.set_idol_setting(setting["idol"], this.max_member_num, false);
+
+		// ぷちアイドル個別のパラメータ設定
+		this.set_petit_idol_setting(setting["petit_idol"], ViewModel.PETIT_IDOL_NUM);
 	}
 
 	/******************************************************************************/

@@ -8,6 +8,7 @@
 /// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 /// <reference path="common.ts" />
 /// <reference path="idol.model.ts" />
+/// <reference path="petit_idol.ts" />
 
 // 計算モード
 enum CALCULATION_TYPE {
@@ -72,6 +73,7 @@ class BaseLiveCalcViewModel {
 	appeal_bonus: string[];
 	training_room_level: string;
 	idol_list: UserIdol[];
+	petit_idol_list: UserPetitIdol[];
 	skill_input_type: string;
 	enable_skill_type: string;
 	rival_front_num: string[];
@@ -103,6 +105,7 @@ class BaseLiveCalcViewModel {
 		this.appeal_bonus = ["0", "0", "0"];
 		this.training_room_level = "0";
 		this.idol_list = [];
+		this.petit_idol_list = [];
 		this.skill_input_type = "0";
 		this.enable_skill_type = "0";
 		this.rival_front_num = ["0", "0", "0"];
@@ -146,6 +149,7 @@ class BaseLiveCalcViewModel {
 	// アイドルリスト初期化
 	init_list(): void {
 		this.init_idol_list();
+		this.init_petit_idol_list();
 
 		// コードがあったら適用
 		var param_list: { [index: string]: string; } = Common.get_param_list();
@@ -154,9 +158,15 @@ class BaseLiveCalcViewModel {
 			this.apply_code();
 		}
 	}
-
-	// アイドルリスト初期化
 	init_idol_list(): void {}
+	init_petit_idol_list(): void {
+		var petit_idols: UserPetitIdol[] = [];
+		for(var i: number = 0; i < ViewModel.PETIT_IDOL_NUM; i++) {
+			var petit_idol: UserPetitIdol = new UserPetitIdol();
+			petit_idols.push(petit_idol);
+		}
+		this.petit_idol_list = petit_idols;
+	}
 
 	// 設定
 	get_setting(): { [index: string]: any; } { return {}; }
@@ -286,6 +296,31 @@ class BaseLiveCalcViewModel {
 			this.rival_back_num = rival_back_num;
 			this.change_rival_back_num();
 		}
+	}
+
+	// ぷちアイドル設定取得
+	get_petit_idol_setting(): { [index: string]: string; }[] {
+		var setting: { [index: string]: string; }[] = [];
+		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
+			setting.push(this.petit_idol_list[i].get_setting());
+		}
+
+		return	setting;
+	}
+
+	// ぷちアイドル設定反映
+	set_petit_idol_setting(settings: { [index: string]: string; }[], max_num: number): void{
+		if(settings == null) {
+			return;
+		}
+		var petit_idols: UserPetitIdol[] = [];
+		for(var i: number = 0; i < settings.length && i != max_num; i++) {
+			var petit_idol: UserPetitIdol = new UserPetitIdol();
+			petit_idol.set_setting(settings[i]);
+			petit_idols.push(petit_idol);
+		}
+
+		this.petit_idol_list = petit_idols;
 	}
 
 	// 設定保存

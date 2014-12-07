@@ -5,7 +5,6 @@
  * http://opensource.org/licenses/mit-license.php
  */
 /// <reference path="live_calc.base.ts" />
-/// <reference path="petit_idol.ts" />
 
 class ViewModel extends BaseLiveCalcViewModel {
 	// 入力項目
@@ -16,7 +15,6 @@ class ViewModel extends BaseLiveCalcViewModel {
 	status_up: string;
 	high_tension: string;
 	groove_type: string;
-	petit_idol_list: UserPetitIdol[];
 	auto_sort: boolean;
 	sort_type: string;
 	add_idol: UserIdol;
@@ -44,7 +42,6 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.status_up = "0";
 		this.high_tension = "0";
 		this.groove_type = "-1";
-		this.petit_idol_list = [];
 		this.auto_sort = false;
 		this.sort_type = "0";
 		this.add_idol = new UserIdol(false);
@@ -82,22 +79,10 @@ class ViewModel extends BaseLiveCalcViewModel {
 	actual_status() : number[] { return this.calculation(); }
 
 	// アイドルリスト初期化
-	init_petit_idol_list(): void {
-		var petit_idols: UserPetitIdol[] = [];
-		for(var i: number = 0; i < ViewModel.PETIT_IDOL_NUM; i++) {
-			var petit_idol: UserPetitIdol = new UserPetitIdol();
-			petit_idols.push(petit_idol);
-		}
-		this.petit_idol_list = petit_idols;
-	}
 	init_idol_list(): void {
 		var idols: UserIdol[] = [];
 		idols.push(new UserIdol(false));
 		this.idol_list = idols;
-	}
-	init_list(): void {
-		this.init_petit_idol_list();
-		super.init_list();
 	}
 
 	is_festival(): boolean { return (parseInt(this.calc_type) == CALCULATION_TYPE.FESTIVAL); }
@@ -331,31 +316,6 @@ class ViewModel extends BaseLiveCalcViewModel {
 		}
 
 		ko.valueHasMutated(this, "idol_list");
-	}
-
-	// ぷちアイドル設定取得
-	get_petit_idol_setting(): { [index: string]: string; }[] {
-		var setting: { [index: string]: string; }[] = [];
-		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
-			setting.push(this.petit_idol_list[i].get_setting());
-		}
-
-		return	setting;
-	}
-
-	// ぷちアイドル設定反映
-	set_petit_idol_setting(settings: { [index: string]: string; }[], max_num: number): void{
-		if(settings == null) {
-			return;
-		}
-		var petit_idols: UserPetitIdol[] = [];
-		for(var i: number = 0; i < settings.length && i != max_num; i++) {
-			var petit_idol: UserPetitIdol = new UserPetitIdol();
-			petit_idol.set_setting(settings[i]);
-			petit_idols.push(petit_idol);
-		}
-
-		this.petit_idol_list = petit_idols;
 	}
 
 	// 設定取得

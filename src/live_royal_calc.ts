@@ -5,7 +5,6 @@
  * http://opensource.org/licenses/mit-license.php
  */
 /// <reference path="live_tour_calc.base.ts" />
-/// <reference path="petit_idol.ts" />
 
 class ViewModel extends BaseLiveTourCalcViewModel {
 	// 定数
@@ -15,7 +14,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 	// 入力項目
 	battle_point: string;
-	petit_idol_list: UserPetitIdol[];
 
 	constructor() {
 		super();
@@ -23,7 +21,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		// 入力値
 		this.calc_type = CALCULATION_TYPE.ROYAL.toString();
 		this.battle_point = "2";
-		this.petit_idol_list = [];
 
 		// セーブデータ関係
 		this.save_data_key = "imas_cg_live_royal_calc";
@@ -37,19 +34,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 	is_guest_live(): boolean { return (parseInt(this.calc_type) == CALCULATION_TYPE.ROYAL_GUEST); }
 
-	// アイドルリスト初期化
-	init_petit_idol_list(): void {
-		var petit_idols: UserPetitIdol[] = [];
-		for(var i: number = 0; i < ViewModel.PETIT_IDOL_NUM; i++) {
-			var petit_idol: UserPetitIdol = new UserPetitIdol();
-			petit_idols.push(petit_idol);
-		}
-		this.petit_idol_list = petit_idols;
-	}
-	init_list(): void {
-		this.init_petit_idol_list();
-		super.init_list();
-	}
 
 	// 発揮値計算
 	calculation(): number[] {
@@ -137,40 +121,12 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	/******************************************************************************/
 	// 設定関連
 	/******************************************************************************/
-	// ぷちアイドル設定取得
-	get_petit_idol_setting(): { [index: string]: string; }[] {
-		var setting: { [index: string]: string; }[] = [];
-		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
-			setting.push(this.petit_idol_list[i].get_setting());
-		}
-
-		return	setting;
-	}
-
-	// ぷちアイドル設定反映
-	set_petit_idol_setting(settings: { [index: string]: string; }[], max_num: number): void{
-		if(settings == null) {
-			return;
-		}
-		var petit_idols: UserPetitIdol[] = [];
-		for(var i: number = 0; i < settings.length && i != max_num; i++) {
-			var petit_idol: UserPetitIdol = new UserPetitIdol();
-			petit_idol.set_setting(settings[i]);
-			petit_idols.push(petit_idol);
-		}
-
-		this.petit_idol_list = petit_idols;
-	}
-
 	// 設定取得
 	get_setting(): { [index: string]: any; } {
 		var setting: { [index: string]: any; } = super.get_setting();
 
 		setting["battle_point"] = this.battle_point;
 		setting["voltage_bonus"] = this.voltage_bonus;
-
-		// ぷちアイドル個別のパラメータ取得
-		setting["petit_idol"] = this.get_petit_idol_setting();
 
 		return setting;
 	}
@@ -181,9 +137,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 		this.battle_point = setting["battle_point"];
 		this.voltage_bonus = setting["voltage_bonus"];
-
-		// ぷちアイドル個別のパラメータ取得
-		this.set_petit_idol_setting(setting["petit_idol"], ViewModel.PETIT_IDOL_NUM);
 	}
 
 	/******************************************************************************/
