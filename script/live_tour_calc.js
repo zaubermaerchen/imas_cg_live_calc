@@ -1957,6 +1957,8 @@ var ViewModel = (function (_super) {
             case 8 /* TALK_BATTLE */:
             default:
         }
+        total_offense += petit_idol_bonus;
+        total_defense += petit_idol_bonus;
         // 通常LIVE時の与ダメージ計算
         this.total_damage_min = Math.ceil(total_damage["min"] + petit_idol_damage);
         this.total_damage_max = Math.ceil(total_damage["max"] + petit_idol_damage);
