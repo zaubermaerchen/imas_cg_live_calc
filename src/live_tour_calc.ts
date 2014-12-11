@@ -136,18 +136,35 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.back_offense = Math.ceil(back_offense);
 		this.back_defense = Math.ceil(back_defense);
 
+		// ぷちデレラボーナス計算
+		var petit_idol_bonus: number = this.calc_petit_idol_bonus();
+		var petit_idol_damage: number = 0;
+		var petit_idol_full_power_damage: number = 0;
+		switch(calc_type) {
+			case CALCULATION_TYPE.DREAM_LIVE_FESTIVAL:
+				// ドリームLIVEフェス
+				petit_idol_bonus = petit_idol_bonus + Math.ceil(petit_idol_bonus * fever_bonus / 100);
+				petit_idol_damage = Math.floor(petit_idol_bonus * UserIdol.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT * 0.2);
+				petit_idol_full_power_damage = Math.floor(petit_idol_bonus * UserIdol.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT * 0.2);
+				break;
+			case CALCULATION_TYPE.TALK_BATTLE:
+				// トークバトル
+			default:
+				// LIVEツアー
+		}
+
 		// 通常LIVE時の与ダメージ計算
-		this.total_damage_min = Math.ceil(total_damage["min"]);
-		this.total_damage_max = Math.ceil(total_damage["max"]);
-		this.total_damage_avg = Math.ceil(total_damage["avg"]);
+		this.total_damage_min = Math.ceil(total_damage["min"] + petit_idol_damage);
+		this.total_damage_max = Math.ceil(total_damage["max"] + petit_idol_damage);
+		this.total_damage_avg = Math.ceil(total_damage["avg"] + petit_idol_damage);
 		this.battle_damage_min = this.total_damage_min * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
 		this.battle_damage_max = this.total_damage_max * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
 		this.battle_damage_avg = this.total_damage_avg* ViewModel.TOTAL_DAMAGE_COEFFICIENT;
 
 		// 全力LIVE時の与ダメージ計算
-		this.total_full_power_damage_min = Math.ceil(total_full_power_damage["min"]);
-		this.total_full_power_damage_max = Math.ceil(total_full_power_damage["max"]);
-		this.total_full_power_damage_avg = Math.ceil(total_full_power_damage["avg"]);
+		this.total_full_power_damage_min = Math.ceil(total_full_power_damage["min"] + petit_idol_full_power_damage);
+		this.total_full_power_damage_max = Math.ceil(total_full_power_damage["max"] + petit_idol_full_power_damage);
+		this.total_full_power_damage_avg = Math.ceil(total_full_power_damage["avg"] + petit_idol_full_power_damage);
 		this.battle_full_power_damage_min = this.total_full_power_damage_min * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
 		this.battle_full_power_damage_max = this.total_full_power_damage_max * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
 		this.battle_full_power_damage_avg = this.total_full_power_damage_avg * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
@@ -156,7 +173,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	}
 
 	/******************************************************************************/
-	// スキル関連
+	// 設定関連
 	/******************************************************************************/
 	// 設定取得
 	get_setting(): { [index: string]: any; } {

@@ -204,7 +204,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		//this.set_rival_member_setting(setting["rival_member"]);
 
 		// アイドル個別のパラメータ設定
-		this.set_idol_setting(setting["idol"], -1, false);
+		this.set_idol_setting(setting["idol"]);
 	}
 }
 

@@ -241,17 +241,14 @@ var UserIdol = (function () {
     UserIdol.prototype.get_cost_corrected_status = function (status, cost, rest_cost) {
         if (cost > rest_cost) {
             var ratio = rest_cost / cost;
-            /*
-            if(this.is_festival() || this.is_survival()) {
+            if (this.is_survival) {
                 status = Math.ceil(status * ratio);
-            } else {
+            }
+            else {
                 ratio = Math.ceil(ratio * 10) / 10;
                 //status = Math.round(status * ratio);
                 status = Math.ceil(status * ratio);
             }
-            */
-            ratio = Math.ceil(ratio * 10) / 10;
-            status = Math.ceil(status * ratio);
         }
         return status;
     };
@@ -476,7 +473,7 @@ var UserIdol = (function () {
         if (this.is_festival) {
             ratio += training_room_level / 100;
             if (high_tension) {
-                ratio += 0.1;
+                ratio += UserIdol.HIGH_TENSION_BONUS_COEFFICIENT;
             }
         }
         status = Math.ceil(status * ratio);
@@ -523,13 +520,13 @@ var UserIdol = (function () {
         // グルーヴボーナス
         ratio = 1;
         if (type == groove_type) {
-            ratio += 0.2;
+            ratio += UserIdol.GROOVE_BONUS_COEFFICIENT;
         }
         status = Math.round(status * ratio);
         // ハイテンションボーナス
         ratio = 1;
         if (high_tension) {
-            ratio += 0.1;
+            ratio += UserIdol.HIGH_TENSION_BONUS_COEFFICIENT;
         }
         //status = Math.floor(status * ratio);
         status = Math.round(status * ratio);
@@ -967,8 +964,12 @@ var UserIdol = (function () {
     UserIdol.INSTITUTION_COEFFICIENT = 0.05;
     // バックメンバー係数
     UserIdol.BACK_MEMBER_COEFFICIENT = 0.8;
+    // ハイテンションボーナス係数
+    UserIdol.HIGH_TENSION_BONUS_COEFFICIENT = 0.1;
     // 相性ボーナス係数
     UserIdol.COMPATIBILITY_BONUS_COEFFICIENT = 0.2;
+    // グルーヴボーナス係数
+    UserIdol.GROOVE_BONUS_COEFFICIENT = 0.2;
     // LIVEツアー係数
     UserIdol.LIVE_TOUR_NORMAL_LIVE_COEFFICIENT = 0.5; // 通常LIVE時
     UserIdol.LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT = 2; // 全力LIVE時
@@ -1172,7 +1173,20 @@ var BaseLiveCalcViewModel = (function () {
         }
         this.petit_idol_list = petit_idols;
     };
-    // 設定
+    BaseLiveCalcViewModel.prototype.calc_petit_idol_bonus = function () {
+        var petit_idol_bonus = 0;
+        for (var i = 0; i < this.petit_idol_list.length; i++) {
+            var petit_idol = this.petit_idol_list[i];
+            petit_idol_bonus += petit_idol.status();
+        }
+        return petit_idol_bonus;
+    };
+    BaseLiveCalcViewModel.prototype.is_smartphone = function () {
+        return Common.is_smartphone();
+    };
+    /******************************************************************************/
+    // 設定関連
+    /******************************************************************************/
     BaseLiveCalcViewModel.prototype.get_setting = function () {
         return {};
     };
@@ -1187,8 +1201,9 @@ var BaseLiveCalcViewModel = (function () {
         return setting;
     };
     // アイドル設定反映
-    BaseLiveCalcViewModel.prototype.set_idol_setting = function (settings, max_num, use_tour_skill) {
+    BaseLiveCalcViewModel.prototype.set_idol_setting = function (settings, max_num) {
         var _this = this;
+        if (max_num === void 0) { max_num = -1; }
         var deferred = jQuery.Deferred();
         var objects = {};
         for (var i = 0; i < settings.length; i++) {
@@ -1203,11 +1218,18 @@ var BaseLiveCalcViewModel = (function () {
             var object = objects[keys[i]];
             method_list.push(Common.load_idol_list(parseInt(object["type"]), parseInt(object["rarity"])));
         }
+        if (max_num == -1) {
+            max_num = settings.length;
+        }
         jQuery.when.apply(null, method_list).done(function () {
             var idol_list = [];
-            for (var i = 0; i < settings.length && i != max_num; i++) {
-                var idol = new UserIdol(use_tour_skill);
+            for (var i = 0; i < settings.length && i < max_num; i++) {
+                var idol = new UserIdol(false);
                 idol.set_setting(settings[i]);
+                idol_list.push(idol);
+            }
+            for (var i = idol_list.length; i < max_num; i++) {
+                var idol = new UserIdol(false);
                 idol_list.push(idol);
             }
             _this.idol_list = idol_list;
@@ -1384,9 +1406,6 @@ var BaseLiveCalcViewModel = (function () {
             console.log(e.message);
             alert("コードの適用に失敗しました。");
         }
-    };
-    BaseLiveCalcViewModel.prototype.is_smartphone = function () {
-        return Common.is_smartphone();
     };
     /******************************************************************************/
     // スキル関連
@@ -1714,38 +1733,6 @@ var BaseLiveTourCalcViewModel = (function (_super) {
     /******************************************************************************/
     // 設定関連
     /******************************************************************************/
-    BaseLiveTourCalcViewModel.prototype.set_idol_setting = function (settings, max_num, use_tour_skill) {
-        var _this = this;
-        var deferred = jQuery.Deferred();
-        var objects = {};
-        for (var i = 0; i < settings.length; i++) {
-            var key = "t" + settings[i]["type"] + "_r" + settings[i]["rarity"];
-            if (!(key in objects)) {
-                objects[key] = { type: settings[i]["type"], rarity: settings[i]["rarity"] };
-            }
-        }
-        var keys = Object.keys(objects);
-        var method_list = [];
-        for (var i = 0; i < keys.length; i++) {
-            var object = objects[keys[i]];
-            method_list.push(Common.load_idol_list(parseInt(object["type"]), parseInt(object["rarity"])));
-        }
-        jQuery.when.apply(null, method_list).done(function () {
-            var idol_list = [];
-            for (var i = 0; i < settings.length && i != max_num; i++) {
-                var idol = new UserIdol(use_tour_skill);
-                idol.set_setting(settings[i]);
-                idol_list.push(idol);
-            }
-            for (var i = idol_list.length; i < max_num; i++) {
-                var idol = new UserIdol(use_tour_skill);
-                idol_list.push(idol);
-            }
-            _this.idol_list = idol_list;
-            deferred.resolve();
-        });
-        return deferred.promise();
-    };
     // 設定取得
     BaseLiveTourCalcViewModel.prototype.get_setting = function () {
         var setting = {};
@@ -1774,7 +1761,7 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         this.enable_skill_type = setting["enable_skill_type"];
         this.set_rival_member_setting(setting["rival_member"]);
         // アイドル個別のパラメータ設定
-        this.set_idol_setting(setting["idol"], this.max_member_num, false);
+        this.set_idol_setting(setting["idol"], this.max_member_num);
         // ぷちアイドル個別のパラメータ設定
         this.set_petit_idol_setting(setting["petit_idol"], ViewModel.PETIT_IDOL_NUM);
     };

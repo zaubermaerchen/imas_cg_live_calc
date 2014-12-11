@@ -100,43 +100,6 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 	/******************************************************************************/
 	// 設定関連
 	/******************************************************************************/
-	set_idol_setting(settings: { [index: string]: string; }[], max_num: number, use_tour_skill: boolean): JQueryPromise<any> {
-		var deferred: JQueryDeferred<any> = jQuery.Deferred();
-		var objects: { [key: string]: { [key: string]: string; }; } = {};
-		for(var i: number = 0; i < settings.length; i++) {
-			var key = "t" + settings[i]["type"] + "_r" + settings[i]["rarity"];
-			if (!(key in objects)) {
-				objects[key] = { type: settings[i]["type"], rarity: settings[i]["rarity"] };
-			}
-		}
-
-		var keys: string[] = Object.keys(objects);
-		var method_list: any[] = [];
-		for(var i: number = 0; i < keys.length; i++) {
-			var object: { [key: string]: string; } = objects[keys[i]];
-			method_list.push(Common.load_idol_list(parseInt(object["type"]), parseInt(object["rarity"])));
-		}
-
-		jQuery.when.apply(null, method_list).done(() => {
-			var idol_list: UserIdol[] = [];
-			for(var i: number = 0; i < settings.length && i != max_num; i++) {
-				var idol: UserIdol = new UserIdol(use_tour_skill);
-				idol.set_setting(settings[i]);
-				idol_list.push(idol);
-			}
-			for(var i: number = idol_list.length; i < max_num; i++) {
-				var idol: UserIdol = new UserIdol(use_tour_skill);
-				idol_list.push(idol);
-			}
-
-			this.idol_list = idol_list;
-			deferred.resolve();
-		});
-
-		return deferred.promise();
-	}
-
-
 	// 設定取得
 	get_setting(): { [index: string]: any; } {
 		var setting: { [index: string]: any; } = {};
@@ -171,7 +134,7 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 		this.set_rival_member_setting(setting["rival_member"]);
 
 		// アイドル個別のパラメータ設定
-		this.set_idol_setting(setting["idol"], this.max_member_num, false);
+		this.set_idol_setting(setting["idol"], this.max_member_num);
 
 		// ぷちアイドル個別のパラメータ設定
 		this.set_petit_idol_setting(setting["petit_idol"], ViewModel.PETIT_IDOL_NUM);

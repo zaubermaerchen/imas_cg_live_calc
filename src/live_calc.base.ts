@@ -168,7 +168,21 @@ class BaseLiveCalcViewModel {
 		this.petit_idol_list = petit_idols;
 	}
 
-	// 設定
+	calc_petit_idol_bonus(): number {
+		var petit_idol_bonus: number = 0;
+		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
+			var petit_idol: UserPetitIdol = this.petit_idol_list[i];
+			petit_idol_bonus += petit_idol.status();
+		}
+
+		return petit_idol_bonus;
+	}
+
+	is_smartphone(): boolean { return Common.is_smartphone(); }
+
+	/******************************************************************************/
+	// 設定関連
+	/******************************************************************************/
 	get_setting(): { [index: string]: any; } { return {}; }
 	set_setting(setting: { [index: string]: any; }): void {}
 
@@ -183,7 +197,7 @@ class BaseLiveCalcViewModel {
 	}
 
 	// アイドル設定反映
-	set_idol_setting(settings: { [index: string]: string; }[], max_num: number, use_tour_skill: boolean): JQueryPromise<any> {
+	set_idol_setting(settings: { [index: string]: string; }[], max_num: number = -1): JQueryPromise<any> {
 		var deferred: JQueryDeferred<any> = jQuery.Deferred();
 		var objects: { [key: string]: { [key: string]: string; }; } = {};
 		for(var i: number = 0; i < settings.length; i++) {
@@ -200,11 +214,19 @@ class BaseLiveCalcViewModel {
 			method_list.push(Common.load_idol_list(parseInt(object["type"]), parseInt(object["rarity"])));
 		}
 
+		if(max_num == -1) {
+			max_num = settings.length;
+		}
+
 		jQuery.when.apply(null, method_list).done(() => {
 			var idol_list: UserIdol[] = [];
-			for(var i: number = 0; i < settings.length && i != max_num; i++) {
-				var idol: UserIdol = new UserIdol(use_tour_skill);
+			for(var i: number = 0; i < settings.length && i < max_num; i++) {
+				var idol: UserIdol = new UserIdol(false);
 				idol.set_setting(settings[i]);
+				idol_list.push(idol);
+			}
+			for(var i: number = idol_list.length; i < max_num; i++) {
+				var idol: UserIdol = new UserIdol(false);
 				idol_list.push(idol);
 			}
 
@@ -407,8 +429,6 @@ class BaseLiveCalcViewModel {
 			alert("コードの適用に失敗しました。");
 		}
 	}
-
-	is_smartphone(): boolean { return Common.is_smartphone(); }
 
 	/******************************************************************************/
 	// スキル関連

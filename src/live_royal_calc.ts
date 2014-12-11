@@ -94,13 +94,9 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.back_defense = back_defense;
 
 		// ぷちデレラボーナス計算
-		var petit_idol_bonus: number = 0;
-		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
-			var petit_idol: UserPetitIdol = this.petit_idol_list[i];
-			petit_idol_bonus += petit_idol.status();
-		}
+		var petit_idol_bonus: number = this.calc_petit_idol_bonus();
 		petit_idol_bonus = Math.ceil(petit_idol_bonus * battle_point_rate * voltage_bonus);
-		var petit_idol_damage: number = Math.floor(petit_idol_bonus * 0.2);
+		var petit_idol_damage: number = Math.floor(petit_idol_bonus * UserIdol.LIVE_ROYAL_DAMAGE_COEFFICIENT);
 		total_offense += petit_idol_bonus;
 		total_defense += petit_idol_bonus;
 		total_damage["min"] += petit_idol_damage;

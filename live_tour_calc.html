@@ -295,6 +295,29 @@
 			</tbody>
 		</table>
 
+
+		<table>
+			<thead>
+				<tr>
+					<th>ぷちデレラ</th>
+					<th>総合値</th>
+				</tr>
+			</thead>
+			<tbody id="petit_idol_list" data-bind="foreach: petit_idol_list">
+				<tr class="idol">
+					<td>
+						<span style="color: #ff0000;">Vo</span>
+						<input type="number" name="vocal" class="status" value="0" data-bind="textInput: vocal" />
+						<span style="color: #0000ff;">Da</span>
+						<input type="number" name="dance" class="status" value="0" data-bind="textInput: dance" />
+						<span style="color: #ffff80;">Vi</span>
+						<input type="number" name="visual" class="status" value="0" data-bind="textInput: visual" />
+					</td>
+					<td class="numeric" data-bind="text: status()">0</td>
+				</tr>
+			</tbody>
+		</table>
+
 		<table>
 			<thead>
 				<tr>

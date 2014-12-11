@@ -185,11 +185,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.back_defense = Math.round(back_defense);
 
 		// ぷちデレラボーナス計算
-		var petit_idol_bonus: number = 0;
-		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
-			var petit_idol: UserPetitIdol = this.petit_idol_list[i];
-			petit_idol_bonus += petit_idol.status();
-		}
+		var petit_idol_bonus: number = this.calc_petit_idol_bonus();
 		if(total_cost > 0) {
 			petit_idol_bonus = Math.floor(petit_idol_bonus * ((use_cost - rest_cost) / total_cost));
 		}
@@ -368,7 +364,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		//set_rival_member_setting(setting["rival_member"]);
 
 		// アイドル個別のパラメータ設定
-		jQuery.when(this.set_idol_setting(setting["idol"], -1, false)).done(() => {
+		jQuery.when(this.set_idol_setting(setting["idol"])).done(() => {
 			this.change_calc_type();
 		});
 

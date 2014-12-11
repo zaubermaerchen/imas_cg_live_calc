@@ -16,8 +16,12 @@ class UserIdol {
 	static INSTITUTION_COEFFICIENT: number =  0.05;
 	// バックメンバー係数
 	static BACK_MEMBER_COEFFICIENT: number = 0.8;
+	// ハイテンションボーナス係数
+	static HIGH_TENSION_BONUS_COEFFICIENT: number = 0.1;
 	// 相性ボーナス係数
 	static COMPATIBILITY_BONUS_COEFFICIENT: number = 0.2;
+	// グルーヴボーナス係数
+	static GROOVE_BONUS_COEFFICIENT: number = 0.2;
 	// LIVEツアー係数
 	static LIVE_TOUR_NORMAL_LIVE_COEFFICIENT: number = 0.5;	// 通常LIVE時
 	static LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT: number = 2;	// 全力LIVE時
@@ -29,7 +33,7 @@ class UserIdol {
 	static DREAM_LIVE_FESTIVAL_COMBO_LEVEL_COEFFICIENT: number = 125;		// コンボLV係数
 	// トークバトル
 	static TALK_BATTLE_FULL_POWER_LIVE_COEFFICIENT: number = 5;		// 全力LIVE時
-	static TALK_BATTLE_COMBO_LEVEL_COEFFICIENT: number = 50;           // コンボLV係数
+	static TALK_BATTLE_COMBO_LEVEL_COEFFICIENT: number = 50;			// コンボLV係数
 
 	// ステータス
 	id: string;
@@ -136,17 +140,13 @@ class UserIdol {
 	get_cost_corrected_status(status: number, cost: number, rest_cost: number): number {
 		if(cost > rest_cost) {
 			var ratio: number = rest_cost / cost;
-			/*
-			if(this.is_festival() || this.is_survival()) {
+			if(this.is_survival) {
 				status = Math.ceil(status * ratio);
 			} else {
 				ratio = Math.ceil(ratio * 10) / 10;
 				//status = Math.round(status * ratio);
 				status = Math.ceil(status * ratio);
 			}
-			*/
-			ratio = Math.ceil(ratio * 10) / 10;
-			status = Math.ceil(status * ratio);
 		}
 
 		return status;
@@ -397,7 +397,7 @@ class UserIdol {
 		if(this.is_festival) {
 			ratio += training_room_level / 100;
 			if(high_tension) {
-				ratio += 0.1;
+				ratio += UserIdol.HIGH_TENSION_BONUS_COEFFICIENT;
 			}
 		}
 		status = Math.ceil(status * ratio);
@@ -456,14 +456,14 @@ class UserIdol {
 		// グルーヴボーナス
 		ratio = 1;
 		if(type == groove_type) {
-			ratio += 0.2;
+			ratio += UserIdol.GROOVE_BONUS_COEFFICIENT;
 		}
 		status = Math.round(status * ratio);
 
 		// ハイテンションボーナス
 		ratio = 1;
 		if(high_tension) {
-			ratio += 0.1;
+			ratio += UserIdol.HIGH_TENSION_BONUS_COEFFICIENT;
 		}
 		//status = Math.floor(status * ratio);
 		status = Math.round(status * ratio);

@@ -192,7 +192,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.training_room_level = setting["training_room_level"];
 
 		// アイドル個別のパラメータ設定
-		this.set_idol_setting(setting["idol"], -1, false);
+		this.set_idol_setting(setting["idol"]);
 	}
 
 	// アイドル一括追加
