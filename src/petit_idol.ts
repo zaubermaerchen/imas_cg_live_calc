@@ -8,12 +8,14 @@
 
 class UserPetitIdol {
 	// ステータス
+	type: string;
 	vocal: string;
 	dance: string;
 	visual: string;
 
 	constructor() {
 		// ステータス
+		this.type = "0";
 		this.vocal = "0";
 		this.dance = "0";
 		this.visual = "0";
@@ -42,6 +44,7 @@ class UserPetitIdol {
 	// 設定取得
 	get_setting(): { [index: string]: string; } {
 		var setting: { [index: string]: string; } = {};
+		setting["type"] = this.type;
 		setting["vocal"] = this.vocal;
 		setting["dance"] = this.dance;
 		setting["visual"] = this.visual;
@@ -51,6 +54,7 @@ class UserPetitIdol {
 
 	// 設定反映
 	set_setting(setting: { [index: string]: string; }): void {
+		this.type = setting["type"];
 		this.vocal = setting["vocal"];
 		this.dance = setting["dance"];
 		this.visual = setting["visual"];

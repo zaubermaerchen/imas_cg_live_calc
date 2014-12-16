@@ -273,6 +273,11 @@
 			<tbody id="petit_idol_list" data-bind="foreach: petit_idol_list">
 				<tr class="idol">
 					<td>
+						<select name="type" data-bind="value: type">
+							<option value="0" selected="selected">キュート</option>
+							<option value="1">クール</option>
+							<option value="2">パッション</option>
+						</select>
 						<span style="color: #ff0000;">Vo</span>
 						<input type="number" name="vocal" class="status" value="0" data-bind="textInput: vocal" />
 						<span style="color: #0000ff;">Da</span>

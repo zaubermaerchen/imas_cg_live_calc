@@ -118,7 +118,7 @@ var Common = (function () {
         var url = location.href;
         var index = url.indexOf("?");
         if (index > -1) {
-            url = url.slice(0, index - 1);
+            url = url.slice(0, index);
         }
         return url;
     };
@@ -994,6 +994,7 @@ var UserIdol = (function () {
 var UserPetitIdol = (function () {
     function UserPetitIdol() {
         // ステータス
+        this.type = "0";
         this.vocal = "0";
         this.dance = "0";
         this.visual = "0";
@@ -1019,6 +1020,7 @@ var UserPetitIdol = (function () {
     // 設定取得
     UserPetitIdol.prototype.get_setting = function () {
         var setting = {};
+        setting["type"] = this.type;
         setting["vocal"] = this.vocal;
         setting["dance"] = this.dance;
         setting["visual"] = this.visual;
@@ -1026,6 +1028,7 @@ var UserPetitIdol = (function () {
     };
     // 設定反映
     UserPetitIdol.prototype.set_setting = function (setting) {
+        this.type = setting["type"];
         this.vocal = setting["vocal"];
         this.dance = setting["dance"];
         this.visual = setting["visual"];

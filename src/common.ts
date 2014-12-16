@@ -140,7 +140,7 @@ class Common {
 		var url: string = location.href;
 		var index: number = url.indexOf("?");
 		if(index > -1) {
-			url = url.slice(0, index -1);
+			url = url.slice(0, index);
 		}
 		return url;
 	}
