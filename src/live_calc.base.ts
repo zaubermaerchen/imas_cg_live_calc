@@ -168,11 +168,12 @@ class BaseLiveCalcViewModel {
 		this.petit_idol_list = petit_idols;
 	}
 
-	calc_petit_idol_bonus(): number {
+	calc_petit_idol_bonus(bonus_type: number = -1): number {
 		var petit_idol_bonus: number = 0;
 		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
 			var petit_idol: UserPetitIdol = this.petit_idol_list[i];
-			petit_idol_bonus += petit_idol.status();
+			petit_idol.calc_status(bonus_type);
+			petit_idol_bonus += petit_idol.status;
 		}
 
 		return petit_idol_bonus;

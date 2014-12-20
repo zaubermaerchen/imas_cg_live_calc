@@ -127,6 +127,19 @@
 							</select>
 						</td>
 					</tr>
+					<!-- ko if: is_talk_battle() -->
+					<tr>
+						<th>ぷちパワー発揮属性</th>
+						<td>
+							<select name="petit_idol_bonus_type" data-bind="value: petit_idol_bonus_type">
+								<option value="-1" selected="selected">無し</option>
+								<option value="0">キュート</option>
+								<option value="1">クール</option>
+								<option value="2">パッション</option>
+							</select>
+						</td>
+					</tr>
+					<!-- /ko -->
 					<tr>
 						<th>計算方式</th>
 						<td>
@@ -293,7 +306,7 @@
 			</tbody>
 		</table>
 
-		<!-- ko if: is_dream_live_festival() -->
+		<!-- ko ifnot: is_live_tour() -->
 		<table>
 			<thead>
 				<tr>
@@ -316,7 +329,7 @@
 						<span style="color: #ffff80;">Vi</span>
 						<input type="number" name="visual" class="status" value="0" data-bind="textInput: visual" />
 					</td>
-					<td class="numeric" data-bind="text: status()">0</td>
+					<td class="numeric" data-bind="text: status">0</td>
 				</tr>
 			</tbody>
 		</table>
@@ -326,39 +339,24 @@
 			<thead>
 				<tr>
 					<th>&nbsp;</th>
-					<th>一発あたりの与ダメージ</th>
+					<th>ターンあたりの与ダメージ</th>
 					<th>一戦あたりの与ダメージ</th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody data-bind="foreach: damage">
 				<tr>
-					<th>通常</th>
+					<th data-bind="text: name">通常</th>
 					<td class="numeric">
-						<span data-bind="text: total_damage_min">0</span>
+						<span data-bind="text: min.get_turn_damage()">0</span>
 						-
-						<span data-bind="text: total_damage_max">0</span>
-						(<span data-bind="text: total_damage_avg">0</span>)
+						<span data-bind="text: max.get_turn_damage()">0</span>
+						(<span data-bind="text: avg.get_turn_damage()">0</span>)
 					</td>
 					<td class="numeric">
-						<span data-bind="text: battle_damage_min">0</span>
+						<span data-bind="text: min.get_battle_damage()">0</span>
 						-
-						<span data-bind="text: battle_damage_max">0</span>
-						(<span data-bind="text: battle_damage_avg">0</span>)
-					</td>
-				</tr>
-				<tr>
-					<th>全力</th>
-					<td class="numeric">
-						<span data-bind="text: total_full_power_damage_min">0</span>
-						-
-						<span data-bind="text: total_full_power_damage_max">0</span>
-						(<span data-bind="text: total_full_power_damage_avg">0</span>)
-					</td>
-					<td class="numeric">
-						<span data-bind="text: battle_full_power_damage_min">0</span>
-						-
-						<span data-bind="text: battle_full_power_damage_max">0</span>
-						(<span data-bind="text: battle_full_power_damage_avg">0</span>)
+						<span data-bind="text: max.get_battle_damage()">0</span>
+						(<span data-bind="text: avg.get_battle_damage()">0</span>)
 					</td>
 				</tr>
 			</tbody>

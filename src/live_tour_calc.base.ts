@@ -5,6 +5,62 @@
  * http://opensource.org/licenses/mit-license.php
  */
 /// <reference path="live_calc.base.ts" />
+class DamageValue {
+	static BATTLE_DAMAGE_COEFFICIENT: number = 5;
+
+	value: number;
+
+	constructor(value: number = 0) {
+		this.value =  value;
+	}
+
+	get_turn_damage(): number {
+		return Math.ceil(this.value);
+	}
+
+	get_battle_damage(): number {
+		return this.get_turn_damage() * DamageValue.BATTLE_DAMAGE_COEFFICIENT;
+	}
+}
+
+class Damage {
+	// 定数
+	// ダメージ係数
+	static COEFFICIENT_MIN: number = 0.97;
+	static COEFFICIENT_MAX: number = 1.02;
+	static COEFFICIENT_AVG: number = 0.995;
+
+	name: string;
+	min: DamageValue;
+	max: DamageValue;
+	avg: DamageValue;
+
+	constructor(name: string = "") {
+		this.name = name;
+		this.min = new DamageValue();
+		this.max = new DamageValue();
+		this.avg = new DamageValue();
+	}
+
+	set_damage(base: number): void {
+		this.min.value = Math.ceil(base * Damage.COEFFICIENT_MIN * 10) / 10;
+		this.max.value = Math.ceil(base * Damage.COEFFICIENT_MAX * 10) / 10;
+		this.avg.value = Math.ceil(base * Damage.COEFFICIENT_AVG * 10) / 10;
+	}
+
+	add_damage(base: number): void {
+		this.min.value += Math.ceil(base * Damage.COEFFICIENT_MIN * 10) / 10;
+		this.max.value += Math.ceil(base * Damage.COEFFICIENT_MAX * 10) / 10;
+		this.avg.value += Math.ceil(base * Damage.COEFFICIENT_AVG * 10) / 10;
+	}
+
+	add_bonus(bonus: number): void {
+		this.min.value += bonus;
+		this.max.value += bonus;
+		this.avg.value += bonus;
+	}
+}
+
 
 class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 	// 定数
@@ -34,6 +90,8 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 	battle_damage_min: number;
 	battle_damage_max: number;
 	battle_damage_avg: number;
+
+	damage: Damage[];
 
 	constructor() {
 		super();
@@ -74,6 +132,7 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 		this.battle_damage_min = 0;
 		this.battle_damage_max = 0;
 		this.battle_damage_avg = 0;
+		this.damage = [];
 	}
 
 	// アイドルリスト初期化

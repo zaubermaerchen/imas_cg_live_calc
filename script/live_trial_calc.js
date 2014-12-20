@@ -998,24 +998,37 @@ var UserPetitIdol = (function () {
         this.vocal = "0";
         this.dance = "0";
         this.visual = "0";
+        this.status = 0;
         ko.track(this);
     }
     // 総ステータス取得
-    UserPetitIdol.prototype.status = function () {
+    UserPetitIdol.prototype.calc_status = function (bonus_type) {
+        if (bonus_type === void 0) { bonus_type = -1; }
         var status = 0;
+        var type = parseInt(this.type);
+        var rate = 1 + UserPetitIdol.TYPE_BONSU_COEFFICIENT;
         var vocal = parseInt(this.vocal);
         if (!isNaN(vocal)) {
+            if (type == bonus_type) {
+                vocal = Math.ceil(vocal * rate);
+            }
             status += vocal;
         }
         var dance = parseInt(this.dance);
         if (!isNaN(dance)) {
+            if (type == bonus_type) {
+                dance = Math.ceil(dance * rate);
+            }
             status += dance;
         }
         var visual = parseInt(this.visual);
         if (!isNaN(visual)) {
+            if (type == bonus_type) {
+                visual = Math.ceil(visual * rate);
+            }
             status += visual;
         }
-        return status;
+        this.status = status;
     };
     // 設定取得
     UserPetitIdol.prototype.get_setting = function () {
@@ -1033,6 +1046,8 @@ var UserPetitIdol = (function () {
         this.dance = setting["dance"];
         this.visual = setting["visual"];
     };
+    // 属性一致ボーナス係数
+    UserPetitIdol.TYPE_BONSU_COEFFICIENT = 0.2;
     return UserPetitIdol;
 })();
 /*!
@@ -1176,11 +1191,13 @@ var BaseLiveCalcViewModel = (function () {
         }
         this.petit_idol_list = petit_idols;
     };
-    BaseLiveCalcViewModel.prototype.calc_petit_idol_bonus = function () {
+    BaseLiveCalcViewModel.prototype.calc_petit_idol_bonus = function (bonus_type) {
+        if (bonus_type === void 0) { bonus_type = -1; }
         var petit_idol_bonus = 0;
         for (var i = 0; i < this.petit_idol_list.length; i++) {
             var petit_idol = this.petit_idol_list[i];
-            petit_idol_bonus += petit_idol.status();
+            petit_idol.calc_status(bonus_type);
+            petit_idol_bonus += petit_idol.status;
         }
         return petit_idol_bonus;
     };

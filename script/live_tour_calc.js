@@ -998,24 +998,37 @@ var UserPetitIdol = (function () {
         this.vocal = "0";
         this.dance = "0";
         this.visual = "0";
+        this.status = 0;
         ko.track(this);
     }
     // 総ステータス取得
-    UserPetitIdol.prototype.status = function () {
+    UserPetitIdol.prototype.calc_status = function (bonus_type) {
+        if (bonus_type === void 0) { bonus_type = -1; }
         var status = 0;
+        var type = parseInt(this.type);
+        var rate = 1 + UserPetitIdol.TYPE_BONSU_COEFFICIENT;
         var vocal = parseInt(this.vocal);
         if (!isNaN(vocal)) {
+            if (type == bonus_type) {
+                vocal = Math.ceil(vocal * rate);
+            }
             status += vocal;
         }
         var dance = parseInt(this.dance);
         if (!isNaN(dance)) {
+            if (type == bonus_type) {
+                dance = Math.ceil(dance * rate);
+            }
             status += dance;
         }
         var visual = parseInt(this.visual);
         if (!isNaN(visual)) {
+            if (type == bonus_type) {
+                visual = Math.ceil(visual * rate);
+            }
             status += visual;
         }
-        return status;
+        this.status = status;
     };
     // 設定取得
     UserPetitIdol.prototype.get_setting = function () {
@@ -1033,6 +1046,8 @@ var UserPetitIdol = (function () {
         this.dance = setting["dance"];
         this.visual = setting["visual"];
     };
+    // 属性一致ボーナス係数
+    UserPetitIdol.TYPE_BONSU_COEFFICIENT = 0.2;
     return UserPetitIdol;
 })();
 /*!
@@ -1176,11 +1191,13 @@ var BaseLiveCalcViewModel = (function () {
         }
         this.petit_idol_list = petit_idols;
     };
-    BaseLiveCalcViewModel.prototype.calc_petit_idol_bonus = function () {
+    BaseLiveCalcViewModel.prototype.calc_petit_idol_bonus = function (bonus_type) {
+        if (bonus_type === void 0) { bonus_type = -1; }
         var petit_idol_bonus = 0;
         for (var i = 0; i < this.petit_idol_list.length; i++) {
             var petit_idol = this.petit_idol_list[i];
-            petit_idol_bonus += petit_idol.status();
+            petit_idol.calc_status(bonus_type);
+            petit_idol_bonus += petit_idol.status;
         }
         return petit_idol_bonus;
     };
@@ -1666,6 +1683,12 @@ var BaseLiveCalcViewModel = (function () {
     BaseLiveCalcViewModel.PETIT_IDOL_NUM = 3;
     return BaseLiveCalcViewModel;
 })();
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 /*!
  * THE IDOLM@STER CINDERELLA GIRLS Exertion Value Calculator Base Class for Live Tour
  * Copyright (c) 2013 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
@@ -1673,12 +1696,50 @@ var BaseLiveCalcViewModel = (function () {
  * http://opensource.org/licenses/mit-license.php
  */
 /// <reference path="live_calc.base.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
+var DamageValue = (function () {
+    function DamageValue(value) {
+        if (value === void 0) { value = 0; }
+        this.value = value;
+    }
+    DamageValue.prototype.get_turn_damage = function () {
+        return Math.ceil(this.value);
+    };
+    DamageValue.prototype.get_battle_damage = function () {
+        return this.get_turn_damage() * DamageValue.BATTLE_DAMAGE_COEFFICIENT;
+    };
+    DamageValue.BATTLE_DAMAGE_COEFFICIENT = 5;
+    return DamageValue;
+})();
+var Damage = (function () {
+    function Damage(name) {
+        if (name === void 0) { name = ""; }
+        this.name = name;
+        this.min = new DamageValue();
+        this.max = new DamageValue();
+        this.avg = new DamageValue();
+    }
+    Damage.prototype.set_damage = function (base) {
+        this.min.value = Math.ceil(base * Damage.COEFFICIENT_MIN * 10) / 10;
+        this.max.value = Math.ceil(base * Damage.COEFFICIENT_MAX * 10) / 10;
+        this.avg.value = Math.ceil(base * Damage.COEFFICIENT_AVG * 10) / 10;
+    };
+    Damage.prototype.add_damage = function (base) {
+        this.min.value += Math.ceil(base * Damage.COEFFICIENT_MIN * 10) / 10;
+        this.max.value += Math.ceil(base * Damage.COEFFICIENT_MAX * 10) / 10;
+        this.avg.value += Math.ceil(base * Damage.COEFFICIENT_AVG * 10) / 10;
+    };
+    Damage.prototype.add_bonus = function (bonus) {
+        this.min.value += bonus;
+        this.max.value += bonus;
+        this.avg.value += bonus;
+    };
+    // 定数
+    // ダメージ係数
+    Damage.COEFFICIENT_MIN = 0.97;
+    Damage.COEFFICIENT_MAX = 1.02;
+    Damage.COEFFICIENT_AVG = 0.995;
+    return Damage;
+})();
 var BaseLiveTourCalcViewModel = (function (_super) {
     __extends(BaseLiveTourCalcViewModel, _super);
     function BaseLiveTourCalcViewModel() {
@@ -1714,6 +1775,7 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         this.battle_damage_min = 0;
         this.battle_damage_max = 0;
         this.battle_damage_avg = 0;
+        this.damage = [];
     }
     // アイドルリスト初期化
     BaseLiveTourCalcViewModel.prototype.init_idol_list = function () {
@@ -1847,13 +1909,7 @@ var ViewModel = (function (_super) {
         this.combo_level = "0";
         this.fever_bonus = "1";
         this.cheer_bonus = "0";
-        // 全力LIVE時の与ダメージ
-        this.total_full_power_damage_min = 0;
-        this.total_full_power_damage_max = 0;
-        this.total_full_power_damage_avg = 0;
-        this.battle_full_power_damage_min = 0;
-        this.battle_full_power_damage_max = 0;
-        this.battle_full_power_damage_avg = 0;
+        this.petit_idol_bonus_type = "-1";
         // セーブデータ関係
         this.save_data_key = "imas_cg_live_tour_calc";
         this.init_list();
@@ -1885,40 +1941,46 @@ var ViewModel = (function (_super) {
         var training_room_level = parseInt(this.training_room_level);
         var fever_bonus = parseInt(this.fever_bonus);
         var cheer_bonus = parseInt(this.cheer_bonus);
+        var petit_idol_bonus_type = parseInt(this.petit_idol_bonus_type);
         var front_num = parseInt(this.front_num);
         // 総発揮値計算
         var total_offense = 0;
         var total_defense = 0;
+        var damage;
+        if (calc_type == 8 /* TALK_BATTLE */) {
+            damage = [new Damage("TP1"), new Damage("TP2"), new Damage("TP3")];
+        }
+        else {
+            damage = [new Damage("通常"), new Damage("全力")];
+        }
+        // アイドルごとの発揮値・与ダメージ計算
         var front_offense = 0;
         var front_defense = 0;
         var back_offense = 0;
         var back_defense = 0;
-        var total_damage = { min: 0, max: 0, avg: 0 };
-        var total_full_power_damage = { min: 0, max: 0, avg: 0 };
         for (var i = 0; i < this.idol_list.length; i++) {
             var idol = this.idol_list[i];
             var member_type = (i < front_num);
-            // アイドルごとの発揮値・与ダメージ計算
-            var normal_damage = 0;
-            var full_power_damage = 0;
             switch (calc_type) {
                 case 5 /* DREAM_LIVE_FESTIVAL */:
                     // ドリームLIVEフェス
                     idol.calculation_dream_live_festival(member_type, producer_type, this.appeal_bonus, combo_level, fever_bonus, training_room_level);
-                    normal_damage = idol.calc_dream_live_festival_damage(false);
-                    full_power_damage = idol.calc_dream_live_festival_damage(true);
+                    damage[0].add_damage(idol.calc_dream_live_festival_damage(false));
+                    damage[1].add_damage(idol.calc_dream_live_festival_damage(true));
                     break;
                 case 8 /* TALK_BATTLE */:
                     // トークバトル
                     idol.calculation_talk_battle(member_type, producer_type, this.appeal_bonus, combo_level, cheer_bonus, training_room_level);
-                    normal_damage = idol.calc_talk_battle_damage(false);
-                    full_power_damage = idol.calc_talk_battle_damage(true);
+                    var base_damage = idol.calc_talk_battle_damage(false);
+                    for (var j = 0; j < damage.length; j++) {
+                        damage[j].add_damage(base_damage * ViewModel.USE_POINT_COEFFICIENT[j]);
+                    }
                     break;
                 default:
                     // LIVEツアー
                     idol.calculation_live_tour(member_type, producer_type, this.appeal_bonus, voltage_bonus, status_up, compatibility_type, training_room_level);
-                    normal_damage = idol.calc_live_tour_damage(false);
-                    full_power_damage = idol.calc_live_tour_damage(true);
+                    damage[0].add_damage(idol.calc_live_tour_damage(false));
+                    damage[1].add_damage(idol.calc_live_tour_damage(true));
                     break;
             }
             var offense = idol.actual_offense;
@@ -1933,12 +1995,6 @@ var ViewModel = (function (_super) {
             }
             total_offense += offense;
             total_defense += defense;
-            total_damage["min"] += Math.ceil(normal_damage * ViewModel.DAMAGE_COEFFICIENT["MIN"] * 10) / 10;
-            total_damage["max"] += Math.ceil(normal_damage * ViewModel.DAMAGE_COEFFICIENT["MAX"] * 10) / 10;
-            total_damage["avg"] += Math.ceil(normal_damage * ViewModel.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
-            total_full_power_damage["min"] += Math.ceil(full_power_damage * ViewModel.DAMAGE_COEFFICIENT["MIN"] * 10) / 10;
-            total_full_power_damage["max"] += Math.ceil(full_power_damage * ViewModel.DAMAGE_COEFFICIENT["MAX"] * 10) / 10;
-            total_full_power_damage["avg"] += Math.ceil(full_power_damage * ViewModel.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
             // 色設定
             idol.style = "numeric " + (member_type ? "front" : "back");
         }
@@ -1947,35 +2003,28 @@ var ViewModel = (function (_super) {
         this.back_offense = Math.ceil(back_offense);
         this.back_defense = Math.ceil(back_defense);
         // ぷちデレラボーナス計算
-        var petit_idol_bonus = this.calc_petit_idol_bonus();
-        var petit_idol_damage = 0;
-        var petit_idol_full_power_damage = 0;
+        var petit_idol_bonus = 0;
         switch (calc_type) {
             case 5 /* DREAM_LIVE_FESTIVAL */:
                 // ドリームLIVEフェス
+                petit_idol_bonus = this.calc_petit_idol_bonus();
                 petit_idol_bonus = petit_idol_bonus + Math.ceil(petit_idol_bonus * fever_bonus / 100);
-                petit_idol_damage = Math.floor(petit_idol_bonus * UserIdol.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT * 0.2);
-                petit_idol_full_power_damage = Math.floor(petit_idol_bonus * UserIdol.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT * 0.2);
+                damage[0].add_bonus(Math.floor(petit_idol_bonus * UserIdol.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT / 5));
+                damage[1].add_bonus(Math.floor(petit_idol_bonus * UserIdol.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT / 5));
                 break;
             case 8 /* TALK_BATTLE */:
+                // トークバトル
+                petit_idol_bonus = this.calc_petit_idol_bonus(petit_idol_bonus_type);
+                petit_idol_bonus = petit_idol_bonus + Math.ceil(petit_idol_bonus * cheer_bonus / 100);
+                for (var i = 0; i < damage.length; i++) {
+                    damage[i].add_bonus(Math.ceil(petit_idol_bonus * ViewModel.USE_POINT_COEFFICIENT[i] / 5));
+                }
+                break;
             default:
         }
         total_offense += petit_idol_bonus;
         total_defense += petit_idol_bonus;
-        // 通常LIVE時の与ダメージ計算
-        this.total_damage_min = Math.ceil(total_damage["min"] + petit_idol_damage);
-        this.total_damage_max = Math.ceil(total_damage["max"] + petit_idol_damage);
-        this.total_damage_avg = Math.ceil(total_damage["avg"] + petit_idol_damage);
-        this.battle_damage_min = this.total_damage_min * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
-        this.battle_damage_max = this.total_damage_max * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
-        this.battle_damage_avg = this.total_damage_avg * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
-        // 全力LIVE時の与ダメージ計算
-        this.total_full_power_damage_min = Math.ceil(total_full_power_damage["min"] + petit_idol_full_power_damage);
-        this.total_full_power_damage_max = Math.ceil(total_full_power_damage["max"] + petit_idol_full_power_damage);
-        this.total_full_power_damage_avg = Math.ceil(total_full_power_damage["avg"] + petit_idol_full_power_damage);
-        this.battle_full_power_damage_min = this.total_full_power_damage_min * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
-        this.battle_full_power_damage_max = this.total_full_power_damage_max * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
-        this.battle_full_power_damage_avg = this.total_full_power_damage_avg * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
+        this.damage = damage;
         return [Math.ceil(total_offense), Math.ceil(total_defense)];
     };
     /******************************************************************************/
@@ -1990,6 +2039,7 @@ var ViewModel = (function (_super) {
         setting["combo_level"] = this.combo_level;
         setting["fever_bonus"] = this.fever_bonus;
         setting["cheer_bonus"] = this.cheer_bonus;
+        setting["petit_idol_bonus_type"] = this.petit_idol_bonus_type;
         return setting;
     };
     // 設定反映
@@ -2006,6 +2056,7 @@ var ViewModel = (function (_super) {
         if (setting["cheer_bonus"]) {
             this.cheer_bonus = setting["cheer_bonus"];
         }
+        this.petit_idol_bonus_type = setting["petit_idol_bonus_type"];
     };
     /******************************************************************************/
     // スキル関連
@@ -2063,6 +2114,8 @@ var ViewModel = (function (_super) {
         idol.defense_skill = defense_skill.toString();
         return result;
     };
+    //
+    ViewModel.USE_POINT_COEFFICIENT = [1, 2.5, 5];
     return ViewModel;
 })(BaseLiveTourCalcViewModel);
 jQuery(function () {
