@@ -35,17 +35,11 @@ class Damage {
 	max: DamageValue;
 	avg: DamageValue;
 
-	constructor(name: string = "") {
+	constructor(name: string = "", value: number = 0) {
 		this.name = name;
-		this.min = new DamageValue();
-		this.max = new DamageValue();
-		this.avg = new DamageValue();
-	}
-
-	set_damage(base: number): void {
-		this.min.value = Math.ceil(base * Damage.COEFFICIENT_MIN * 10) / 10;
-		this.max.value = Math.ceil(base * Damage.COEFFICIENT_MAX * 10) / 10;
-		this.avg.value = Math.ceil(base * Damage.COEFFICIENT_AVG * 10) / 10;
+		this.min = new DamageValue(value);
+		this.max = new DamageValue(value);
+		this.avg = new DamageValue(value);
 	}
 
 	add_damage(base: number): void {
@@ -63,15 +57,6 @@ class Damage {
 
 
 class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
-	// 定数
-	// ダメージ係数
-	static DAMAGE_COEFFICIENT: { [index: string]: number; } = {
-		MIN: 0.97,
-		MAX: 1.02,
-		AVG: 0.995
-	};
-	static TOTAL_DAMAGE_COEFFICIENT: number = 5;
-
 	// 最大メンバー数
 	max_member_num: number;
 
@@ -84,14 +69,7 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 	back_offense: number;
 	back_defense: number;
 	// LIVE時の与ダメージ
-	total_damage_min: number;
-	total_damage_max: number;
-	total_damage_avg: number;
-	battle_damage_min: number;
-	battle_damage_max: number;
-	battle_damage_avg: number;
-
-	damage: Damage[];
+	damage_list: Damage[];
 
 	constructor() {
 		super();
@@ -126,13 +104,7 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 		this.back_defense = 0;
 
 		// LIVE時の与ダメージ
-		this.total_damage_min = 0;
-		this.total_damage_max = 0;
-		this.total_damage_avg = 0;
-		this.battle_damage_min = 0;
-		this.battle_damage_max = 0;
-		this.battle_damage_avg = 0;
-		this.damage = [];
+		this.damage_list = [];
 	}
 
 	// アイドルリスト初期化

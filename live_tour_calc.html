@@ -335,15 +335,16 @@
 		</table>
 		<!-- /ko -->
 
+		<h3>与ダメージ</h3>
 		<table>
 			<thead>
 				<tr>
 					<th>&nbsp;</th>
-					<th>ターンあたりの与ダメージ</th>
-					<th>一戦あたりの与ダメージ</th>
+					<th>ターンあたり</th>
+					<th>一戦あたり</th>
 				</tr>
 			</thead>
-			<tbody data-bind="foreach: damage">
+			<tbody data-bind="foreach: damage_list">
 				<tr>
 					<th data-bind="text: name">通常</th>
 					<td class="numeric">

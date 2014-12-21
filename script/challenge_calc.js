@@ -1711,18 +1711,14 @@ var DamageValue = (function () {
     return DamageValue;
 })();
 var Damage = (function () {
-    function Damage(name) {
+    function Damage(name, value) {
         if (name === void 0) { name = ""; }
+        if (value === void 0) { value = 0; }
         this.name = name;
-        this.min = new DamageValue();
-        this.max = new DamageValue();
-        this.avg = new DamageValue();
+        this.min = new DamageValue(value);
+        this.max = new DamageValue(value);
+        this.avg = new DamageValue(value);
     }
-    Damage.prototype.set_damage = function (base) {
-        this.min.value = Math.ceil(base * Damage.COEFFICIENT_MIN * 10) / 10;
-        this.max.value = Math.ceil(base * Damage.COEFFICIENT_MAX * 10) / 10;
-        this.avg.value = Math.ceil(base * Damage.COEFFICIENT_AVG * 10) / 10;
-    };
     Damage.prototype.add_damage = function (base) {
         this.min.value += Math.ceil(base * Damage.COEFFICIENT_MIN * 10) / 10;
         this.max.value += Math.ceil(base * Damage.COEFFICIENT_MAX * 10) / 10;
@@ -1769,13 +1765,7 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         this.back_offense = 0;
         this.back_defense = 0;
         // LIVE時の与ダメージ
-        this.total_damage_min = 0;
-        this.total_damage_max = 0;
-        this.total_damage_avg = 0;
-        this.battle_damage_min = 0;
-        this.battle_damage_max = 0;
-        this.battle_damage_avg = 0;
-        this.damage = [];
+        this.damage_list = [];
     }
     // アイドルリスト初期化
     BaseLiveTourCalcViewModel.prototype.init_idol_list = function () {
@@ -1880,14 +1870,6 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         }
         return result;
     };
-    // 定数
-    // ダメージ係数
-    BaseLiveTourCalcViewModel.DAMAGE_COEFFICIENT = {
-        MIN: 0.97,
-        MAX: 1.02,
-        AVG: 0.995
-    };
-    BaseLiveTourCalcViewModel.TOTAL_DAMAGE_COEFFICIENT = 5;
     return BaseLiveTourCalcViewModel;
 })(BaseLiveCalcViewModel);
 /*!
@@ -1906,17 +1888,6 @@ var ViewModel = (function (_super) {
         this.status_up = "0";
         this.unit_type = "-1";
         this.fever_bonus = "1";
-        // スコア
-        this.turn_score = [
-            { min: 0, max: 0, avg: 0 },
-            { min: 0, max: 0, avg: 0 },
-            { min: 0, max: 0, avg: 0 }
-        ];
-        this.lesson_score = [
-            { min: 0, max: 0, avg: 0 },
-            { min: 0, max: 0, avg: 0 },
-            { min: 0, max: 0, avg: 0 }
-        ];
         // セーブデータ関係
         this.save_data_key = "imas_cg_challenge_calc";
         this.init_list();
@@ -1942,11 +1913,10 @@ var ViewModel = (function (_super) {
         var front_defense = 0;
         var back_offense = 0;
         var back_defense = 0;
-        var total_score = {
-            "CP1": { min: 0, max: 0, avg: 0 },
-            "CP2": { min: 0, max: 0, avg: 0 },
-            "CP3": { min: 0, max: 0, avg: 0 }
-        };
+        var damage_list = [];
+        for (var i = 0; i < ViewModel.USE_POINT_COEFFICIENT.length; i++) {
+            damage_list.push(new Damage("CP" + (i + 1), ViewModel.SCORE_OFFSET));
+        }
         for (var i = 0; i < this.idol_list.length; i++) {
             var idol = this.idol_list[i];
             var member_type = (i < front_num);
@@ -1965,11 +1935,8 @@ var ViewModel = (function (_super) {
             }
             total_offense += offense;
             total_defense += defense;
-            for (var key in ViewModel.USE_CP_COEFFICIENT) {
-                var _score = score * ViewModel.USE_CP_COEFFICIENT[key];
-                total_score[key]["min"] += Math.ceil(_score * ViewModel.DAMAGE_COEFFICIENT["MIN"] * 10) / 10;
-                total_score[key]["max"] += Math.ceil(_score * ViewModel.DAMAGE_COEFFICIENT["MAX"] * 10) / 10;
-                total_score[key]["avg"] += Math.ceil(_score * ViewModel.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
+            for (var j = 0; j < damage_list.length; j++) {
+                damage_list[j].add_damage(score * ViewModel.USE_POINT_COEFFICIENT[j]);
             }
             // 色設定
             idol.style = "numeric " + (member_type ? "front" : "back");
@@ -1978,25 +1945,7 @@ var ViewModel = (function (_super) {
         this.front_defense = Math.ceil(front_defense);
         this.back_offense = Math.ceil(back_offense);
         this.back_defense = Math.ceil(back_defense);
-        // スコア計算
-        var turn_score = [];
-        var lesson_score = [];
-        for (var key in ViewModel.USE_CP_COEFFICIENT) {
-            var _turn_score = {};
-            var _lesson_score = {};
-            for (var key2 in total_score[key]) {
-                var _score = Math.ceil(total_score[key][key2]);
-                if (_score > 0) {
-                    _score += ViewModel.SCORE_OFFSET;
-                }
-                _turn_score[key2] = _score;
-                _lesson_score[key2] = _score * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
-            }
-            turn_score.push(_turn_score);
-            lesson_score.push(_lesson_score);
-        }
-        this.turn_score = turn_score;
-        this.lesson_score = lesson_score;
+        this.damage_list = damage_list;
         return [Math.ceil(total_offense), Math.ceil(total_defense)];
     };
     /******************************************************************************/
@@ -2047,12 +1996,7 @@ var ViewModel = (function (_super) {
         return result;
     };
     // 定数
-    // セーブデータ関係
-    ViewModel.USE_CP_COEFFICIENT = {
-        "CP1": 1,
-        "CP2": 2.5,
-        "CP3": 5
-    };
+    ViewModel.USE_POINT_COEFFICIENT = [1, 2.5, 5];
     ViewModel.SCORE_OFFSET = 2000;
     return ViewModel;
 })(BaseLiveTourCalcViewModel);

@@ -291,30 +291,29 @@
 		</table>
 
 		<!-- ko if: is_guest_live() -->
+		<h3>与ダメージ</h3>
 		<table>
 			<thead>
 				<tr>
-					<th>&nbsp;</th>
-					<th>一発あたりの与ダメージ</th>
-					<th>一戦あたりの与ダメージ</th>
+					<th>ターンあたり</th>
+					<th>一戦あたり</th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody data-bind="foreach: damage_list">
 				<tr>
-					<th>LIVE</th>
 					<td class="numeric">
-						<span data-bind="text: total_damage_min">0</span>
+						<span data-bind="text: min.get_turn_damage()">0</span>
 						-
-						<span data-bind="text: total_damage_max">0</span>
-						(<span data-bind="text: total_damage_avg">0</span>)
+						<span data-bind="text: max.get_turn_damage()">0</span>
+						(<span data-bind="text: avg.get_turn_damage()">0</span>)
 					</td>
 					<td class="numeric">
-						<span data-bind="text: battle_damage_min">0</span>
+						<span data-bind="text: min.get_battle_damage()">0</span>
 						-
-						<span data-bind="text: battle_damage_max">0</span>
-						(<span data-bind="text: battle_damage_avg">0</span>)
+						<span data-bind="text: max.get_battle_damage()">0</span>
+						(<span data-bind="text: avg.get_battle_damage()">0</span>)
 					</td>
-				</tr>
+			</tr>
 			</tbody>
 		</table>
 		<!-- /ko -->

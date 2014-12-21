@@ -252,36 +252,29 @@
 			<thead>
 				<tr>
 					<th>&nbsp;</th>
-					<th>CP1</th>
-					<th>CP2</th>
-					<th>CP3</th>
+					<th>ターンあたり</th>
+					<th>レッスンあたり</th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody data-bind="foreach: damage_list">
 				<tr>
-					<th>ターン</th>
-					<!-- ko foreach: turn_score -->
+					<th data-bind="text: name">CP1</th>
 					<td class="numeric">
-						<span data-bind="text: min">0</span>
+						<span data-bind="text: min.get_turn_damage()">0</span>
 						-
-						<span data-bind="text: max">0</span>
-						(<span data-bind="text: avg">0</span>)
+						<span data-bind="text: max.get_turn_damage()">0</span>
+						(<span data-bind="text: avg.get_turn_damage()">0</span>)
 					</td>
-					<!-- /ko -->
-				</tr>
-				<tr>
-					<th>レッスン</th>
-					<!-- ko foreach: lesson_score -->
 					<td class="numeric">
-						<span data-bind="text: min">0</span>
+						<span data-bind="text: min.get_battle_damage()">0</span>
 						-
-						<span data-bind="text: max">0</span>
-						(<span data-bind="text: avg">0</span>)
+						<span data-bind="text: max.get_battle_damage()">0</span>
+						(<span data-bind="text: avg.get_battle_damage()">0</span>)
 					</td>
-					<!-- /ko -->
 				</tr>
 			</tbody>
 		</table>
+
 		<table>
 			<tbody>
 				<tr>

@@ -1711,18 +1711,14 @@ var DamageValue = (function () {
     return DamageValue;
 })();
 var Damage = (function () {
-    function Damage(name) {
+    function Damage(name, value) {
         if (name === void 0) { name = ""; }
+        if (value === void 0) { value = 0; }
         this.name = name;
-        this.min = new DamageValue();
-        this.max = new DamageValue();
-        this.avg = new DamageValue();
+        this.min = new DamageValue(value);
+        this.max = new DamageValue(value);
+        this.avg = new DamageValue(value);
     }
-    Damage.prototype.set_damage = function (base) {
-        this.min.value = Math.ceil(base * Damage.COEFFICIENT_MIN * 10) / 10;
-        this.max.value = Math.ceil(base * Damage.COEFFICIENT_MAX * 10) / 10;
-        this.avg.value = Math.ceil(base * Damage.COEFFICIENT_AVG * 10) / 10;
-    };
     Damage.prototype.add_damage = function (base) {
         this.min.value += Math.ceil(base * Damage.COEFFICIENT_MIN * 10) / 10;
         this.max.value += Math.ceil(base * Damage.COEFFICIENT_MAX * 10) / 10;
@@ -1769,13 +1765,7 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         this.back_offense = 0;
         this.back_defense = 0;
         // LIVE時の与ダメージ
-        this.total_damage_min = 0;
-        this.total_damage_max = 0;
-        this.total_damage_avg = 0;
-        this.battle_damage_min = 0;
-        this.battle_damage_max = 0;
-        this.battle_damage_avg = 0;
-        this.damage = [];
+        this.damage_list = [];
     }
     // アイドルリスト初期化
     BaseLiveTourCalcViewModel.prototype.init_idol_list = function () {
@@ -1880,14 +1870,6 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         }
         return result;
     };
-    // 定数
-    // ダメージ係数
-    BaseLiveTourCalcViewModel.DAMAGE_COEFFICIENT = {
-        MIN: 0.97,
-        MAX: 1.02,
-        AVG: 0.995
-    };
-    BaseLiveTourCalcViewModel.TOTAL_DAMAGE_COEFFICIENT = 5;
     return BaseLiveTourCalcViewModel;
 })(BaseLiveCalcViewModel);
 /*!
@@ -1933,11 +1915,11 @@ var ViewModel = (function (_super) {
         // 総発揮値計算
         var total_offense = 0;
         var total_defense = 0;
+        var damage = new Damage();
         var front_offense = 0;
         var front_defense = 0;
         var back_offense = 0;
         var back_defense = 0;
-        var total_damage = { min: 0, max: 0, avg: 0 };
         for (var i = 0; i < this.idol_list.length; i++) {
             var idol = this.idol_list[i];
             var member_type = (i < front_num);
@@ -1957,10 +1939,7 @@ var ViewModel = (function (_super) {
             total_defense += defense;
             // 与ダメージ計算
             if (is_guest_live) {
-                var damage = idol.calc_live_royal_damage();
-                total_damage["min"] += Math.ceil(damage * ViewModel.DAMAGE_COEFFICIENT["MIN"] * 10) / 10;
-                total_damage["max"] += Math.ceil(damage * ViewModel.DAMAGE_COEFFICIENT["MAX"] * 10) / 10;
-                total_damage["avg"] += Math.ceil(damage * ViewModel.DAMAGE_COEFFICIENT["AVG"] * 10) / 10;
+                damage.add_damage(idol.calc_live_royal_damage());
             }
             // 色設定
             idol.style = "numeric " + (member_type ? "front" : "back");
@@ -1972,19 +1951,10 @@ var ViewModel = (function (_super) {
         // ぷちデレラボーナス計算
         var petit_idol_bonus = this.calc_petit_idol_bonus();
         petit_idol_bonus = Math.ceil(petit_idol_bonus * battle_point_rate * voltage_bonus);
-        var petit_idol_damage = Math.floor(petit_idol_bonus * UserIdol.LIVE_ROYAL_DAMAGE_COEFFICIENT);
         total_offense += petit_idol_bonus;
         total_defense += petit_idol_bonus;
-        total_damage["min"] += petit_idol_damage;
-        total_damage["max"] += petit_idol_damage;
-        total_damage["avg"] += petit_idol_damage;
-        // 与ダメージ計算
-        this.total_damage_min = Math.ceil(total_damage["min"]);
-        this.total_damage_max = Math.ceil(total_damage["max"]);
-        this.total_damage_avg = Math.ceil(total_damage["avg"]);
-        this.battle_damage_min = this.total_damage_min * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
-        this.battle_damage_max = this.total_damage_max * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
-        this.battle_damage_avg = this.total_damage_avg * ViewModel.TOTAL_DAMAGE_COEFFICIENT;
+        damage.add_bonus(Math.floor(petit_idol_bonus * UserIdol.LIVE_ROYAL_DAMAGE_COEFFICIENT));
+        this.damage_list = [damage];
         return [total_offense, total_defense];
     };
     /******************************************************************************/
