@@ -33,7 +33,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.status_up = "0";
 		this.auto_sort = false;
 		this.sort_type = "0";
-		this.add_idol = new UserIdol(false);
+		this.add_idol = new UserIdol();
 		this.add_idol_num = "1";
 
 		// 発揮値
@@ -45,7 +45,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		var self = this;
 		this.add = function() {
 			var index:number = self.idol_list.indexOf(this);
-			self.idol_list.splice(index + 1, 0, new UserIdol(false));
+			self.idol_list.splice(index + 1, 0, new UserIdol());
 		};
 		this.remove = function() {
 			if(self.idol_list.length > 1) {
@@ -65,7 +65,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 	// アイドルリスト初期化
 	init_idol_list(): void {
 		var idols: UserIdol[] = [];
-		idols.push(new UserIdol(false));
+		idols.push(new UserIdol());
 		this.idol_list = idols;
 	}
 
@@ -202,7 +202,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 
 		var idol_list = this.idol_list;
 		for(var i: number = 0 ; i < num; i++) {
-			var idol: UserIdol = new UserIdol(false);
+			var idol: UserIdol = new UserIdol();
 			idol.set_setting(setting);
 			idol_list.push(idol);
 		}

@@ -119,7 +119,7 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 
 		var idols: UserIdol[] = [];
 		for(var i: number = 0; i < member_num; i++) {
-			var idol: UserIdol = new UserIdol(false);
+			var idol: UserIdol = new UserIdol();
 			if(settings[i] != null) {
 				idol.set_setting(settings[i]);
 			}

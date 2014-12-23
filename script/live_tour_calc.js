@@ -162,7 +162,7 @@ var Common = (function () {
 /// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 /// <reference path="common.ts" />
 var UserIdol = (function () {
-    function UserIdol(use_tour_skill) {
+    function UserIdol() {
         // ステータス
         this.id = "0";
         this.type = "0";
@@ -179,7 +179,6 @@ var UserIdol = (function () {
         this.skill_name = "無し";
         this.is_festival = false;
         this.is_survival = false;
-        this.use_tour_skill = use_tour_skill;
         this.enable_skill = false;
         // 発揮値
         this.actual_offense = 0;
@@ -332,9 +331,6 @@ var UserIdol = (function () {
         var skill_name = "無し";
         if (data != null) {
             skill_id = data["skill_id"];
-            if (this.use_tour_skill) {
-                skill_id = data["live_tour_skill_id"];
-            }
             if (data["skill_name"] != undefined && data["skill_name"] != "") {
                 skill_name = data["skill_name"];
             }
@@ -401,7 +397,7 @@ var UserIdol = (function () {
         return ratio;
     };
     UserIdol.prototype.load_idol_list = function (type, rarity) {
-        var fields = ["type", "rarity", "name", "cost", "max_offense", "max_defense", "skill_name", "skill_id", "live_tour_skill_id"];
+        var fields = ["type", "rarity", "name", "cost", "max_offense", "max_defense", "skill_name", "skill_id"];
         var deferred = jQuery.Deferred();
         jQuery.when(Common.load_idol_list(type, rarity, fields)).done(function (response) {
             deferred.resolve(response);
@@ -1244,12 +1240,12 @@ var BaseLiveCalcViewModel = (function () {
         jQuery.when.apply(null, method_list).done(function () {
             var idol_list = [];
             for (var i = 0; i < settings.length && i < max_num; i++) {
-                var idol = new UserIdol(false);
+                var idol = new UserIdol();
                 idol.set_setting(settings[i]);
                 idol_list.push(idol);
             }
             for (var i = idol_list.length; i < max_num; i++) {
-                var idol = new UserIdol(false);
+                var idol = new UserIdol();
                 idol_list.push(idol);
             }
             _this.idol_list = idol_list;
@@ -1777,7 +1773,7 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         }
         var idols = [];
         for (var i = 0; i < member_num; i++) {
-            var idol = new UserIdol(false);
+            var idol = new UserIdol();
             if (settings[i] != null) {
                 idol.set_setting(settings[i]);
             }

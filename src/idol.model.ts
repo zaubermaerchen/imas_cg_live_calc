@@ -52,7 +52,6 @@ class UserIdol {
 	skill_name: string;
 	is_festival: boolean;
 	is_survival: boolean;
-	use_tour_skill: boolean;
 	enable_skill: boolean;
 
 	// 発揮値
@@ -64,7 +63,7 @@ class UserIdol {
 	idol_data_list: { [index: string]: string; }[];
 	skill_data_list: { [index: string]: string; }[];
 
-	constructor(use_tour_skill: boolean) {
+	constructor() {
 		// ステータス
 		this.id = "0";
 		this.type = "0";
@@ -82,7 +81,6 @@ class UserIdol {
 		this.skill_name = "無し";
 		this.is_festival = false;
 		this.is_survival = false;
-		this.use_tour_skill = use_tour_skill;
 		this.enable_skill = false;
 
 		// 発揮値
@@ -246,9 +244,6 @@ class UserIdol {
 
 		if(data != null) {
 			skill_id = data["skill_id"];
-			if(this.use_tour_skill) {
-				skill_id = data["live_tour_skill_id"];
-			}
 			if(data["skill_name"] != undefined && data["skill_name"] != "") {
 				skill_name = data["skill_name"];
 			}
@@ -321,7 +316,7 @@ class UserIdol {
 	}
 
 	load_idol_list(type: number, rarity: number): JQueryPromise<{ [index: string]: { [index: string]: string; } }> {
-		var fields: string[] = ["type", "rarity", "name", "cost", "max_offense", "max_defense", "skill_name", "skill_id", "live_tour_skill_id"];
+		var fields: string[] = ["type", "rarity", "name", "cost", "max_offense", "max_defense", "skill_name", "skill_id"];
 		var deferred: JQueryDeferred<{ [index: string]: { [index: string]: string; } }> = jQuery.Deferred();
 		jQuery.when(Common.load_idol_list(type, rarity, fields)).done(function(response: { [index: string]: { [index: string]: string; } }) {
 			deferred.resolve(response);

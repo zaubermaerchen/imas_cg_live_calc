@@ -222,12 +222,12 @@ class BaseLiveCalcViewModel {
 		jQuery.when.apply(null, method_list).done(() => {
 			var idol_list: UserIdol[] = [];
 			for(var i: number = 0; i < settings.length && i < max_num; i++) {
-				var idol: UserIdol = new UserIdol(false);
+				var idol: UserIdol = new UserIdol();
 				idol.set_setting(settings[i]);
 				idol_list.push(idol);
 			}
 			for(var i: number = idol_list.length; i < max_num; i++) {
-				var idol: UserIdol = new UserIdol(false);
+				var idol: UserIdol = new UserIdol();
 				idol_list.push(idol);
 			}
 

@@ -162,7 +162,7 @@ var Common = (function () {
 /// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 /// <reference path="common.ts" />
 var UserIdol = (function () {
-    function UserIdol(use_tour_skill) {
+    function UserIdol() {
         // ステータス
         this.id = "0";
         this.type = "0";
@@ -179,7 +179,6 @@ var UserIdol = (function () {
         this.skill_name = "無し";
         this.is_festival = false;
         this.is_survival = false;
-        this.use_tour_skill = use_tour_skill;
         this.enable_skill = false;
         // 発揮値
         this.actual_offense = 0;
@@ -332,9 +331,6 @@ var UserIdol = (function () {
         var skill_name = "無し";
         if (data != null) {
             skill_id = data["skill_id"];
-            if (this.use_tour_skill) {
-                skill_id = data["live_tour_skill_id"];
-            }
             if (data["skill_name"] != undefined && data["skill_name"] != "") {
                 skill_name = data["skill_name"];
             }
@@ -401,7 +397,7 @@ var UserIdol = (function () {
         return ratio;
     };
     UserIdol.prototype.load_idol_list = function (type, rarity) {
-        var fields = ["type", "rarity", "name", "cost", "max_offense", "max_defense", "skill_name", "skill_id", "live_tour_skill_id"];
+        var fields = ["type", "rarity", "name", "cost", "max_offense", "max_defense", "skill_name", "skill_id"];
         var deferred = jQuery.Deferred();
         jQuery.when(Common.load_idol_list(type, rarity, fields)).done(function (response) {
             deferred.resolve(response);
@@ -1244,12 +1240,12 @@ var BaseLiveCalcViewModel = (function () {
         jQuery.when.apply(null, method_list).done(function () {
             var idol_list = [];
             for (var i = 0; i < settings.length && i < max_num; i++) {
-                var idol = new UserIdol(false);
+                var idol = new UserIdol();
                 idol.set_setting(settings[i]);
                 idol_list.push(idol);
             }
             for (var i = idol_list.length; i < max_num; i++) {
-                var idol = new UserIdol(false);
+                var idol = new UserIdol();
                 idol_list.push(idol);
             }
             _this.idol_list = idol_list;
@@ -1712,7 +1708,7 @@ var ViewModel = (function (_super) {
         this.groove_type = "-1";
         this.auto_sort = false;
         this.sort_type = "0";
-        this.add_idol = new UserIdol(false);
+        this.add_idol = new UserIdol();
         this.add_idol_num = "1";
         // 特技関係
         this.max_skill_invoke = 3;
@@ -1727,7 +1723,7 @@ var ViewModel = (function (_super) {
         var self = this;
         this.add = function () {
             var index = self.idol_list.indexOf(this);
-            self.idol_list.splice(index + 1, 0, new UserIdol(false));
+            self.idol_list.splice(index + 1, 0, new UserIdol());
         };
         this.remove = function () {
             if (self.idol_list.length > 1) {
@@ -1743,7 +1739,7 @@ var ViewModel = (function (_super) {
     // アイドルリスト初期化
     ViewModel.prototype.init_idol_list = function () {
         var idols = [];
-        idols.push(new UserIdol(false));
+        idols.push(new UserIdol());
         this.idol_list = idols;
     };
     ViewModel.prototype.is_festival = function () {
@@ -1949,7 +1945,7 @@ var ViewModel = (function (_super) {
         var num = parseInt(this.add_idol_num);
         var idol_list = this.idol_list;
         for (var i = 0; i < num; i++) {
-            var idol = new UserIdol(false);
+            var idol = new UserIdol();
             idol.set_setting(setting);
             idol_list.push(idol);
         }
