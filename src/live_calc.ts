@@ -185,12 +185,13 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.back_defense = Math.round(back_defense);
 
 		// ぷちデレラボーナス計算
-		var petit_idol_bonus: number = this.calc_petit_idol_bonus();
+		var petit_idol_total_status: number = this.calculation_petit_idol();
 		if(total_cost > 0) {
-			petit_idol_bonus = Math.floor(petit_idol_bonus * ((use_cost - rest_cost) / total_cost));
+			petit_idol_total_status = Math.floor(petit_idol_total_status * ((use_cost - rest_cost) / total_cost));
 		}
-		total_offense += petit_idol_bonus;
-		total_defense += petit_idol_bonus;
+		total_offense += petit_idol_total_status;
+		total_defense += petit_idol_total_status;
+		this.petit_idol_total_status = petit_idol_total_status;
 
 		return [Math.round(total_offense), Math.round(total_defense)];
 	}

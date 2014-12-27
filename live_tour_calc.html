@@ -127,6 +127,19 @@
 							</select>
 						</td>
 					</tr>
+					<!-- ko if: is_live_tour() -->
+					<tr>
+						<th>ぷちパワー発揮パラメータ</th>
+						<td>
+							<select name="petit_idol_bonus_parameter" data-bind="value: petit_idol_bonus_parameter">
+								<option value="-1" selected="selected">無し</option>
+								<option value="0">Vo</option>
+								<option value="1">Da</option>
+								<option value="2">Vi</option>
+							</select>
+						</td>
+					</tr>
+					<!-- /ko -->
 					<!-- ko if: is_talk_battle() -->
 					<tr>
 						<th>ぷちパワー発揮属性</th>
@@ -223,6 +236,10 @@
 					<td class="numeric" data-bind="text: back_defense">0</td>
 				</tr>
 				<tr>
+					<th colspan="5">ぷちデレラ発揮値</th>
+					<td colspan="2" class="numeric" data-bind="text: petit_idol_total_status">0</td>
+				</tr>
+				<tr>
 					<th colspan="5">総発揮値</th>
 					<td class="numeric" data-bind="text: actual_status()[0]">0</td>
 					<td class="numeric" data-bind="text: actual_status()[1]">0</td>
@@ -306,14 +323,19 @@
 			</tbody>
 		</table>
 
-		<!-- ko ifnot: is_live_tour() -->
 		<table>
 			<thead>
 				<tr>
 					<th>ぷちデレラ</th>
-					<th>総合値</th>
+					<th>発揮値</th>
 				</tr>
 			</thead>
+			<tfoot>
+				<tr>
+					<th>総発揮値</th>
+					<td class="numeric" data-bind="text: petit_idol_total_status">0</td>
+				</tr>
+			</tfoot>
 			<tbody id="petit_idol_list" data-bind="foreach: petit_idol_list">
 				<tr class="idol">
 					<td>
@@ -329,11 +351,10 @@
 						<span style="color: #ffff80;">Vi</span>
 						<input type="number" name="visual" class="status" value="0" data-bind="textInput: visual" />
 					</td>
-					<td class="numeric" data-bind="text: status">0</td>
+					<td class="numeric" data-bind="text: display_status()">0</td>
 				</tr>
 			</tbody>
 		</table>
-		<!-- /ko -->
 
 		<h3>与ダメージ</h3>
 		<table>
@@ -405,6 +426,6 @@
 		<script src="script/select2.min.js"></script>
 		<script src="script/select2_locale_ja.js"></script>
 		<script src="script/knockout-select2.js"></script>
-		<script src="script/live_tour_calc.min.js"></script>
+		<script src="script/live_tour_calc.js"></script>
 	</body>
 </html>

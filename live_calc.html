@@ -201,6 +201,10 @@
 					<td class="numeric" data-bind="text: back_defense">0</td>
 				</tr>
 				<tr>
+					<th colspan="6">ぷちデレラ発揮値</th>
+					<td colspan="2" class="numeric" data-bind="text: petit_idol_total_status">0</td>
+				</tr>
+				<tr>
 					<th colspan="6">総発揮値</th>
 					<td class="numeric" data-bind="text: actual_status()[0]">0</td>
 					<td class="numeric" data-bind="text: actual_status()[1]">0</td>
@@ -289,9 +293,15 @@
 			<thead>
 				<tr>
 					<th>ぷちデレラ</th>
-					<th>総合値</th>
+					<th>発揮値</th>
 				</tr>
 			</thead>
+			<tfoot>
+				<tr>
+					<th>総発揮値</th>
+					<td class="numeric" data-bind="text: petit_idol_total_status">0</td>
+				</tr>
+			</tfoot>
 			<tbody id="petit_idol_list" data-bind="foreach: petit_idol_list">
 				<tr class="idol">
 					<td>
@@ -307,7 +317,7 @@
 						<span style="color: #ffff80;">Vi</span>
 						<input type="number" name="visual" class="status" value="0" data-bind="textInput: visual" />
 					</td>
-					<td class="numeric" data-bind="text: status">0</td>
+					<td class="numeric" data-bind="text: display_status()">0</td>
 				</tr>
 			</tbody>
 		</table>

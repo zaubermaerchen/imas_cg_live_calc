@@ -40,11 +40,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		// スキル効果反映
 		this.calc_skill_value();
 
-		var battle_point: number = parseInt(this.battle_point);
-		var battle_point_rate: number = ViewModel.BATTLE_POINT_RATE_LIST[battle_point - 1];
-		if(this.is_guest_live()) {
-			battle_point_rate = ViewModel.GUEST_BATTLE_POINT_RATE_LIST[battle_point - 1];
-		}
+		var battle_point_rate: number = this.get_battle_point_rate();
 		var front_num: number = parseInt(this.front_num);
 		var producer_type: number = parseInt(this.producer_type);
 		var voltage_bonus: number = parseFloat(this.voltage_bonus);
@@ -92,16 +88,38 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.back_defense = back_defense;
 
 		// ぷちデレラボーナス計算
-		var petit_idol_bonus: number = this.calc_petit_idol_bonus();
-		petit_idol_bonus = Math.ceil(petit_idol_bonus * battle_point_rate * voltage_bonus);
-		total_offense += petit_idol_bonus;
-		total_defense += petit_idol_bonus;
-		damage.add_bonus(Math.floor(petit_idol_bonus * UserIdol.LIVE_ROYAL_DAMAGE_COEFFICIENT));
-
+		var petit_idol_total_status: number = this.calculation_petit_idol();
+		damage.add_bonus(Math.floor(petit_idol_total_status * UserIdol.LIVE_ROYAL_DAMAGE_COEFFICIENT));
+		total_offense += petit_idol_total_status;
+		total_defense += petit_idol_total_status;
+		this.petit_idol_total_status = petit_idol_total_status;
 
 		this.damage_list = [damage];
 
 		return [total_offense, total_defense];
+	}
+
+	calculation_petit_idol(): number {
+		var battle_point_rate: number = this.get_battle_point_rate();
+		var voltage_bonus: number = parseFloat(this.voltage_bonus);
+
+		var status: number = 0;
+		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
+			var petit_idol: UserPetitIdol = this.petit_idol_list[i];
+			petit_idol.calculation_live_royal(battle_point_rate, voltage_bonus);
+			status += petit_idol.status;
+		}
+
+		return Math.ceil(status);
+	}
+
+	get_battle_point_rate(): number {
+		var battle_point: number = parseInt(this.battle_point);
+		var battle_point_rate: number = ViewModel.BATTLE_POINT_RATE_LIST[battle_point - 1];
+		if(this.is_guest_live()) {
+			battle_point_rate = ViewModel.GUEST_BATTLE_POINT_RATE_LIST[battle_point - 1];
+		}
+		return battle_point_rate;
 	}
 
 	/******************************************************************************/

@@ -997,34 +997,79 @@ var UserPetitIdol = (function () {
         this.status = 0;
         ko.track(this);
     }
+    UserPetitIdol.prototype.display_status = function () {
+        return Math.ceil(this.status);
+    };
     // 総ステータス取得
-    UserPetitIdol.prototype.calc_status = function (bonus_type) {
-        if (bonus_type === void 0) { bonus_type = -1; }
+    UserPetitIdol.prototype.calculation = function () {
+        var parameters = this.get_parameters();
         var status = 0;
-        var type = parseInt(this.type);
-        var rate = 1 + UserPetitIdol.TYPE_BONSU_COEFFICIENT;
-        var vocal = parseInt(this.vocal);
-        if (!isNaN(vocal)) {
-            if (type == bonus_type) {
-                vocal = Math.ceil(vocal * rate);
-            }
-            status += vocal;
-        }
-        var dance = parseInt(this.dance);
-        if (!isNaN(dance)) {
-            if (type == bonus_type) {
-                dance = Math.ceil(dance * rate);
-            }
-            status += dance;
-        }
-        var visual = parseInt(this.visual);
-        if (!isNaN(visual)) {
-            if (type == bonus_type) {
-                visual = Math.ceil(visual * rate);
-            }
-            status += visual;
+        for (var i = 0; i < parameters.length; i++) {
+            status += parameters[i];
         }
         this.status = status;
+    };
+    UserPetitIdol.prototype.calculation_live_tour = function (bonus_parameter) {
+        var parameters = this.get_parameters();
+        var status = 0;
+        for (var i = 0; i < parameters.length; i++) {
+            // パラメーターボーナス
+            if (i == bonus_parameter) {
+                parameters[i] += parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT;
+            }
+            status += parameters[i];
+        }
+        this.status = status;
+    };
+    UserPetitIdol.prototype.calculation_dream_live_festival = function (fever_bonus) {
+        var parameters = this.get_parameters();
+        var status = 0;
+        for (var i = 0; i < parameters.length; i++) {
+            // フィーバーボーナス
+            parameters[i] += parameters[i] * fever_bonus / 100;
+            status += parameters[i];
+        }
+        this.status = status;
+    };
+    UserPetitIdol.prototype.calculation_talk_battle = function (bonus_type, cheer_bonus) {
+        var type = parseInt(this.type);
+        var parameters = this.get_parameters();
+        // ステータス計算
+        var status = 0;
+        for (var i = 0; i < parameters.length; i++) {
+            // 属性ボーナス
+            if (type == bonus_type) {
+                parameters[i] = Math.ceil(parameters[i] * UserPetitIdol.TYPE_BONUS_COEFFICIENT);
+            }
+            // 応援ボーナス
+            parameters[i] += parameters[i] * cheer_bonus / 100;
+            status += parameters[i];
+        }
+        this.status = status;
+    };
+    UserPetitIdol.prototype.calculation_live_royal = function (battle_point_rate, voltage_bonus) {
+        var parameters = this.get_parameters();
+        var status = 0;
+        for (var i = 0; i < parameters.length; i++) {
+            status += parameters[i];
+        }
+        // ボルテージボーナス
+        status = status * voltage_bonus;
+        // BP補正
+        status = status * battle_point_rate;
+        this.status = status;
+    };
+    UserPetitIdol.prototype.get_parameters = function () {
+        var parameters = [];
+        parameters.push(parseInt(this.vocal));
+        parameters.push(parseInt(this.dance));
+        parameters.push(parseInt(this.visual));
+        for (var i = 0; i < parameters.length; i++) {
+            if (isNaN(parameters[i])) {
+                parameters[i] = 0;
+            }
+        }
+        return parameters;
     };
     // 設定取得
     UserPetitIdol.prototype.get_setting = function () {
@@ -1043,7 +1088,9 @@ var UserPetitIdol = (function () {
         this.visual = setting["visual"];
     };
     // 属性一致ボーナス係数
-    UserPetitIdol.TYPE_BONSU_COEFFICIENT = 0.2;
+    UserPetitIdol.TYPE_BONUS_COEFFICIENT = 0.2;
+    // パラメーターボーナス係数
+    UserPetitIdol.PARAMETER_BONUS_COEFFICIENT = 0.5;
     return UserPetitIdol;
 })();
 /*!
@@ -1130,6 +1177,7 @@ var BaseLiveCalcViewModel = (function () {
         this.enable_skill_type = "0";
         this.rival_front_num = ["0", "0", "0"];
         this.rival_back_num = ["0", "0", "0"];
+        this.petit_idol_total_status = 0;
         // 特技関係
         this.max_skill_invoke = 0;
         this.skill_invocation_rate_list = [];
@@ -1187,12 +1235,11 @@ var BaseLiveCalcViewModel = (function () {
         }
         this.petit_idol_list = petit_idols;
     };
-    BaseLiveCalcViewModel.prototype.calc_petit_idol_bonus = function (bonus_type) {
-        if (bonus_type === void 0) { bonus_type = -1; }
+    BaseLiveCalcViewModel.prototype.calculation_petit_idol = function () {
         var petit_idol_bonus = 0;
         for (var i = 0; i < this.petit_idol_list.length; i++) {
             var petit_idol = this.petit_idol_list[i];
-            petit_idol.calc_status(bonus_type);
+            petit_idol.calculation();
             petit_idol_bonus += petit_idol.status;
         }
         return petit_idol_bonus;
@@ -1898,11 +1945,7 @@ var ViewModel = (function (_super) {
     ViewModel.prototype.calculation = function () {
         // スキル効果反映
         this.calc_skill_value();
-        var battle_point = parseInt(this.battle_point);
-        var battle_point_rate = ViewModel.BATTLE_POINT_RATE_LIST[battle_point - 1];
-        if (this.is_guest_live()) {
-            battle_point_rate = ViewModel.GUEST_BATTLE_POINT_RATE_LIST[battle_point - 1];
-        }
+        var battle_point_rate = this.get_battle_point_rate();
         var front_num = parseInt(this.front_num);
         var producer_type = parseInt(this.producer_type);
         var voltage_bonus = parseFloat(this.voltage_bonus);
@@ -1945,13 +1988,32 @@ var ViewModel = (function (_super) {
         this.back_offense = back_offense;
         this.back_defense = back_defense;
         // ぷちデレラボーナス計算
-        var petit_idol_bonus = this.calc_petit_idol_bonus();
-        petit_idol_bonus = Math.ceil(petit_idol_bonus * battle_point_rate * voltage_bonus);
-        total_offense += petit_idol_bonus;
-        total_defense += petit_idol_bonus;
-        damage.add_bonus(Math.floor(petit_idol_bonus * UserIdol.LIVE_ROYAL_DAMAGE_COEFFICIENT));
+        var petit_idol_total_status = this.calculation_petit_idol();
+        damage.add_bonus(Math.floor(petit_idol_total_status * UserIdol.LIVE_ROYAL_DAMAGE_COEFFICIENT));
+        total_offense += petit_idol_total_status;
+        total_defense += petit_idol_total_status;
+        this.petit_idol_total_status = petit_idol_total_status;
         this.damage_list = [damage];
         return [total_offense, total_defense];
+    };
+    ViewModel.prototype.calculation_petit_idol = function () {
+        var battle_point_rate = this.get_battle_point_rate();
+        var voltage_bonus = parseFloat(this.voltage_bonus);
+        var status = 0;
+        for (var i = 0; i < this.petit_idol_list.length; i++) {
+            var petit_idol = this.petit_idol_list[i];
+            petit_idol.calculation_live_royal(battle_point_rate, voltage_bonus);
+            status += petit_idol.status;
+        }
+        return Math.ceil(status);
+    };
+    ViewModel.prototype.get_battle_point_rate = function () {
+        var battle_point = parseInt(this.battle_point);
+        var battle_point_rate = ViewModel.BATTLE_POINT_RATE_LIST[battle_point - 1];
+        if (this.is_guest_live()) {
+            battle_point_rate = ViewModel.GUEST_BATTLE_POINT_RATE_LIST[battle_point - 1];
+        }
+        return battle_point_rate;
     };
     /******************************************************************************/
     // 設定関連

@@ -5,7 +5,6 @@
  * http://opensource.org/licenses/mit-license.php
  */
 /// <reference path="live_tour_calc.base.ts" />
-
 class ViewModel extends BaseLiveTourCalcViewModel {
 	//
 	static USE_POINT_COEFFICIENT: number[] = [1, 2.5, 5];
@@ -16,6 +15,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	combo_level: string;
 	fever_bonus: string;
 	cheer_bonus: string;
+	petit_idol_bonus_parameter: string;
 	petit_idol_bonus_type: string;
 
 	constructor() {
@@ -30,6 +30,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.fever_bonus = "1";
 		this.cheer_bonus = "0";
 		this.petit_idol_bonus_type = "-1";
+		this.petit_idol_bonus_parameter = "-1";
 
 		// セーブデータ関係
 		this.save_data_key = "imas_cg_live_tour_calc";
@@ -60,7 +61,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		var training_room_level: number = parseInt(this.training_room_level);
 		var fever_bonus: number = parseInt(this.fever_bonus);
 		var cheer_bonus: number = parseInt(this.cheer_bonus);
-		var petit_idol_bonus_type: number = parseInt(this.petit_idol_bonus_type);
 		var front_num: number = parseInt(this.front_num);
 
 		// 総発揮値計算
@@ -125,31 +125,62 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.back_defense = Math.ceil(back_defense);
 
 		// ぷちデレラボーナス計算
-		var petit_idol_bonus: number = 0;
+		var petit_idol_total_status: number = this.calculation_petit_idol();
 		switch(calc_type) {
 			case CALCULATION_TYPE.DREAM_LIVE_FESTIVAL:
 				// ドリームLIVEフェス
-				petit_idol_bonus = this.calc_petit_idol_bonus();
-				petit_idol_bonus = petit_idol_bonus + Math.ceil(petit_idol_bonus * fever_bonus / 100);
-				damage_list[0].add_bonus(Math.floor(petit_idol_bonus * UserIdol.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT / 5));
-				damage_list[1].add_bonus(Math.floor(petit_idol_bonus * UserIdol.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT / 5));
+				damage_list[0].add_bonus(Math.floor(petit_idol_total_status * UserIdol.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT / 5));
+				damage_list[1].add_bonus(Math.floor(petit_idol_total_status * UserIdol.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT / 5));
 				break;
 			case CALCULATION_TYPE.TALK_BATTLE:
 				// トークバトル
-				petit_idol_bonus = this.calc_petit_idol_bonus(petit_idol_bonus_type);
-				petit_idol_bonus = petit_idol_bonus + Math.ceil(petit_idol_bonus * cheer_bonus / 100);
 				for(var i: number = 0; i < damage_list.length; i++) {
-					damage_list[i].add_bonus(Math.ceil(petit_idol_bonus * ViewModel.USE_POINT_COEFFICIENT[i] / 5));
+					damage_list[i].add_bonus(Math.ceil(petit_idol_total_status * ViewModel.USE_POINT_COEFFICIENT[i] / 5));
 				}
 				break;
 			default:
 				// LIVEツアー
+				damage_list[0].add_bonus(Math.floor(petit_idol_total_status * UserIdol.LIVE_TOUR_NORMAL_LIVE_COEFFICIENT / 5));
+				damage_list[1].add_bonus(Math.floor(petit_idol_total_status * UserIdol.LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT / 5));
 		}
-		total_offense += petit_idol_bonus;
-		total_defense += petit_idol_bonus;
+		total_offense += petit_idol_total_status;
+		total_defense += petit_idol_total_status;
+		this.petit_idol_total_status = petit_idol_total_status;
+
 		this.damage_list = damage_list;
 
 		return [Math.ceil(total_offense), Math.ceil(total_defense)];
+	}
+
+	calculation_petit_idol(): number {
+		var calc_type: number = parseInt(this.calc_type);
+		var bonus_type: number = parseInt(this.petit_idol_bonus_type);
+		var bonus_parameter: number = parseInt(this.petit_idol_bonus_parameter);
+		var fever_bonus: number = parseInt(this.fever_bonus);
+		var cheer_bonus: number = parseInt(this.cheer_bonus);
+
+		var status: number = 0;
+		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
+			var petit_idol: UserPetitIdol = this.petit_idol_list[i];
+
+			switch(calc_type) {
+				case CALCULATION_TYPE.DREAM_LIVE_FESTIVAL:
+					// ドリームLIVEフェス
+					petit_idol.calculation_dream_live_festival(fever_bonus);
+					break;
+				case CALCULATION_TYPE.TALK_BATTLE:
+					// トークバトル
+					petit_idol.calculation_talk_battle(bonus_type, cheer_bonus);
+					break;
+				default:
+					// LIVEツアー
+					petit_idol.calculation_live_tour(bonus_parameter);
+					break;
+			}
+			status += petit_idol.status;
+		}
+
+		return Math.ceil(status);
 	}
 
 	/******************************************************************************/

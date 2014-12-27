@@ -79,6 +79,8 @@ class BaseLiveCalcViewModel {
 	rival_front_num: string[];
 	rival_back_num: string[];
 
+	petit_idol_total_status: number;
+
 	// 特技関係
 	max_skill_invoke: number;
 	skill_invocation_rate_list: number[];
@@ -110,6 +112,8 @@ class BaseLiveCalcViewModel {
 		this.enable_skill_type = "0";
 		this.rival_front_num = ["0", "0", "0"];
 		this.rival_back_num = ["0", "0", "0"];
+
+		this.petit_idol_total_status = 0;
 
 		// 特技関係
 		this.max_skill_invoke = 0;
@@ -168,11 +172,11 @@ class BaseLiveCalcViewModel {
 		this.petit_idol_list = petit_idols;
 	}
 
-	calc_petit_idol_bonus(bonus_type: number = -1): number {
+	calculation_petit_idol(): number {
 		var petit_idol_bonus: number = 0;
 		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
 			var petit_idol: UserPetitIdol = this.petit_idol_list[i];
-			petit_idol.calc_status(bonus_type);
+			petit_idol.calculation();
 			petit_idol_bonus += petit_idol.status;
 		}
 
