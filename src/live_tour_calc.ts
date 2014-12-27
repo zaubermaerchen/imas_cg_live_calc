@@ -156,6 +156,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		var calc_type: number = parseInt(this.calc_type);
 		var bonus_type: number = parseInt(this.petit_idol_bonus_type);
 		var bonus_parameter: number = parseInt(this.petit_idol_bonus_parameter);
+		var voltage_bonus: number = parseInt(this.voltage_bonus);
 		var fever_bonus: number = parseInt(this.fever_bonus);
 		var cheer_bonus: number = parseInt(this.cheer_bonus);
 
@@ -174,7 +175,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 					break;
 				default:
 					// LIVEツアー
-					petit_idol.calculation_live_tour(bonus_parameter);
+					petit_idol.calculation_live_tour(bonus_parameter, voltage_bonus);
 					break;
 			}
 			status += petit_idol.status;

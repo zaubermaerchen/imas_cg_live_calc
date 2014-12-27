@@ -44,7 +44,7 @@ class UserPetitIdol {
 		this.status = status;
 	}
 
-	calculation_live_tour(bonus_parameter: number): void {
+	calculation_live_tour(bonus_parameter: number, voltage_bonus: number): void {
 		var parameters = this.get_parameters();
 
 		var status: number = 0;
@@ -53,6 +53,9 @@ class UserPetitIdol {
 			if(i == bonus_parameter) {
 				parameters[i] += parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT;
 			}
+
+			// ボルテージボーナス
+			parameters[i] += parameters[i] * voltage_bonus / 100;
 
 			status += parameters[i];
 		}

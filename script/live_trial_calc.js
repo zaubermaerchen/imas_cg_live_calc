@@ -1009,7 +1009,7 @@ var UserPetitIdol = (function () {
         }
         this.status = status;
     };
-    UserPetitIdol.prototype.calculation_live_tour = function (bonus_parameter) {
+    UserPetitIdol.prototype.calculation_live_tour = function (bonus_parameter, voltage_bonus) {
         var parameters = this.get_parameters();
         var status = 0;
         for (var i = 0; i < parameters.length; i++) {
@@ -1017,6 +1017,8 @@ var UserPetitIdol = (function () {
             if (i == bonus_parameter) {
                 parameters[i] += parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT;
             }
+            // ボルテージボーナス
+            parameters[i] += parameters[i] * voltage_bonus / 100;
             status += parameters[i];
         }
         this.status = status;
