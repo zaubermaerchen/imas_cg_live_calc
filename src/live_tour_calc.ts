@@ -197,6 +197,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		setting["fever_bonus"] = this.fever_bonus;
 		setting["cheer_bonus"] = this.cheer_bonus;
 		setting["petit_idol_bonus_type"] = this.petit_idol_bonus_type;
+		setting["petit_idol_bonus_parameter"] = this.petit_idol_bonus_parameter;
 
 		return setting;
 	}
@@ -217,6 +218,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 			this.cheer_bonus = setting["cheer_bonus"];
 		}
 		this.petit_idol_bonus_type = setting["petit_idol_bonus_type"];
+		this.petit_idol_bonus_parameter = setting["petit_idol_bonus_parameter"];
 	}
 
 	/******************************************************************************/
