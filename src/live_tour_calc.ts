@@ -16,7 +16,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	fever_bonus: string;
 	cheer_bonus: string;
 	petit_idol_bonus_parameter: string;
-	petit_idol_bonus_type: string;
 
 	constructor() {
 		super();
@@ -29,7 +28,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.combo_level = "0";
 		this.fever_bonus = "1";
 		this.cheer_bonus = "0";
-		this.petit_idol_bonus_type = "-1";
 		this.petit_idol_bonus_parameter = "-1";
 
 		// セーブデータ関係

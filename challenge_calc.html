@@ -91,6 +91,17 @@
 							</select>
 						</td>
 					</tr>
+					<tr>
+						<th>ぷちパワー発揮属性</th>
+						<td>
+							<select name="petit_idol_bonus_type" data-bind="value: petit_idol_bonus_type">
+								<option value="-1" selected="selected">無し</option>
+								<option value="0">キュート</option>
+								<option value="1">クール</option>
+								<option value="2">パッション</option>
+							</select>
+						</td>
+					</tr>
 				</tbody>
 			</table>
 
@@ -162,6 +173,10 @@
 					<th colspan="5">バックメンバー発揮値</th>
 					<td class="numeric" data-bind="text: back_offense">0</td>
 					<td class="numeric" data-bind="text: back_defense">0</td>
+				</tr>
+				<tr>
+					<th colspan="5">ぷちデレラ発揮値</th>
+					<td colspan="2" class="numeric" data-bind="text: petit_idol_total_status">0</td>
 				</tr>
 				<tr>
 					<th colspan="5">総発揮値</th>
@@ -243,6 +258,39 @@
 					</td>
 					<td class="numeric" data-bind="text: display_offense(), css: style">0</td>
 					<td class="numeric" data-bind="text: display_defense(), css: style">0</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<table>
+			<thead>
+				<tr>
+					<th>ぷちデレラ</th>
+					<th>発揮値</th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					<th>総発揮値</th>
+					<td class="numeric" data-bind="text: petit_idol_total_status">0</td>
+				</tr>
+			</tfoot>
+			<tbody id="petit_idol_list" data-bind="foreach: petit_idol_list">
+				<tr class="idol">
+					<td>
+						<select name="type" data-bind="value: type">
+							<option value="0" selected="selected">キュート</option>
+							<option value="1">クール</option>
+							<option value="2">パッション</option>
+						</select>
+						<span style="color: #ff0000;">Vo</span>
+						<input type="number" name="vocal" class="status" value="0" data-bind="textInput: vocal" />
+						<span style="color: #0000ff;">Da</span>
+						<input type="number" name="dance" class="status" value="0" data-bind="textInput: dance" />
+						<span style="color: #ffff80;">Vi</span>
+						<input type="number" name="visual" class="status" value="0" data-bind="textInput: visual" />
+					</td>
+					<td class="numeric" data-bind="text: display_status()">0</td>
 				</tr>
 			</tbody>
 		</table>

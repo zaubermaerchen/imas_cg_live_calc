@@ -62,6 +62,7 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 
 	// 入力項目
 	voltage_bonus: string;
+	petit_idol_bonus_type: string;
 
 	// 発揮値
 	front_offense: number;
@@ -70,6 +71,7 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 	back_defense: number;
 	// LIVE時の与ダメージ
 	damage_list: Damage[];
+
 
 	constructor() {
 		super();
@@ -80,6 +82,7 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 		// 入力値
 		this.front_num = "10";
 		this.voltage_bonus = "0";
+		this.petit_idol_bonus_type = "-1";
 
 		// 特技関係
 		this.max_skill_invoke = 5;
