@@ -1,8 +1,3 @@
-/*!
- * Copyright (c) 2014 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
- * Released under the MIT license
- * http://opensource.org/licenses/mit-license.php
- */
 /// <reference path="typings/knockout/knockout.d.ts" />
 /// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 

@@ -1,9 +1,3 @@
-/*!
- * THE IDOLM@STER CINDERELLA GIRLS Exertion Value Calculator for Live Trial
- * Copyright (c) 2013 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
- * Released under the MIT license
- * http://opensource.org/licenses/mit-license.php
- */
 /// <reference path="live_calc.base.ts" />
 
 class ViewModel extends BaseLiveCalcViewModel {

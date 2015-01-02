@@ -1,9 +1,3 @@
-/*!
- * THE IDOLM@STER CINDERELLA GIRLS Exertion Value Calculator Base Class for Live Tour
- * Copyright (c) 2013 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
- * Released under the MIT license
- * http://opensource.org/licenses/mit-license.php
- */
 /// <reference path="live_calc.base.ts" />
 class DamageValue {
 	static BATTLE_DAMAGE_COEFFICIENT: number = 5;

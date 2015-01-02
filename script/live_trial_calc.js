@@ -1,8 +1,3 @@
-/*!
- * Copyright (c) 2012 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
- * Released under the MIT license
- * http://opensource.org/licenses/mit-license.php
- */
 /// <reference path="typings/jquery/jquery.d.ts" />
 var Common = (function () {
     function Common() {
@@ -153,11 +148,6 @@ var Common = (function () {
     Common.cache_data = {};
     return Common;
 })();
-/*!
- * Copyright (c) 2012 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
- * Released under the MIT license
- * http://opensource.org/licenses/mit-license.php
- */
 /// <reference path="typings/knockout/knockout.d.ts" />
 /// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 /// <reference path="common.ts" />
@@ -980,11 +970,6 @@ var UserIdol = (function () {
     UserIdol.TALK_BATTLE_COMBO_LEVEL_COEFFICIENT = 50; // コンボLV係数
     return UserIdol;
 })();
-/*!
- * Copyright (c) 2014 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
- * Released under the MIT license
- * http://opensource.org/licenses/mit-license.php
- */
 /// <reference path="typings/knockout/knockout.d.ts" />
 /// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 var UserPetitIdol = (function () {
@@ -1111,12 +1096,6 @@ var UserPetitIdol = (function () {
     UserPetitIdol.PARAMETER_BONUS_COEFFICIENT = 0.5;
     return UserPetitIdol;
 })();
-/*!
- * THE IDOLM@STER CINDERELLA GIRLS Exertion Value Calculator Base Class
- * Copyright (c) 2012 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
- * Released under the MIT license
- * http://opensource.org/licenses/mit-license.php
- */
 /// <reference path="typings/knockout/knockout.d.ts" />
 /// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 /// <reference path="common.ts" />
@@ -1744,12 +1723,6 @@ var BaseLiveCalcViewModel = (function () {
     BaseLiveCalcViewModel.PETIT_IDOL_NUM = 3;
     return BaseLiveCalcViewModel;
 })();
-/*!
- * THE IDOLM@STER CINDERELLA GIRLS Exertion Value Calculator for Live Trial
- * Copyright (c) 2013 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
- * Released under the MIT license
- * http://opensource.org/licenses/mit-license.php
- */
 /// <reference path="live_calc.base.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];

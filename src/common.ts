@@ -1,8 +1,3 @@
-/*!
- * Copyright (c) 2012 Mutsuki Kimuraya (http://www4018uf.sakura.ne.jp/)
- * Released under the MIT license
- * http://opensource.org/licenses/mit-license.php
- */
 /// <reference path="typings/jquery/jquery.d.ts" />
 declare var Zlib: any;
 
