@@ -1034,10 +1034,14 @@ var UserPetitIdol = (function () {
         }
         this.status = status;
     };
-    UserPetitIdol.prototype.calculation_live_royal = function (battle_point_rate, voltage_bonus) {
+    UserPetitIdol.prototype.calculation_live_royal = function (bonus_parameter, battle_point_rate, voltage_bonus) {
         var parameters = this.get_parameters();
         var status = 0;
         for (var i = 0; i < parameters.length; i++) {
+            // パラメーターボーナス
+            if (i == bonus_parameter) {
+                parameters[i] += parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT;
+            }
             // ボルテージボーナス
             parameters[i] = parameters[i] * voltage_bonus;
             status += parameters[i];

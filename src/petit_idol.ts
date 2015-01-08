@@ -93,11 +93,16 @@ class UserPetitIdol {
 		this.status = status;
 	}
 
-	calculation_live_royal(battle_point_rate: number, voltage_bonus: number): void {
+	calculation_live_royal(bonus_parameter: number, battle_point_rate: number, voltage_bonus: number): void {
 		var parameters = this.get_parameters();
 
 		var status: number = 0;
 		for(var i: number = 0; i < parameters.length; i++) {
+			// パラメーターボーナス
+			if(i == bonus_parameter) {
+				parameters[i] += parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT;
+			}
+
 			// ボルテージボーナス
 			parameters[i] = parameters[i] * voltage_bonus;
 

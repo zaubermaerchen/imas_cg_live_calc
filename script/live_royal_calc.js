@@ -1034,10 +1034,14 @@ var UserPetitIdol = (function () {
         }
         this.status = status;
     };
-    UserPetitIdol.prototype.calculation_live_royal = function (battle_point_rate, voltage_bonus) {
+    UserPetitIdol.prototype.calculation_live_royal = function (bonus_parameter, battle_point_rate, voltage_bonus) {
         var parameters = this.get_parameters();
         var status = 0;
         for (var i = 0; i < parameters.length; i++) {
+            // パラメーターボーナス
+            if (i == bonus_parameter) {
+                parameters[i] += parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT;
+            }
             // ボルテージボーナス
             parameters[i] = parameters[i] * voltage_bonus;
             status += parameters[i];
@@ -1780,6 +1784,7 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         this.front_num = "10";
         this.voltage_bonus = "0";
         this.petit_idol_bonus_type = "-1";
+        this.petit_idol_bonus_parameter = "-1";
         // 特技関係
         this.max_skill_invoke = 5;
         this.skill_invocation_rate_list = [
@@ -1983,12 +1988,13 @@ var ViewModel = (function (_super) {
         return [total_offense, total_defense];
     };
     ViewModel.prototype.calculation_petit_idol = function () {
+        var bonus_parameter = parseInt(this.petit_idol_bonus_parameter);
         var battle_point_rate = this.get_battle_point_rate();
         var voltage_bonus = parseFloat(this.voltage_bonus);
         var status = 0;
         for (var i = 0; i < this.petit_idol_list.length; i++) {
             var petit_idol = this.petit_idol_list[i];
-            petit_idol.calculation_live_royal(battle_point_rate, voltage_bonus);
+            petit_idol.calculation_live_royal(bonus_parameter, battle_point_rate, voltage_bonus);
             status += petit_idol.status;
         }
         return Math.ceil(status);
@@ -2009,6 +2015,7 @@ var ViewModel = (function (_super) {
         var setting = _super.prototype.get_setting.call(this);
         setting["battle_point"] = this.battle_point;
         setting["voltage_bonus"] = this.voltage_bonus;
+        setting["petit_idol_bonus_parameter"] = this.petit_idol_bonus_parameter;
         return setting;
     };
     // 設定反映
@@ -2016,6 +2023,7 @@ var ViewModel = (function (_super) {
         _super.prototype.set_setting.call(this, setting);
         this.battle_point = setting["battle_point"];
         this.voltage_bonus = setting["voltage_bonus"];
+        this.petit_idol_bonus_parameter = setting["petit_idol_bonus_parameter"];
     };
     /******************************************************************************/
     // スキル関連

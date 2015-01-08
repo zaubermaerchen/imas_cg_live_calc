@@ -1034,10 +1034,14 @@ var UserPetitIdol = (function () {
         }
         this.status = status;
     };
-    UserPetitIdol.prototype.calculation_live_royal = function (battle_point_rate, voltage_bonus) {
+    UserPetitIdol.prototype.calculation_live_royal = function (bonus_parameter, battle_point_rate, voltage_bonus) {
         var parameters = this.get_parameters();
         var status = 0;
         for (var i = 0; i < parameters.length; i++) {
+            // パラメーターボーナス
+            if (i == bonus_parameter) {
+                parameters[i] += parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT;
+            }
             // ボルテージボーナス
             parameters[i] = parameters[i] * voltage_bonus;
             status += parameters[i];
@@ -1780,6 +1784,7 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         this.front_num = "10";
         this.voltage_bonus = "0";
         this.petit_idol_bonus_type = "-1";
+        this.petit_idol_bonus_parameter = "-1";
         // 特技関係
         this.max_skill_invoke = 5;
         this.skill_invocation_rate_list = [

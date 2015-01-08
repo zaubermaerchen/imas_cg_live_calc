@@ -95,6 +95,17 @@
 						</td>
 					</tr>
 					<tr>
+						<th>ぷちパワー発揮パラメータ</th>
+						<td>
+							<select name="petit_idol_bonus_parameter" data-bind="value: petit_idol_bonus_parameter">
+								<option value="-1" selected="selected">無し</option>
+								<option value="0">Vo</option>
+								<option value="1">Da</option>
+								<option value="2">Vi</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
 						<th>計算方式</th>
 						<td>
 							<select name="calc_type" data-bind="value: calc_type">
@@ -295,7 +306,7 @@
 						<span style="color: #ffff80;">Vi</span>
 						<input type="number" name="visual" class="status" value="0" data-bind="textInput: visual" />
 					</td>
-					<td class="numeric" data-bind="text: status">0</td>
+					<td class="numeric" data-bind="text: display_status()">0</td>
 				</tr>
 			</tbody>
 		</table>
