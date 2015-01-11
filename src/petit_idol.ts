@@ -46,7 +46,7 @@ class UserPetitIdol {
 		for(var i: number = 0; i < parameters.length; i++) {
 			// パラメーターボーナス
 			if(i == bonus_parameter) {
-				parameters[i] += parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT;
+				parameters[i] += Math.ceil(parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT);
 			}
 
 			// ボルテージボーナス
@@ -100,14 +100,14 @@ class UserPetitIdol {
 		for(var i: number = 0; i < parameters.length; i++) {
 			// パラメーターボーナス
 			if(i == bonus_parameter) {
-				parameters[i] += parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT;
+				parameters[i] += Math.ceil(parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT);
 			}
-
-			// ボルテージボーナス
-			parameters[i] = parameters[i] * voltage_bonus;
 
 			status += parameters[i];
 		}
+
+		// ボルテージボーナス
+		status = Math.ceil(status * voltage_bonus);
 
 		// BP補正
 		status = status * battle_point_rate;
