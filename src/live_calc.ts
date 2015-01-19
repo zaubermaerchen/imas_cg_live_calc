@@ -189,6 +189,22 @@ class ViewModel extends BaseLiveCalcViewModel {
 
 		return [Math.round(total_offense), Math.round(total_defense)];
 	}
+	
+	calculation_petit_idol(): number {
+		var calc_type: number = parseInt(this.calc_type);
+		if(calc_type != CALCULATION_TYPE.FESTIVAL_S) {
+			return super.calculation_petit_idol();
+		}
+		var groove_type: number = parseInt(this.groove_type);
+		var petit_idol_bonus: number = 0;
+		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
+			var petit_idol: UserPetitIdol = this.petit_idol_list[i];
+			petit_idol.calculation(groove_type);
+			petit_idol_bonus += petit_idol.status;
+		}
+
+		return petit_idol_bonus;
+	}
 
 	// ソート処理
 	sort_idol(): void {

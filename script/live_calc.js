@@ -986,64 +986,49 @@ var UserPetitIdol = (function () {
         return Math.ceil(this.status);
     };
     // 総ステータス取得
-    UserPetitIdol.prototype.calculation = function () {
+    UserPetitIdol.prototype.calculation = function (bonus_type, bonus_parameter) {
+        if (bonus_type === void 0) { bonus_type = -1; }
+        if (bonus_parameter === void 0) { bonus_parameter = -1; }
+        var type = parseInt(this.type);
         var parameters = this.get_parameters();
         var status = 0;
         for (var i = 0; i < parameters.length; i++) {
+            // パラメーターボーナス
+            if (i == bonus_parameter) {
+                parameters[i] += Math.ceil(parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT);
+            }
             status += parameters[i];
+        }
+        // 属性ボーナス
+        if (type == bonus_type) {
+            status += Math.ceil(status * UserPetitIdol.TYPE_BONUS_COEFFICIENT);
         }
         this.status = status;
     };
     UserPetitIdol.prototype.calculation_live_tour = function (bonus_parameter, voltage_bonus) {
-        var parameters = this.get_parameters();
-        var status = 0;
-        for (var i = 0; i < parameters.length; i++) {
-            // パラメーターボーナス
-            if (i == bonus_parameter) {
-                parameters[i] += Math.ceil(parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT);
-            }
-            // ボルテージボーナス
-            parameters[i] += parameters[i] * voltage_bonus / 100;
-            status += parameters[i];
-        }
+        this.calculation(-1, bonus_parameter);
+        var status = this.status;
+        // ボルテージボーナス
+        status += status * voltage_bonus / 100;
         this.status = status;
     };
     UserPetitIdol.prototype.calculation_dream_live_festival = function (fever_bonus) {
-        var parameters = this.get_parameters();
-        var status = 0;
-        for (var i = 0; i < parameters.length; i++) {
-            // フィーバーボーナス
-            parameters[i] += parameters[i] * fever_bonus / 100;
-            status += parameters[i];
-        }
+        this.calculation();
+        var status = this.status;
+        // フィーバーボーナス
+        status += status * fever_bonus / 100;
         this.status = status;
     };
     UserPetitIdol.prototype.calculation_talk_battle = function (bonus_type, cheer_bonus) {
-        var type = parseInt(this.type);
-        var parameters = this.get_parameters();
-        // ステータス計算
-        var status = 0;
-        for (var i = 0; i < parameters.length; i++) {
-            // 属性ボーナス
-            if (type == bonus_type) {
-                parameters[i] += Math.ceil(parameters[i] * UserPetitIdol.TYPE_BONUS_COEFFICIENT);
-            }
-            // 応援ボーナス
-            parameters[i] += parameters[i] * cheer_bonus / 100;
-            status += parameters[i];
-        }
+        this.calculation(bonus_type);
+        var status = this.status;
+        // 応援ボーナス
+        status += status * cheer_bonus / 100;
         this.status = status;
     };
     UserPetitIdol.prototype.calculation_live_royal = function (bonus_parameter, battle_point_rate, voltage_bonus) {
-        var parameters = this.get_parameters();
-        var status = 0;
-        for (var i = 0; i < parameters.length; i++) {
-            // パラメーターボーナス
-            if (i == bonus_parameter) {
-                parameters[i] += Math.ceil(parameters[i] * UserPetitIdol.PARAMETER_BONUS_COEFFICIENT);
-            }
-            status += parameters[i];
-        }
+        this.calculation(-1, bonus_parameter);
+        var status = this.status;
         // ボルテージボーナス
         status = Math.ceil(status * voltage_bonus);
         // BP補正
@@ -1051,19 +1036,10 @@ var UserPetitIdol = (function () {
         this.status = status;
     };
     UserPetitIdol.prototype.calculation_challenge = function (bonus_type, fever_bonus) {
-        var type = parseInt(this.type);
-        var parameters = this.get_parameters();
-        // ステータス計算
-        var status = 0;
-        for (var i = 0; i < parameters.length; i++) {
-            // 属性ボーナス
-            if (type == bonus_type) {
-                parameters[i] += Math.ceil(parameters[i] * UserPetitIdol.TYPE_BONUS_COEFFICIENT);
-            }
-            // フィーバーボーナス
-            parameters[i] += parameters[i] * fever_bonus / 100;
-            status += parameters[i];
-        }
+        this.calculation(bonus_type);
+        var status = this.status;
+        // フィーバーボーナス
+        status += status * fever_bonus / 100;
         this.status = status;
     };
     UserPetitIdol.prototype.get_parameters = function () {
@@ -1321,7 +1297,7 @@ var BaseLiveCalcViewModel = (function () {
         for (var i = 0; i < settings.length; i++) {
             if (settings[i] != undefined) {
                 var setting = settings[i];
-                appeal_bonus[setting["type"]] = setting["value"];
+                appeal_bonus[setting["type"]] = setting["value"].toString();
             }
         }
         this.appeal_bonus = appeal_bonus;
@@ -1356,7 +1332,7 @@ var BaseLiveCalcViewModel = (function () {
             for (var i = 0; i < settings["front"].length; i++) {
                 if (settings["front"][i] != undefined) {
                     var setting = settings["front"][i];
-                    rival_front_num[setting["type"]] = setting["value"];
+                    rival_front_num[setting["type"]] = setting["value"].toString();
                 }
             }
             this.rival_front_num = rival_front_num;
@@ -1367,7 +1343,7 @@ var BaseLiveCalcViewModel = (function () {
             for (var i = 0; i < settings["back"].length; i++) {
                 if (settings["back"][i] != undefined) {
                     var setting = settings["back"][i];
-                    rival_back_num[setting["type"]] = setting["value"];
+                    rival_back_num[setting["type"]] = setting["value"].toString();
                 }
             }
             this.rival_back_num = rival_back_num;
@@ -1886,6 +1862,20 @@ var ViewModel = (function (_super) {
         total_defense += petit_idol_total_status;
         this.petit_idol_total_status = petit_idol_total_status;
         return [Math.round(total_offense), Math.round(total_defense)];
+    };
+    ViewModel.prototype.calculation_petit_idol = function () {
+        var calc_type = parseInt(this.calc_type);
+        if (calc_type != 10 /* FESTIVAL_S */) {
+            return _super.prototype.calculation_petit_idol.call(this);
+        }
+        var groove_type = parseInt(this.groove_type);
+        var petit_idol_bonus = 0;
+        for (var i = 0; i < this.petit_idol_list.length; i++) {
+            var petit_idol = this.petit_idol_list[i];
+            petit_idol.calculation(groove_type);
+            petit_idol_bonus += petit_idol.status;
+        }
+        return petit_idol_bonus;
     };
     // ソート処理
     ViewModel.prototype.sort_idol = function () {

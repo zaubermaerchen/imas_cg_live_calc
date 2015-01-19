@@ -237,11 +237,11 @@ class BaseLiveCalcViewModel {
 	}
 
 	// アピールボーナス設定取得
-	get_appeal_bonus_setting(): { [index: number]: string; }[] {
-		var settings: { [index: number]: string; }[] = [];
+	get_appeal_bonus_setting(): { [index: string]: string; }[] {
+		var settings: { [index: string]: string; }[] = [];
 
 		for(var i: number = 0; i < this.appeal_bonus.length; i++) {
-			var setting: { [index: number]: string; } = {};
+			var setting: { [index: string]: string; } = {};
 			setting["type"] = i.toString();
 			setting["value"] = this.appeal_bonus[i];
 			settings.push(setting);
@@ -251,7 +251,7 @@ class BaseLiveCalcViewModel {
 	}
 
 	// アピールボーナス設定反映
-	set_appeal_bonus_setting(settings: { [index: number]: string; }[]): void {
+	set_appeal_bonus_setting(settings: { [index: string]: number; }[]): void {
 		if(settings == undefined) {
 			return;
 		}
@@ -260,7 +260,7 @@ class BaseLiveCalcViewModel {
 		for(var i: number = 0; i < settings.length; i++) {
 			if(settings[i] != undefined) {
 				var setting = settings[i];
-				appeal_bonus[setting["type"]] = setting["value"];
+				appeal_bonus[setting["type"]] = setting["value"].toString();
 			}
 		}
 		this.appeal_bonus = appeal_bonus;
@@ -273,7 +273,7 @@ class BaseLiveCalcViewModel {
 
 		settings["front"] = [];
 		for(var i: number = 0; i < this.rival_front_num.length; i++) {
-			var setting: { [index: number]: string; } = {};
+			var setting: { [index: string]: string; } = {};
 			setting["type"] = i.toString();
 			setting["value"] = this.rival_front_num[i];
 			settings["front"].push(setting);
@@ -281,7 +281,7 @@ class BaseLiveCalcViewModel {
 
 		settings["back"] = [];
 		for(var i: number = 0; i < this.rival_back_num.length; i++) {
-			var setting: { [index: number]: string; } = {};
+			var setting: { [index: string]: string; } = {};
 			setting["type"] = i.toString();
 			setting["value"] = this.rival_back_num[i];
 			settings["back"].push(setting);
@@ -291,7 +291,7 @@ class BaseLiveCalcViewModel {
 	}
 
 	// ライバルユニット設定反映
-	set_rival_member_setting(settings: { [index: string]: { [index: number]: string; }[]}): void {
+	set_rival_member_setting(settings: { [index: string]: { [index: string]: number; }[]}): void {
 		if(settings == undefined) {
 			return;
 		}
@@ -299,8 +299,8 @@ class BaseLiveCalcViewModel {
 			var rival_front_num: string[] = this.rival_front_num;
 			for(var i: number = 0; i < settings["front"].length; i++) {
 				if(settings["front"][i] != undefined) {
-					var setting = settings["front"][i];
-					rival_front_num[setting["type"]] = setting["value"];
+					var setting: { [index: string]: number; } = settings["front"][i];
+					rival_front_num[setting["type"]] = setting["value"].toString();
 				}
 			}
 			this.rival_front_num = rival_front_num;
@@ -310,8 +310,8 @@ class BaseLiveCalcViewModel {
 			var rival_back_num: string[] = this.rival_back_num;
 			for(var i: number = 0; i < settings["back"].length; i++) {
 				if(settings["back"][i] != undefined) {
-					var setting = settings["back"][i];
-					rival_back_num[setting["type"]] = setting["value"];
+					var setting: { [index: string]: number; } = settings["back"][i];
+					rival_back_num[setting["type"]] = setting["value"].toString();
 				}
 			}
 			this.rival_back_num = rival_back_num;
