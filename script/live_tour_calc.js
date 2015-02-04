@@ -1012,8 +1012,8 @@ var UserPetitIdol = (function () {
         status += status * voltage_bonus / 100;
         this.status = status;
     };
-    UserPetitIdol.prototype.calculation_dream_live_festival = function (fever_bonus) {
-        this.calculation();
+    UserPetitIdol.prototype.calculation_dream_live_festival = function (bonus_type, fever_bonus) {
+        this.calculation(bonus_type);
         var status = this.status;
         // フィーバーボーナス
         status += status * fever_bonus / 100;
@@ -2029,7 +2029,7 @@ var ViewModel = (function (_super) {
             switch (calc_type) {
                 case 5 /* DREAM_LIVE_FESTIVAL */:
                     // ドリームLIVEフェス
-                    petit_idol.calculation_dream_live_festival(fever_bonus);
+                    petit_idol.calculation_dream_live_festival(bonus_type, fever_bonus);
                     break;
                 case 8 /* TALK_BATTLE */:
                     // トークバトル

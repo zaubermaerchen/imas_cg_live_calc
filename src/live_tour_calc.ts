@@ -157,7 +157,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 			switch(calc_type) {
 				case CALCULATION_TYPE.DREAM_LIVE_FESTIVAL:
 					// ドリームLIVEフェス
-					petit_idol.calculation_dream_live_festival(fever_bonus);
+					petit_idol.calculation_dream_live_festival(bonus_type, fever_bonus);
 					break;
 				case CALCULATION_TYPE.TALK_BATTLE:
 					// トークバトル
