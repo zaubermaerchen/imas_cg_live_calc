@@ -259,7 +259,7 @@ class BaseLiveCalcViewModel {
 		var appeal_bonus: string[] = this.appeal_bonus;
 		for(var i: number = 0; i < settings.length; i++) {
 			if(settings[i] != undefined) {
-				var setting = settings[i];
+				var setting: { [index: string]: number; } = settings[i];
 				appeal_bonus[setting["type"]] = setting["value"].toString();
 			}
 		}

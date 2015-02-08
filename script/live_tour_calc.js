@@ -1026,8 +1026,8 @@ var UserPetitIdol = (function () {
         status += status * cheer_bonus / 100;
         this.status = status;
     };
-    UserPetitIdol.prototype.calculation_live_royal = function (bonus_parameter, battle_point_rate, voltage_bonus) {
-        this.calculation(-1, bonus_parameter);
+    UserPetitIdol.prototype.calculation_live_royal = function (bonus_type, bonus_parameter, battle_point_rate, voltage_bonus) {
+        this.calculation(bonus_type, bonus_parameter);
         var status = this.status;
         // ボルテージボーナス
         status = Math.ceil(status * voltage_bonus);
@@ -1811,6 +1811,8 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         setting["producer_type"] = this.producer_type;
         setting["appeal_bonus"] = this.get_appeal_bonus_setting();
         setting["training_room_level"] = this.training_room_level;
+        setting["petit_idol_bonus_type"] = this.petit_idol_bonus_type;
+        setting["petit_idol_bonus_parameter"] = this.petit_idol_bonus_parameter;
         setting["calc_type"] = this.calc_type;
         setting["skill_input_type"] = this.skill_input_type;
         setting["enable_skill_type"] = this.enable_skill_type;
@@ -1827,6 +1829,8 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         this.producer_type = setting["producer_type"];
         this.set_appeal_bonus_setting(setting["appeal_bonus"]);
         this.training_room_level = setting["training_room_level"];
+        this.petit_idol_bonus_type = setting["petit_idol_bonus_type"];
+        this.petit_idol_bonus_parameter = setting["petit_idol_bonus_parameter"];
         this.calc_type = setting["calc_type"];
         this.skill_input_type = setting["skill_input_type"];
         this.enable_skill_type = setting["enable_skill_type"];
@@ -2056,8 +2060,6 @@ var ViewModel = (function (_super) {
         setting["combo_level"] = this.combo_level;
         setting["fever_bonus"] = this.fever_bonus;
         setting["cheer_bonus"] = this.cheer_bonus;
-        setting["petit_idol_bonus_type"] = this.petit_idol_bonus_type;
-        setting["petit_idol_bonus_parameter"] = this.petit_idol_bonus_parameter;
         return setting;
     };
     // 設定反映
@@ -2074,8 +2076,6 @@ var ViewModel = (function (_super) {
         if (setting["cheer_bonus"]) {
             this.cheer_bonus = setting["cheer_bonus"];
         }
-        this.petit_idol_bonus_type = setting["petit_idol_bonus_type"];
-        this.petit_idol_bonus_parameter = setting["petit_idol_bonus_parameter"];
     };
     /******************************************************************************/
     // スキル関連

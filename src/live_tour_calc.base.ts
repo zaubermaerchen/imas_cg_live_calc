@@ -138,6 +138,8 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 		setting["producer_type"] = this.producer_type;
 		setting["appeal_bonus"] = this.get_appeal_bonus_setting();
 		setting["training_room_level"] = this.training_room_level;
+		setting["petit_idol_bonus_type"] = this.petit_idol_bonus_type;
+		setting["petit_idol_bonus_parameter"] = this.petit_idol_bonus_parameter;
 		setting["calc_type"] = this.calc_type;
 		setting["skill_input_type"] = this.skill_input_type;
 		setting["enable_skill_type"] = this.enable_skill_type;
@@ -158,6 +160,8 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 		this.producer_type = setting["producer_type"];
 		this.set_appeal_bonus_setting(setting["appeal_bonus"]);
 		this.training_room_level = setting["training_room_level"];
+		this.petit_idol_bonus_type = setting["petit_idol_bonus_type"];
+		this.petit_idol_bonus_parameter = setting["petit_idol_bonus_parameter"];
 		this.calc_type = setting["calc_type"];
 		this.skill_input_type = setting["skill_input_type"];
 		this.enable_skill_type = setting["enable_skill_type"];

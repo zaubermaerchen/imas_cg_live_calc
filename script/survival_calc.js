@@ -1026,8 +1026,8 @@ var UserPetitIdol = (function () {
         status += status * cheer_bonus / 100;
         this.status = status;
     };
-    UserPetitIdol.prototype.calculation_live_royal = function (bonus_parameter, battle_point_rate, voltage_bonus) {
-        this.calculation(-1, bonus_parameter);
+    UserPetitIdol.prototype.calculation_live_royal = function (bonus_type, bonus_parameter, battle_point_rate, voltage_bonus) {
+        this.calculation(bonus_type, bonus_parameter);
         var status = this.status;
         // ボルテージボーナス
         status = Math.ceil(status * voltage_bonus);

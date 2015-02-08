@@ -82,9 +82,15 @@ class UserPetitIdol {
 		this.status = status;
 	}
 
+<<<<<<< HEAD
 	calculation_live_royal(bonus_parameter: number, battle_point_rate: number, voltage_bonus: number): void {
 		this.calculation(-1, bonus_parameter);
 
+=======
+	calculation_live_royal(bonus_type: number, bonus_parameter: number, battle_point_rate: number, voltage_bonus: number): void {
+		this.calculation(bonus_type, bonus_parameter);
+		
+>>>>>>> LIVEロワイヤルでのぷちパワー発揮属性に対応
 		var status: number = this.status;
 
 		// ボルテージボーナス

@@ -94,6 +94,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	}
 
 	calculation_petit_idol(): number {
+		var bonus_type: number = parseInt(this.petit_idol_bonus_type);
 		var bonus_parameter: number = parseInt(this.petit_idol_bonus_parameter);
 		var battle_point_rate: number = this.get_battle_point_rate();
 		var voltage_bonus: number = parseFloat(this.voltage_bonus);
@@ -101,7 +102,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		var status: number = 0;
 		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
 			var petit_idol: UserPetitIdol = this.petit_idol_list[i];
-			petit_idol.calculation_live_royal(bonus_parameter, battle_point_rate, voltage_bonus);
+			petit_idol.calculation_live_royal(bonus_type, bonus_parameter, battle_point_rate, voltage_bonus);
 			status += petit_idol.status;
 		}
 
@@ -126,7 +127,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 		setting["battle_point"] = this.battle_point;
 		setting["voltage_bonus"] = this.voltage_bonus;
-		setting["petit_idol_bonus_parameter"] = this.petit_idol_bonus_parameter;
 
 		return setting;
 	}
@@ -137,7 +137,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 		this.battle_point = setting["battle_point"];
 		this.voltage_bonus = setting["voltage_bonus"];
-		this.petit_idol_bonus_parameter = setting["petit_idol_bonus_parameter"];
 	}
 
 	/******************************************************************************/
