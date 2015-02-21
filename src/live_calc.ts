@@ -298,8 +298,8 @@ class ViewModel extends BaseLiveCalcViewModel {
 				var idol: UserIdol = this.idol_list[i];
 				if(parseInt(idol.skill_id) > 0 && parseInt(idol.skill_level) > 0) {
 					// 発動スキルを取得
-					var skill: { [index: string]: string; } = this.check_skill_enable(idol, skill_data_list, member_num, rival_member_num);
-					if(skill != null) {
+					var skill: { [index: string]: string; } = this.get_skill(idol, skill_data_list);
+					if(skill != null && this.check_skill_enable(skill, member_num, rival_member_num)) {
 						idol.enable_skill = true;
 						this.correct_skill_value(skill, invoke_skill_list.length);
 						if(parseInt(skill["target_member"]) == SKILL_TARGET_MEMBER.SELF) {

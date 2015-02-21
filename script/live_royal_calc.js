@@ -1509,8 +1509,8 @@ var BaseLiveCalcViewModel = (function () {
                 var idol = _this.idol_list[i];
                 if (parseInt(idol.skill_id) > 0 && parseInt(idol.skill_level) > 0) {
                     // 発動スキルを取得
-                    var skill = _this.check_skill_enable(idol, skill_data_list, member_num, rival_member_num);
-                    if (skill != null) {
+                    var skill = _this.get_skill(idol, skill_data_list);
+                    if (skill != null && _this.check_skill_enable(skill, member_num, rival_member_num)) {
                         idol.enable_skill = true;
                         _this.correct_skill_value(skill, invoke_skill_list.length);
                         if (parseInt(skill["target_member"]) == 0 /* SELF */) {
@@ -1528,23 +1528,29 @@ var BaseLiveCalcViewModel = (function () {
         });
         return deferred.promise();
     };
-    // 発動可能なスキルかチェック
-    BaseLiveCalcViewModel.prototype.check_skill_enable = function (idol, skill_data_list, member_num, rival_member_num) {
+    // スキル取得
+    BaseLiveCalcViewModel.prototype.get_skill = function (idol, skill_data_list) {
         // 発動スキルを取得
         var skill = jQuery.extend(true, {}, skill_data_list[idol.skill_id]);
-        skill["skill_level"] = parseInt(idol.skill_level);
         if (skill["skill_value_list"].length == 0) {
             return null;
         }
+        var skill_level = parseInt(idol.skill_level);
+        var skill_value = 0;
+        if (skill_level > 0) {
+            skill_value = parseInt(skill["skill_value_list"][skill_level - 1]);
+        }
+        skill["skill_value"] = skill_value;
+        return skill;
+    };
+    BaseLiveCalcViewModel.prototype.check_skill_enable = function (skill, member_num, rival_member_num) {
         var target_unit = parseInt(skill["target_unit"]);
         if (target_unit == 0 /* OWN */) {
             // 自分
             return this.check_target_own_unit_skill_enable(skill, member_num);
         }
-        else {
-            // 相手
-            return this.check_target_rival_unit_skill_enable(skill, rival_member_num);
-        }
+        // 相手
+        return this.check_target_rival_unit_skill_enable(skill, rival_member_num);
     };
     BaseLiveCalcViewModel.prototype.check_target_own_unit_skill_enable = function (skill, member_num) {
         var enable_skill_type = parseInt(this.enable_skill_type);
@@ -1553,25 +1559,19 @@ var BaseLiveCalcViewModel = (function () {
         var target_type = parseInt(skill["target_type"]);
         // 有効スキルかチェック
         if (enable_skill_type != 0 /* ALL */ && target_param != 0 /* ALL */ && enable_skill_type != target_param) {
-            return null;
+            return false;
         }
         if (target_member == 0 /* SELF */) {
-            return skill;
+            return true;
         }
         // 対象範囲チェック
-        if (!this.check_skill_target(target_member, target_type, member_num)) {
-            return null;
-        }
-        return skill;
+        return this.check_skill_target(target_member, target_type, member_num);
     };
     BaseLiveCalcViewModel.prototype.check_target_rival_unit_skill_enable = function (skill, rival_member_num) {
         var enable_skill_type = parseInt(this.enable_skill_type);
         var target_param = parseInt(skill["target_param"]);
         // 有効スキルかチェック
-        if (enable_skill_type != 0 /* ALL */ && (enable_skill_type ^ target_param) == 0) {
-            return null;
-        }
-        return skill;
+        return (enable_skill_type == 0 /* ALL */ || (enable_skill_type ^ target_param) > 0);
     };
     // スキルの対象範囲をチェック
     BaseLiveCalcViewModel.prototype.check_skill_target = function (target_member, target_type, member_num) {
@@ -1613,8 +1613,7 @@ var BaseLiveCalcViewModel = (function () {
         }
         var rate = this.skill_invocation_rate_list[index];
         if (rate != undefined) {
-            for (var i = 0; i < skill["skill_value_list"].length; i++) {
-            }
+            skill["skill_value"] = parseInt(skill["skill_value"]) * (rate / 100);
         }
     };
     // フロントメンバーにスキル効果適用
@@ -1645,11 +1644,7 @@ var BaseLiveCalcViewModel = (function () {
             return false;
         }
         var target_param = parseInt(invoke_skill["target_param"]);
-        var skill_level = parseInt(invoke_skill["skill_level"]);
-        var skill_value = 0;
-        if (skill_level > 0) {
-            skill_value = parseInt(invoke_skill["skill_value_list"][skill_level - 1]);
-        }
+        var skill_value = parseInt(invoke_skill["skill_value"]);
         return this.apply_skill_value(idol, target_param, skill_value);
     };
     BaseLiveCalcViewModel.prototype.apply_skill_value = function (idol, target_param, skill_value) {
@@ -1841,10 +1836,10 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         var target_type = parseInt(skill["target_type"]);
         // 有効スキルかチェック
         if (enable_skill_type != 0 /* ALL */ && (enable_skill_type ^ target_param) == 0) {
-            return null;
+            return false;
         }
         if (target_member != 1 /* FRONT */ && target_member != 3 /* ALL */) {
-            return null;
+            return false;
         }
         if (this.check_skill_target(target_member, target_type, rival_member_num)) {
             switch (target_param) {
@@ -1861,7 +1856,7 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         else {
             skill["skill_level"] = 0;
         }
-        return skill;
+        return true;
     };
     // スキル効果適用可能チェック
     BaseLiveTourCalcViewModel.prototype.check_apply_skill = function (idol, invoke_skill) {
@@ -2003,10 +1998,7 @@ var ViewModel = (function (_super) {
         var enable_skill_type = parseInt(this.enable_skill_type);
         var target_param = parseInt(skill["target_param"]);
         // 有効スキルかチェック
-        if (enable_skill_type != 0 /* ALL */ && (enable_skill_type ^ target_param) == 0) {
-            return null;
-        }
-        return skill;
+        return (enable_skill_type == 0 /* ALL */ || (enable_skill_type ^ target_param) > 0);
     };
     // スキル効果適用可能チェック
     ViewModel.prototype.check_apply_skill = function (idol, invoke_skill) {

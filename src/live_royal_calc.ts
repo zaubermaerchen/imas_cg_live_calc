@@ -140,7 +140,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	/******************************************************************************/
 	// スキル関連
 	/******************************************************************************/
-	check_target_rival_unit_skill_enable(skill: { [index: string]: any; }, rival_member_num: number[][]): { [index: string]: any; } {
+	check_target_rival_unit_skill_enable(skill: { [index: string]: any; }, rival_member_num: number[][]): boolean {
 		if(this.is_guest_live()) {
 			return super.check_target_rival_unit_skill_enable(skill, rival_member_num);
 		}
@@ -149,11 +149,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		var target_param: number = parseInt(skill["target_param"]);
 
 		// 有効スキルかチェック
-		if(enable_skill_type != ENABLE_SKILL_TYPE.ALL && (enable_skill_type ^ target_param) == 0) {
-			return null;
-		}
-
-		return skill;
+		return (enable_skill_type == ENABLE_SKILL_TYPE.ALL || (enable_skill_type ^ target_param) > 0);
 	}
 
 	// スキル効果適用可能チェック

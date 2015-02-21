@@ -437,7 +437,7 @@ class BaseLiveCalcViewModel {
 
 	// スキル自動計算
 	calc_skill_value(): void {
-		if(!this.is_skill_input_type_manual()) {
+		if(this.is_skill_input_type_manual()) {
 			return;
 		}
 
@@ -513,8 +513,8 @@ class BaseLiveCalcViewModel {
 				var idol: UserIdol = this.idol_list[i];
 				if(parseInt(idol.skill_id) > 0 && parseInt(idol.skill_level) > 0) {
 					// 発動スキルを取得
-					var skill: { [index: string]: string; } = this.check_skill_enable(idol, skill_data_list, member_num, rival_member_num);
-					if(skill != null) {
+					var skill: { [index: string]: string; } = this.get_skill(idol, skill_data_list);
+					if(skill != null && this.check_skill_enable(skill, member_num, rival_member_num)) {
 						idol.enable_skill = true;
 						this.correct_skill_value(skill, invoke_skill_list.length);
 						if(parseInt(skill["target_member"]) == SKILL_TARGET_MEMBER.SELF) {
@@ -535,26 +535,33 @@ class BaseLiveCalcViewModel {
 		return deferred.promise();
 	}
 
-	// 発動可能なスキルかチェック
-	check_skill_enable(idol: UserIdol, skill_data_list: { [index: string]: { [index: string]: any; } }, member_num: number[][], rival_member_num: number[][]): { [index: string]: any; } {
+	// スキル取得
+	get_skill(idol: UserIdol, skill_data_list: { [index: string]: { [index: string]: any; } }): { [index: string]: any; } {
 		// 発動スキルを取得
-		var skill: { [index: string]: any; } = jQuery.extend(true, {}, skill_data_list[idol.skill_id]);
-		skill["skill_level"] = parseInt(idol.skill_level);
-		if(skill["skill_value_list"].length == 0) {
+		var skill:{ [index: string]: any; } = jQuery.extend(true, {}, skill_data_list[idol.skill_id]);
+		if (skill["skill_value_list"].length == 0) {
 			return null;
 		}
-
+		var skill_level:number = parseInt(idol.skill_level);
+		var skill_value:number = 0;
+		if (skill_level > 0) {
+			skill_value = parseInt(skill["skill_value_list"][skill_level - 1]);
+		}
+		skill["skill_value"] = skill_value;
+		return skill;
+	}
+	
+	check_skill_enable(skill: { [index: string]: any; }, member_num: number[][], rival_member_num: number[][]): boolean {
 		var target_unit: number = parseInt(skill["target_unit"]);
 		if(target_unit == SKILL_TARGET_UNIT.OWN) {
 			// 自分
 			return this.check_target_own_unit_skill_enable(skill, member_num);
-		} else {
-			// 相手
-			return this.check_target_rival_unit_skill_enable(skill, rival_member_num);
 		}
+		// 相手
+		return this.check_target_rival_unit_skill_enable(skill, rival_member_num);
 	}
 
-	check_target_own_unit_skill_enable(skill: { [index: string]: any; }, member_num: number[][]): { [index: string]: any; } {
+	check_target_own_unit_skill_enable(skill: { [index: string]: any; }, member_num: number[][]): boolean {
 		var enable_skill_type: number = parseInt(this.enable_skill_type);
 		var target_param: number = parseInt(skill["target_param"]);
 		var target_member: number = parseInt(skill["target_member"]);
@@ -564,31 +571,23 @@ class BaseLiveCalcViewModel {
 		if(enable_skill_type != ENABLE_SKILL_TYPE.ALL &&
 			target_param != SKILL_TARGET_PARAM.ALL &&
 			enable_skill_type != target_param) {
-			return null;
+			return false;
 		}
 
 		if(target_member == SKILL_TARGET_MEMBER.SELF) {
-			return skill;
+			return true;
 		}
 
 		// 対象範囲チェック
-		if(!this.check_skill_target(target_member, target_type, member_num)) {
-			return null;
-		}
-
-		return skill;
+		return this.check_skill_target(target_member, target_type, member_num);
 	}
 
-	check_target_rival_unit_skill_enable(skill: { [index: string]: any; }, rival_member_num: number[][]): { [index: string]: any; } {
+	check_target_rival_unit_skill_enable(skill: { [index: string]: any; }, rival_member_num: number[][]): boolean {
 		var enable_skill_type: number = parseInt(this.enable_skill_type);
 		var target_param: number = parseInt(skill["target_param"]);
 
 		// 有効スキルかチェック
-		if(enable_skill_type != ENABLE_SKILL_TYPE.ALL && (enable_skill_type ^ target_param) == 0) {
-			return null;
-		}
-
-		return skill;
+		return (enable_skill_type == ENABLE_SKILL_TYPE.ALL || (enable_skill_type ^ target_param) > 0);
 	}
 
 	// スキルの対象範囲をチェック
@@ -634,15 +633,13 @@ class BaseLiveCalcViewModel {
 	}
 	
 	//
-	correct_skill_value(skill: { [index: string]: string; }, index: number): void {
+	correct_skill_value(skill: { [index: string]: any; }, index: number): void {
 		if(parseInt(this.skill_input_type) != SKILL_INPUT_MODE.AUTO_MEAN) {
 			return;
 		}
 		var rate = this.skill_invocation_rate_list[index];
 		if(rate != undefined) {
-			for(var i: number = 0; i < skill["skill_value_list"].length; i++) {
-				//skill["skill_value_list"][i] = "0";
-			}
+			skill["skill_value"] = parseInt(skill["skill_value"]) * (rate / 100);
 		}
 	}
 
@@ -678,11 +675,7 @@ class BaseLiveCalcViewModel {
 		}
 
 		var target_param: number = parseInt(invoke_skill["target_param"]);
-		var skill_level: number = parseInt(invoke_skill["skill_level"]);
-		var skill_value: number = 0;
-		if(skill_level > 0) {
-			skill_value = parseInt(invoke_skill["skill_value_list"][skill_level - 1]);
-		}
+		var skill_value: number = parseInt(invoke_skill["skill_value"]);
 
 		return this.apply_skill_value(idol, target_param, skill_value);
 	}
