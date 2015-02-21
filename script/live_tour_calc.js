@@ -1441,7 +1441,7 @@ var BaseLiveCalcViewModel = (function () {
     // スキル自動計算
     BaseLiveCalcViewModel.prototype.calc_skill_value = function () {
         var _this = this;
-        if (!this.is_skill_input_type_manual()) {
+        if (this.is_skill_input_type_manual()) {
             return;
         }
         for (var i = 0; i < this.idol_list.length; i++) {

@@ -437,7 +437,7 @@ class BaseLiveCalcViewModel {
 
 	// スキル自動計算
 	calc_skill_value(): void {
-		if(!this.is_skill_input_type_manual()) {
+		if(this.is_skill_input_type_manual()) {
 			return;
 		}
 		
