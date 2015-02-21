@@ -84,7 +84,8 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.back_defense = Math.ceil(back_defense);
 
 		// ぷちデレラボーナス計算
-		var petit_idol_total_status: number = this.calculation_petit_idol();
+		var petit_idol_bonus_type: number = parseInt(this.petit_idol_bonus_type);
+		var petit_idol_total_status: number = this.calculation_petit_idol(fever_bonus, petit_idol_bonus_type);
 		for(var i: number = 0; i < damage_list.length; i++) {
 			damage_list[i].add_bonus(Math.ceil(petit_idol_total_status * ViewModel.USE_POINT_COEFFICIENT[i] / 5));
 		}
@@ -95,20 +96,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.damage_list = damage_list;
 
 		return [Math.ceil(total_offense), Math.ceil(total_defense)];
-	}
-
-	calculation_petit_idol(): number {
-		var bonus_type: number = parseInt(this.petit_idol_bonus_type);
-		var fever_bonus: number = parseInt(this.fever_bonus);
-
-		var status: number = 0;
-		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
-			var petit_idol: UserPetitIdol = this.petit_idol_list[i];
-			petit_idol.calculation_challenge(bonus_type, fever_bonus);
-			status += petit_idol.status;
-		}
-
-		return Math.ceil(status);
 	}
 
 	/******************************************************************************/

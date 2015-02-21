@@ -401,8 +401,7 @@ class UserIdol {
 		var cost: number = this.get_cost();
 
 		// バックメンバー補正
-		var base_status: number = Math.ceil(status * UserIdol.BACK_MEMBER_COEFFICIENT);
-		var actual_status: number = base_status;
+		var actual_status: number = Math.ceil(status * UserIdol.BACK_MEMBER_COEFFICIENT);
 
 		// コスト補正
 		if(cost_cut) {
@@ -410,11 +409,8 @@ class UserIdol {
 		}
 
 		// スキル補正計算
-		if(!this.is_festival || (!cost_cut || rest_cost >= cost)) {
-			var ratio: number = (skill) / 100;
-			actual_status = Math.floor(actual_status) + Math.ceil(base_status * ratio * 10) / 10;
-			//actual_status = Math.floor(actual_status) + Math.round(base_status * ratio);
-		}
+		var ratio: number = 1 + (skill) / 100;
+		actual_status = Math.floor(actual_status * ratio * 10) / 10;
 
 		return actual_status;
 	}

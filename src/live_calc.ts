@@ -179,7 +179,21 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.back_defense = Math.round(back_defense);
 
 		// ぷちデレラボーナス計算
-		var petit_idol_total_status: number = this.calculation_petit_idol();
+		var petit_idol_total_status: number = 0;
+		switch(calc_type) {
+			case CALCULATION_TYPE.FESTIVAL:
+				// フェス
+				petit_idol_total_status = this.calculation_festival_petit_idol(high_tension);
+				break;
+			case CALCULATION_TYPE.FESTIVAL_S:
+				// フェスS
+				petit_idol_total_status = this.calculation_petit_idol(0, groove_type);
+				break;
+			default:
+				// 通常
+				petit_idol_total_status = this.calculation_petit_idol();
+				break;
+		}
 		if(total_cost > 0) {
 			petit_idol_total_status = Math.floor(petit_idol_total_status * ((use_cost - rest_cost) / total_cost));
 		}
@@ -189,17 +203,12 @@ class ViewModel extends BaseLiveCalcViewModel {
 
 		return [Math.round(total_offense), Math.round(total_defense)];
 	}
-	
-	calculation_petit_idol(): number {
-		var calc_type: number = parseInt(this.calc_type);
-		if(calc_type != CALCULATION_TYPE.FESTIVAL_S) {
-			return super.calculation_petit_idol();
-		}
-		var groove_type: number = parseInt(this.groove_type);
+
+	calculation_festival_petit_idol(high_tension: boolean): number {
 		var petit_idol_bonus: number = 0;
 		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
 			var petit_idol: UserPetitIdol = this.petit_idol_list[i];
-			petit_idol.calculation(groove_type);
+			petit_idol.calculation_festival(high_tension);
 			petit_idol_bonus += petit_idol.status;
 		}
 

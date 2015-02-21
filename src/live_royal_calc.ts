@@ -82,7 +82,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		this.back_defense = back_defense;
 
 		// ぷちデレラボーナス計算
-		var petit_idol_total_status: number = this.calculation_petit_idol();
+		var petit_idol_total_status: number = this.calculation_royal_petit_idol(voltage_bonus, battle_point_rate);
 		damage.add_bonus(Math.floor(petit_idol_total_status * UserIdol.LIVE_ROYAL_DAMAGE_COEFFICIENT));
 		total_offense += petit_idol_total_status;
 		total_defense += petit_idol_total_status;
@@ -93,11 +93,9 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		return [total_offense, total_defense];
 	}
 
-	calculation_petit_idol(): number {
+	calculation_royal_petit_idol(voltage_bonus: number, battle_point_rate: number): number {
 		var bonus_type: number = parseInt(this.petit_idol_bonus_type);
 		var bonus_parameter: number = parseInt(this.petit_idol_bonus_parameter);
-		var battle_point_rate: number = this.get_battle_point_rate();
-		var voltage_bonus: number = parseFloat(this.voltage_bonus);
 
 		var status: number = 0;
 		for(var i: number = 0; i < this.petit_idol_list.length; i++) {

@@ -6,6 +6,8 @@ class UserPetitIdol {
 	static TYPE_BONUS_COEFFICIENT: number = 0.2;
 	// パラメーターボーナス係数
 	static PARAMETER_BONUS_COEFFICIENT: number = 0.5;
+	// ハイテンションボーナス係数
+	static HIGH_TENSION_BONUS_COEFFICIENT: number = 0.1;
 
 	// ステータス
 	type: string;
@@ -28,7 +30,7 @@ class UserPetitIdol {
 	display_status() : number { return Math.ceil(this.status); }
 
 	// 総ステータス取得
-	calculation(bonus_type: number = -1, bonus_parameter: number = -1): void {
+	calculation(event_bonus = 0, bonus_type: number = -1, bonus_parameter: number = -1): void {
 		var type: number = parseInt(this.type);
 		var parameters = this.get_parameters();
 
@@ -45,45 +47,24 @@ class UserPetitIdol {
 		if(type == bonus_type) {
 			status += Math.ceil(status * UserPetitIdol.TYPE_BONUS_COEFFICIENT);
 		}
-
-		this.status = status;
-	}
-
-	calculation_live_tour(bonus_parameter: number, voltage_bonus: number): void {
-		this.calculation(-1, bonus_parameter);
-
-		var status: number = this.status;
-
+		
 		// ボルテージボーナス
-		status += status * voltage_bonus / 100;
+		status += status * event_bonus / 100;
 
 		this.status = status;
 	}
 
-	calculation_dream_live_festival(bonus_type: number, fever_bonus: number): void {
-		this.calculation(bonus_type);
-
-		var status: number = this.status;
-
-		// フィーバーボーナス
-		status += status * fever_bonus / 100;
-
-		this.status = status;
-	}
-
-	calculation_talk_battle(bonus_type: number, cheer_bonus: number): void {
-		this.calculation(bonus_type);
-
-		var status: number = this.status;
-
-		// 応援ボーナス
-		status += status * cheer_bonus / 100;
-
-		this.status = status;
+	calculation_festival(high_tension: boolean): void {
+		var high_tension_bonus: number = 0;
+		if(high_tension) {
+			high_tension_bonus = UserPetitIdol.HIGH_TENSION_BONUS_COEFFICIENT * 100;
+		}
+		
+		this.calculation(high_tension_bonus);
 	}
 
 	calculation_live_royal(bonus_type: number, bonus_parameter: number, battle_point_rate: number, voltage_bonus: number): void {
-		this.calculation(bonus_type, bonus_parameter);
+		this.calculation(0, bonus_type, bonus_parameter);
 
 		var status: number = this.status;
 
@@ -92,17 +73,6 @@ class UserPetitIdol {
 
 		// BP補正
 		status = status * battle_point_rate;
-
-		this.status = status;
-	}
-
-	calculation_challenge(bonus_type: number, fever_bonus: number): void {
-		this.calculation(bonus_type);
-
-		var status: number = this.status;
-
-		// フィーバーボーナス
-		status += status * fever_bonus / 100;
 
 		this.status = status;
 	}

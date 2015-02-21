@@ -166,11 +166,11 @@ class BaseLiveCalcViewModel {
 		this.petit_idol_list = petit_idols;
 	}
 
-	calculation_petit_idol(): number {
+	calculation_petit_idol(event_bonus: number = 0, bonus_type: number = -1, bonus_parameter: number = -1): number {
 		var petit_idol_bonus: number = 0;
 		for(var i: number = 0; i < this.petit_idol_list.length; i++) {
 			var petit_idol: UserPetitIdol = this.petit_idol_list[i];
-			petit_idol.calculation();
+			petit_idol.calculation(event_bonus, bonus_type, bonus_parameter);
 			petit_idol_bonus += petit_idol.status;
 		}
 
@@ -438,44 +438,46 @@ class BaseLiveCalcViewModel {
 	// スキル自動計算
 	calc_skill_value(): void {
 		if(!this.is_skill_input_type_manual()) {
-			// 初期化
-			for(var i: number = 0; i < this.idol_list.length; i++) {
-				var idol: UserIdol = this.idol_list[i];
-				idol.offense_skill = "0";
-				idol.defense_skill = "0";
-				idol.enable_skill = false;
-			}
-
-			// 発動スキル取得
-			jQuery.when(this.get_invoke_skill_list()).done((invoke_skill_list: { [index: string]: string; }[]) => {
-				// スキル効果適用
-				for(var i: number = 0; i < invoke_skill_list.length; i++) {
-					var invoke_skill: { [index: string]: string; } = invoke_skill_list[i];
-					var target_member: number = parseInt(invoke_skill["target_member"]);
-					switch (target_member) {
-						case SKILL_TARGET_MEMBER.SELF:
-							// 発動者
-							// 何もしない
-							break;
-						case SKILL_TARGET_MEMBER.FRONT:
-							// フロントメンバー
-							this.apply_skill_effect_front_member(invoke_skill, i);
-							break;
-						case SKILL_TARGET_MEMBER.BACK:
-							// バックメンバー
-							this.apply_skill_effect_back_member(invoke_skill, i);
-							break;
-						case SKILL_TARGET_MEMBER.ALL:
-							// 全メンバー
-							this.apply_skill_effect_front_member(invoke_skill, i);
-							this.apply_skill_effect_back_member(invoke_skill, i);
-							break;
-						default:
-							break;
-					}
-				}
-			});
+			return;
 		}
+		
+		// 初期化
+		for(var i: number = 0; i < this.idol_list.length; i++) {
+			var idol: UserIdol = this.idol_list[i];
+			idol.offense_skill = "0";
+			idol.defense_skill = "0";
+			idol.enable_skill = false;
+		}
+
+		// 発動スキル取得
+		jQuery.when(this.get_invoke_skill_list()).done((invoke_skill_list: { [index: string]: string; }[]) => {
+			// スキル効果適用
+			for(var i: number = 0; i < invoke_skill_list.length; i++) {
+				var invoke_skill: { [index: string]: string; } = invoke_skill_list[i];
+				var target_member: number = parseInt(invoke_skill["target_member"]);
+				switch (target_member) {
+					case SKILL_TARGET_MEMBER.SELF:
+						// 発動者
+						// 何もしない
+						break;
+					case SKILL_TARGET_MEMBER.FRONT:
+						// フロントメンバー
+						this.apply_skill_effect_front_member(invoke_skill, i);
+						break;
+					case SKILL_TARGET_MEMBER.BACK:
+						// バックメンバー
+						this.apply_skill_effect_back_member(invoke_skill, i);
+						break;
+					case SKILL_TARGET_MEMBER.ALL:
+						// 全メンバー
+						this.apply_skill_effect_front_member(invoke_skill, i);
+						this.apply_skill_effect_back_member(invoke_skill, i);
+						break;
+					default:
+						break;
+				}
+			}
+		});
 	}
 
 	// 発動スキル取得
