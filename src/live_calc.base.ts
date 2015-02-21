@@ -440,7 +440,7 @@ class BaseLiveCalcViewModel {
 		if(!this.is_skill_input_type_manual()) {
 			return;
 		}
-		
+
 		// 初期化
 		for(var i: number = 0; i < this.idol_list.length; i++) {
 			var idol: UserIdol = this.idol_list[i];
@@ -462,16 +462,16 @@ class BaseLiveCalcViewModel {
 						break;
 					case SKILL_TARGET_MEMBER.FRONT:
 						// フロントメンバー
-						this.apply_skill_effect_front_member(invoke_skill, i);
+						this.apply_skill_effect_front_member(invoke_skill);
 						break;
 					case SKILL_TARGET_MEMBER.BACK:
 						// バックメンバー
-						this.apply_skill_effect_back_member(invoke_skill, i);
+						this.apply_skill_effect_back_member(invoke_skill);
 						break;
 					case SKILL_TARGET_MEMBER.ALL:
 						// 全メンバー
-						this.apply_skill_effect_front_member(invoke_skill, i);
-						this.apply_skill_effect_back_member(invoke_skill, i);
+						this.apply_skill_effect_front_member(invoke_skill);
+						this.apply_skill_effect_back_member(invoke_skill);
 						break;
 					default:
 						break;
@@ -508,20 +508,23 @@ class BaseLiveCalcViewModel {
 		var deferred: JQueryDeferred<{ [index: string]: string; }[]> = jQuery.Deferred();
 		jQuery.when(Common.load_skill_list()).done((skill_data_list: { [index: string]: { [index: string]: any; } }) => {
 			var invoke_skill_list: { [index: string]: string; }[] = [];
-			var skill_count: number = 0;
 			var skill_input_type: number = parseInt(this.skill_input_type);
 			for(var i: number = 0; i < this.idol_list.length && i < front_num; i++) {
 				var idol: UserIdol = this.idol_list[i];
 				if(parseInt(idol.skill_id) > 0 && parseInt(idol.skill_level) > 0) {
 					// 発動スキルを取得
-					var skill: { [index: string]: string; } = this.check_skill_enable(idol, skill_data_list, skill_count, member_num, rival_member_num);
+					var skill: { [index: string]: string; } = this.check_skill_enable(idol, skill_data_list, member_num, rival_member_num);
 					if(skill != null) {
 						idol.enable_skill = true;
+						this.correct_skill_value(skill, invoke_skill_list.length);
+						if(parseInt(skill["target_member"]) == SKILL_TARGET_MEMBER.SELF) {
+							// 自分スキルの適用
+							this.apply_skill_effect(idol, skill);
+						}
 						invoke_skill_list.push(skill);
-						skill_count++;
 					}
 
-					if(skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && skill_count >= this.max_skill_invoke) {
+					if(skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && invoke_skill_list.length >= this.max_skill_invoke) {
 						break;
 					}
 				}
@@ -533,7 +536,7 @@ class BaseLiveCalcViewModel {
 	}
 
 	// 発動可能なスキルかチェック
-	check_skill_enable(idol: UserIdol, skill_data_list: { [index: string]: { [index: string]: any; } }, skill_count: number, member_num: number[][], rival_member_num: number[][]): { [index: string]: any; } {
+	check_skill_enable(idol: UserIdol, skill_data_list: { [index: string]: { [index: string]: any; } }, member_num: number[][], rival_member_num: number[][]): { [index: string]: any; } {
 		// 発動スキルを取得
 		var skill: { [index: string]: any; } = jQuery.extend(true, {}, skill_data_list[idol.skill_id]);
 		skill["skill_level"] = parseInt(idol.skill_level);
@@ -544,14 +547,14 @@ class BaseLiveCalcViewModel {
 		var target_unit: number = parseInt(skill["target_unit"]);
 		if(target_unit == SKILL_TARGET_UNIT.OWN) {
 			// 自分
-			return this.check_target_own_unit_skill_enable(skill, member_num, idol, skill_count);
+			return this.check_target_own_unit_skill_enable(skill, member_num);
 		} else {
 			// 相手
 			return this.check_target_rival_unit_skill_enable(skill, rival_member_num);
 		}
 	}
 
-	check_target_own_unit_skill_enable(skill: { [index: string]: any; }, member_num: number[][], idol: UserIdol, skill_count: number): { [index: string]: any; } {
+	check_target_own_unit_skill_enable(skill: { [index: string]: any; }, member_num: number[][]): { [index: string]: any; } {
 		var enable_skill_type: number = parseInt(this.enable_skill_type);
 		var target_param: number = parseInt(skill["target_param"]);
 		var target_member: number = parseInt(skill["target_member"]);
@@ -565,8 +568,6 @@ class BaseLiveCalcViewModel {
 		}
 
 		if(target_member == SKILL_TARGET_MEMBER.SELF) {
-			// 自分スキルの適用
-			this.apply_skill_effect(idol, skill, skill_count);
 			return skill;
 		}
 
@@ -631,17 +632,30 @@ class BaseLiveCalcViewModel {
 
 		return enable_skill;
 	}
+	
+	//
+	correct_skill_value(skill: { [index: string]: string; }, index: number): void {
+		if(parseInt(this.skill_input_type) != SKILL_INPUT_MODE.AUTO_MEAN) {
+			return;
+		}
+		var rate = this.skill_invocation_rate_list[index];
+		if(rate != undefined) {
+			for(var i: number = 0; i < skill["skill_value_list"].length; i++) {
+				//skill["skill_value_list"][i] = "0";
+			}
+		}
+	}
 
 	// フロントメンバーにスキル効果適用
-	apply_skill_effect_front_member(invoke_skill: { [index: string]: string; }, index: number): void {
+	apply_skill_effect_front_member(invoke_skill: { [index: string]: string; }): void {
 		var front_num: number = parseInt(this.front_num);
 		for(var i: number = 0; i < this.idol_list.length && i < front_num; i++) {
-			this.apply_skill_effect(this.idol_list[i], invoke_skill, index);
+			this.apply_skill_effect(this.idol_list[i], invoke_skill);
 		}
 	}
 
 	// バックメンバーにスキル効果適用
-	apply_skill_effect_back_member(invoke_skill: { [index: string]: string; }, index: number): void {
+	apply_skill_effect_back_member(invoke_skill: { [index: string]: string; }): void {
 		var target_num: number = parseInt(invoke_skill["target_num"]);
 		var front_num: number = parseInt(this.front_num);
 
@@ -650,14 +664,14 @@ class BaseLiveCalcViewModel {
 		}
 		var count: number = 0;
 		for(var i: number = front_num; i < this.idol_list.length && count < target_num; i++) {
-			if(this.apply_skill_effect(this.idol_list[i], invoke_skill, index)) {
+			if(this.apply_skill_effect(this.idol_list[i], invoke_skill)) {
 				count++;
 			}
 		}
 	}
 
 	// スキル効果適用
-	apply_skill_effect(idol: UserIdol, invoke_skill: { [index: string]: string; }, index: number): boolean {
+	apply_skill_effect(idol: UserIdol, invoke_skill: { [index: string]: string; }): boolean {
 		// スキルが効果適用可能かチェック
 		if(!this.check_apply_skill(idol, invoke_skill)) {
 			return false;
@@ -668,12 +682,6 @@ class BaseLiveCalcViewModel {
 		var skill_value: number = 0;
 		if(skill_level > 0) {
 			skill_value = parseInt(invoke_skill["skill_value_list"][skill_level - 1]);
-		}
-		if(parseInt(this.skill_input_type) == SKILL_INPUT_MODE.AUTO_MEAN) {
-			var rate = this.skill_invocation_rate_list[index];
-			if(rate != undefined) {
-				skill_value = skill_value * (rate / 100);
-			}
 		}
 
 		return this.apply_skill_value(idol, target_param, skill_value);

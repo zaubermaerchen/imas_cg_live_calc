@@ -293,22 +293,23 @@ class ViewModel extends BaseLiveCalcViewModel {
 		jQuery.when(Common.load_skill_list()).done((skill_data_list: { [index: string]: { [index: string]: any; } }) => {
 			var invoke_skill_list: { [index: string]: string; }[] = [];
 			var skill_input_type: number = parseInt(this.skill_input_type);
-			var skill_count: number = 0;
 			var rest_cost: number = use_cost;
 			for(var i = 0; i < this.idol_list.length && i < front_num && (!cost_cut || rest_cost > 0); i++) {
 				var idol: UserIdol = this.idol_list[i];
 				if(parseInt(idol.skill_id) > 0 && parseInt(idol.skill_level) > 0) {
 					// 発動スキルを取得
-					var skill: { [index: string]: string; } = this.check_skill_enable(idol, skill_data_list, skill_count, member_num, rival_member_num);
+					var skill: { [index: string]: string; } = this.check_skill_enable(idol, skill_data_list, member_num, rival_member_num);
 					if(skill != null) {
 						idol.enable_skill = true;
+						this.correct_skill_value(skill, invoke_skill_list.length);
+						if(parseInt(skill["target_member"]) == SKILL_TARGET_MEMBER.SELF) {
+							// 自分スキルの適用
+							this.apply_skill_effect(idol, skill);
+						}
 						invoke_skill_list.push(skill);
-						skill_count++;
 					}
 
-					rest_cost -= idol.get_cost();
-
-					if(skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && skill_count >= this.max_skill_invoke) {
+					if(skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && invoke_skill_list.length >= this.max_skill_invoke) {
 						break;
 					}
 				}

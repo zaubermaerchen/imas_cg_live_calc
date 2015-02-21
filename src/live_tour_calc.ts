@@ -184,7 +184,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	/******************************************************************************/
 	// スキル関連
 	/******************************************************************************/
-	check_target_own_unit_skill_enable(skill: { [index: string]: any; }, member_num: number[][], idol: UserIdol, skill_count: number): { [index: string]: any; } {
+	check_target_own_unit_skill_enable(skill: { [index: string]: any; }, member_num: number[][]): { [index: string]: any; } {
 		var enable_skill_type: number = parseInt(this.enable_skill_type);
 		var target_param: number = parseInt(skill["target_param"]);
 		var target_member: number = parseInt(skill["target_member"]);
@@ -198,9 +198,10 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		}
 
 		if(target_member == SKILL_TARGET_MEMBER.SELF) {
-			// 自分スキルの適用
-			if(!this.is_dream_live_festival()) {
-				this.apply_skill_effect(idol, skill, skill_count);
+			if(this.is_dream_live_festival()) {
+				for(var i: number = 0; i < skill["skill_value_list"].length; i++) {
+					skill["skill_value_list"][i] = "0";
+				}
 			}
 			return skill;
 		}
