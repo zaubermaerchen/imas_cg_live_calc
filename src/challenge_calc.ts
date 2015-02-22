@@ -124,8 +124,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	/******************************************************************************/
 	// スキル関連
 	/******************************************************************************/
-	apply_skill_value(idol: UserIdol, target_param: number, skill_value: number): boolean {
-		var result: boolean = false;
+	apply_skill_value(idol: UserIdol, target_param: number, skill_value: number): void {
 		var offense_skill: number = parseFloat(idol.offense_skill);
 		var defense_skill: number = parseFloat(idol.defense_skill);
 
@@ -136,15 +135,12 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 			case SKILL_TARGET_PARAM.ALL:
 				offense_skill *= skill_value;
 				defense_skill *= skill_value;
-				result = true;
 				break;
 			case SKILL_TARGET_PARAM.OFFENSE:
 				offense_skill *= skill_value;
-				result = true;
 				break;
 			case SKILL_TARGET_PARAM.DEFENSE:
 				defense_skill *= skill_value;
-				result = true;
 				break
 		}
 		offense_skill = (offense_skill - 1) * 100;
@@ -152,8 +148,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 		idol.offense_skill = offense_skill.toString();
 		idol.defense_skill = defense_skill.toString();
-
-		return result;
 	}
 }
 

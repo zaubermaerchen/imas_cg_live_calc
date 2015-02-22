@@ -304,7 +304,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 						this.correct_skill_value(skill, invoke_skill_list.length);
 						if(parseInt(skill["target_member"]) == SKILL_TARGET_MEMBER.SELF) {
 							// 自分スキルの適用
-							this.apply_skill_effect(idol, skill);
+							this.apply_skill_effect(idol, true, [skill]);
 						}
 						invoke_skill_list.push(skill);
 					}

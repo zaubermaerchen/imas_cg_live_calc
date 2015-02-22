@@ -1441,7 +1441,7 @@ var BaseLiveCalcViewModel = (function () {
     // スキル自動計算
     BaseLiveCalcViewModel.prototype.calc_skill_value = function () {
         var _this = this;
-        if (!this.is_skill_input_type_manual()) {
+        if (this.is_skill_input_type_manual()) {
             return;
         }
         for (var i = 0; i < this.idol_list.length; i++) {
@@ -1451,29 +1451,12 @@ var BaseLiveCalcViewModel = (function () {
             idol.enable_skill = false;
         }
         // 発動スキル取得
-        jQuery.when(this.get_invoke_skill_list()).done(function (invoke_skill_list) {
-            for (var i = 0; i < invoke_skill_list.length; i++) {
-                var invoke_skill = invoke_skill_list[i];
-                var target_member = parseInt(invoke_skill["target_member"]);
-                switch (target_member) {
-                    case 0 /* SELF */:
-                        break;
-                    case 1 /* FRONT */:
-                        // フロントメンバー
-                        _this.apply_skill_effect_front_member(invoke_skill);
-                        break;
-                    case 2 /* BACK */:
-                        // バックメンバー
-                        _this.apply_skill_effect_back_member(invoke_skill);
-                        break;
-                    case 3 /* ALL */:
-                        // 全メンバー
-                        _this.apply_skill_effect_front_member(invoke_skill);
-                        _this.apply_skill_effect_back_member(invoke_skill);
-                        break;
-                    default:
-                        break;
-                }
+        jQuery.when(this.get_invoke_skill_list()).done(function (invoke_skills) {
+            // スキル効果適用
+            var front_num = parseInt(_this.front_num);
+            for (var i = 0; i < _this.idol_list.length; i++) {
+                var front_member = (i < front_num);
+                _this.apply_skill_effect(_this.idol_list[i], front_member, invoke_skills);
             }
         });
     };
@@ -1515,7 +1498,7 @@ var BaseLiveCalcViewModel = (function () {
                         _this.correct_skill_value(skill, invoke_skill_list.length);
                         if (parseInt(skill["target_member"]) == 0 /* SELF */) {
                             // 自分スキルの適用
-                            _this.apply_skill_effect(idol, skill);
+                            _this.apply_skill_value(idol, parseInt(skill["target_param"]), parseFloat(skill["skill_value"]));
                         }
                         invoke_skill_list.push(skill);
                     }
@@ -1613,62 +1596,69 @@ var BaseLiveCalcViewModel = (function () {
         }
         var rate = this.skill_invocation_rate_list[index];
         if (rate != undefined) {
-            skill["skill_value"] = parseInt(skill["skill_value"]) * (rate / 100);
+            skill["skill_value"] = parseFloat(skill["skill_value"]) * (rate / 100);
         }
     };
-    // フロントメンバーにスキル効果適用
-    BaseLiveCalcViewModel.prototype.apply_skill_effect_front_member = function (invoke_skill) {
-        var front_num = parseInt(this.front_num);
-        for (var i = 0; i < this.idol_list.length && i < front_num; i++) {
-            this.apply_skill_effect(this.idol_list[i], invoke_skill);
-        }
-    };
-    // バックメンバーにスキル効果適用
-    BaseLiveCalcViewModel.prototype.apply_skill_effect_back_member = function (invoke_skill) {
-        var target_num = parseInt(invoke_skill["target_num"]);
-        var front_num = parseInt(this.front_num);
-        if (target_num == -1) {
-            target_num = this.idol_list.length - front_num;
-        }
-        var count = 0;
-        for (var i = front_num; i < this.idol_list.length && count < target_num; i++) {
-            if (this.apply_skill_effect(this.idol_list[i], invoke_skill)) {
-                count++;
+    BaseLiveCalcViewModel.prototype.apply_skill_effect = function (idol, front_member, invoke_skills) {
+        for (var i = 0; i < invoke_skills.length; i++) {
+            var skill = invoke_skills[i];
+            if (!this.check_apply_skill(idol, skill)) {
+                continue;
+            }
+            var target_member = parseInt(skill["target_member"]);
+            var target_param = parseInt(skill["target_param"]);
+            var skill_value = parseFloat(skill["skill_value"]);
+            var target_num = parseInt(skill["target_num"]);
+            switch (target_member) {
+                case 0 /* SELF */:
+                    break;
+                case 1 /* FRONT */:
+                    // フロントメンバー
+                    if (front_member) {
+                        this.apply_skill_value(idol, target_param, skill_value);
+                    }
+                    break;
+                case 2 /* BACK */:
+                    // バックメンバー
+                    if (!front_member && (target_num == -1 || target_num > 0)) {
+                        this.apply_skill_value(idol, target_param, skill_value);
+                        target_num--;
+                        skill["target_num"] = target_num.toString();
+                    }
+                    break;
+                case 3 /* ALL */:
+                    // 全メンバー
+                    if (front_member) {
+                        this.apply_skill_value(idol, target_param, skill_value);
+                    }
+                    else if (target_num == -1 || target_num > 0) {
+                        this.apply_skill_value(idol, target_param, skill_value);
+                        target_num--;
+                        skill["target_num"] = target_num.toString();
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     };
-    // スキル効果適用
-    BaseLiveCalcViewModel.prototype.apply_skill_effect = function (idol, invoke_skill) {
-        // スキルが効果適用可能かチェック
-        if (!this.check_apply_skill(idol, invoke_skill)) {
-            return false;
-        }
-        var target_param = parseInt(invoke_skill["target_param"]);
-        var skill_value = parseInt(invoke_skill["skill_value"]);
-        return this.apply_skill_value(idol, target_param, skill_value);
-    };
     BaseLiveCalcViewModel.prototype.apply_skill_value = function (idol, target_param, skill_value) {
-        var result = false;
         var offense_skill = parseFloat(idol.offense_skill);
         var defense_skill = parseFloat(idol.defense_skill);
         switch (target_param) {
             case 0 /* ALL */:
                 offense_skill += skill_value;
                 defense_skill += skill_value;
-                result = true;
                 break;
             case 1 /* OFFENSE */:
                 offense_skill += skill_value;
-                result = true;
                 break;
             case 2 /* DEFENSE */:
                 defense_skill += skill_value;
-                result = true;
                 break;
         }
         idol.offense_skill = offense_skill.toString();
         idol.defense_skill = defense_skill.toString();
-        return result;
     };
     // スキル効果適用可能チェック
     BaseLiveCalcViewModel.prototype.check_apply_skill = function (idol, invoke_skill) {
@@ -2064,9 +2054,9 @@ var ViewModel = (function (_super) {
     };
     ViewModel.prototype.apply_skill_value = function (idol, target_param, skill_value) {
         if (!this.is_talk_battle()) {
-            return _super.prototype.apply_skill_value.call(this, idol, target_param, skill_value);
+            _super.prototype.apply_skill_value.call(this, idol, target_param, skill_value);
+            return;
         }
-        var result = false;
         var offense_skill = parseFloat(idol.offense_skill);
         var defense_skill = parseFloat(idol.defense_skill);
         skill_value = 1 + (skill_value / 100);
@@ -2076,22 +2066,18 @@ var ViewModel = (function (_super) {
             case 0 /* ALL */:
                 offense_skill *= skill_value;
                 defense_skill *= skill_value;
-                result = true;
                 break;
             case 1 /* OFFENSE */:
                 offense_skill *= skill_value;
-                result = true;
                 break;
             case 2 /* DEFENSE */:
                 defense_skill *= skill_value;
-                result = true;
                 break;
         }
         offense_skill = (offense_skill - 1) * 100;
         defense_skill = (defense_skill - 1) * 100;
         idol.offense_skill = offense_skill.toString();
         idol.defense_skill = defense_skill.toString();
-        return result;
     };
     //
     ViewModel.USE_POINT_COEFFICIENT = [1, 2.5, 5];

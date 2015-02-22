@@ -450,32 +450,12 @@ class BaseLiveCalcViewModel {
 		}
 
 		// 発動スキル取得
-		jQuery.when(this.get_invoke_skill_list()).done((invoke_skill_list: { [index: string]: string; }[]) => {
+		jQuery.when(this.get_invoke_skill_list()).done((invoke_skills: { [index: string]: string; }[]) => {
 			// スキル効果適用
-			for(var i: number = 0; i < invoke_skill_list.length; i++) {
-				var invoke_skill: { [index: string]: string; } = invoke_skill_list[i];
-				var target_member: number = parseInt(invoke_skill["target_member"]);
-				switch (target_member) {
-					case SKILL_TARGET_MEMBER.SELF:
-						// 発動者
-						// 何もしない
-						break;
-					case SKILL_TARGET_MEMBER.FRONT:
-						// フロントメンバー
-						this.apply_skill_effect_front_member(invoke_skill);
-						break;
-					case SKILL_TARGET_MEMBER.BACK:
-						// バックメンバー
-						this.apply_skill_effect_back_member(invoke_skill);
-						break;
-					case SKILL_TARGET_MEMBER.ALL:
-						// 全メンバー
-						this.apply_skill_effect_front_member(invoke_skill);
-						this.apply_skill_effect_back_member(invoke_skill);
-						break;
-					default:
-						break;
-				}
+			var front_num: number = parseInt(this.front_num);
+			for(var i: number = 0; i < this.idol_list.length; i++) {
+				var front_member = (i < front_num);
+				this.apply_skill_effect(this.idol_list[i], front_member, invoke_skills);
 			}
 		});
 	}
@@ -519,7 +499,7 @@ class BaseLiveCalcViewModel {
 						this.correct_skill_value(skill, invoke_skill_list.length);
 						if(parseInt(skill["target_member"]) == SKILL_TARGET_MEMBER.SELF) {
 							// 自分スキルの適用
-							this.apply_skill_effect(idol, skill);
+							this.apply_skill_value(idol, parseInt(skill["target_param"]), parseFloat(skill["skill_value"]));
 						}
 						invoke_skill_list.push(skill);
 					}
@@ -639,70 +619,73 @@ class BaseLiveCalcViewModel {
 		}
 		var rate = this.skill_invocation_rate_list[index];
 		if(rate != undefined) {
-			skill["skill_value"] = parseInt(skill["skill_value"]) * (rate / 100);
+			skill["skill_value"] = parseFloat(skill["skill_value"]) * (rate / 100);
 		}
 	}
 
-	// フロントメンバーにスキル効果適用
-	apply_skill_effect_front_member(invoke_skill: { [index: string]: string; }): void {
-		var front_num: number = parseInt(this.front_num);
-		for(var i: number = 0; i < this.idol_list.length && i < front_num; i++) {
-			this.apply_skill_effect(this.idol_list[i], invoke_skill);
-		}
-	}
 
-	// バックメンバーにスキル効果適用
-	apply_skill_effect_back_member(invoke_skill: { [index: string]: string; }): void {
-		var target_num: number = parseInt(invoke_skill["target_num"]);
-		var front_num: number = parseInt(this.front_num);
-
-		if(target_num == -1) {
-			target_num = this.idol_list.length - front_num;
-		}
-		var count: number = 0;
-		for(var i: number = front_num; i < this.idol_list.length && count < target_num; i++) {
-			if(this.apply_skill_effect(this.idol_list[i], invoke_skill)) {
-				count++;
+	apply_skill_effect(idol: UserIdol, front_member: boolean, invoke_skills: { [index: string]: string; }[]): void {
+		for(var i: number = 0; i < invoke_skills.length; i++) {
+			var skill: { [index: string]: string; } = invoke_skills[i];
+			if(!this.check_apply_skill(idol, skill)) {
+				continue;
+			}
+			var target_member: number = parseInt(skill["target_member"]);
+			var target_param: number = parseInt(skill["target_param"]);
+			var skill_value: number = parseFloat(skill["skill_value"]);
+			var target_num: number = parseInt(skill["target_num"]);
+			switch (target_member) {
+				case SKILL_TARGET_MEMBER.SELF:
+					// 発動者
+					// 何もしない
+					break;
+				case SKILL_TARGET_MEMBER.FRONT:
+					// フロントメンバー
+					if(front_member) {
+						this.apply_skill_value(idol, target_param, skill_value);
+					}
+					break;
+				case SKILL_TARGET_MEMBER.BACK:
+					// バックメンバー
+					if(!front_member && (target_num == -1 || target_num > 0)) {
+						this.apply_skill_value(idol, target_param, skill_value);
+						target_num--;
+						skill["target_num"] = target_num.toString();
+					}
+					break;
+				case SKILL_TARGET_MEMBER.ALL:
+					// 全メンバー
+					if(front_member) {
+						this.apply_skill_value(idol, target_param, skill_value);
+					} else if(target_num == -1 || target_num > 0) {
+						this.apply_skill_value(idol, target_param, skill_value);
+						target_num--;
+						skill["target_num"] = target_num.toString();
+					}
+					break;
+				default:
+					break;
 			}
 		}
 	}
 
-	// スキル効果適用
-	apply_skill_effect(idol: UserIdol, invoke_skill: { [index: string]: string; }): boolean {
-		// スキルが効果適用可能かチェック
-		if(!this.check_apply_skill(idol, invoke_skill)) {
-			return false;
-		}
-
-		var target_param: number = parseInt(invoke_skill["target_param"]);
-		var skill_value: number = parseInt(invoke_skill["skill_value"]);
-
-		return this.apply_skill_value(idol, target_param, skill_value);
-	}
-
-	apply_skill_value(idol: UserIdol, target_param: number, skill_value: number): boolean {
-		var result: boolean = false;
+	apply_skill_value(idol: UserIdol, target_param: number, skill_value: number): void {
 		var offense_skill: number = parseFloat(idol.offense_skill);
 		var defense_skill: number = parseFloat(idol.defense_skill);
 		switch(target_param) {
 			case SKILL_TARGET_PARAM.ALL:
 				offense_skill += skill_value;
 				defense_skill += skill_value;
-				result = true;
 				break;
 			case SKILL_TARGET_PARAM.OFFENSE:
 				offense_skill += skill_value;
-				result = true;
 				break;
 			case SKILL_TARGET_PARAM.DEFENSE:
 				defense_skill += skill_value;
-				result = true;
 				break
 		}
 		idol.offense_skill = offense_skill.toString();
 		idol.defense_skill = defense_skill.toString();
-
-		return result;
 	}
 
 	// スキル効果適用可能チェック

@@ -208,12 +208,12 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		return this.check_skill_target(target_member, target_type, member_num);
 	}
 
-	apply_skill_value(idol: UserIdol, target_param: number, skill_value: number): boolean {
+	apply_skill_value(idol: UserIdol, target_param: number, skill_value: number): void {
 		if(!this.is_talk_battle()) {
-			return super.apply_skill_value(idol, target_param, skill_value);
+			super.apply_skill_value(idol, target_param, skill_value);
+			return;
 		}
 
-		var result: boolean = false;
 		var offense_skill: number = parseFloat(idol.offense_skill);
 		var defense_skill: number = parseFloat(idol.defense_skill);
 
@@ -224,15 +224,12 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 			case SKILL_TARGET_PARAM.ALL:
 				offense_skill *= skill_value;
 				defense_skill *= skill_value;
-				result = true;
 				break;
 			case SKILL_TARGET_PARAM.OFFENSE:
 				offense_skill *= skill_value;
-				result = true;
 				break;
 			case SKILL_TARGET_PARAM.DEFENSE:
 				defense_skill *= skill_value;
-				result = true;
 				break
 		}
 		offense_skill = (offense_skill - 1) * 100;
@@ -240,8 +237,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 		idol.offense_skill = offense_skill.toString();
 		idol.defense_skill = defense_skill.toString();
-
-		return result;
 	}
 }
 
