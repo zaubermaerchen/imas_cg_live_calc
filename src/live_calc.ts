@@ -296,22 +296,16 @@ class ViewModel extends BaseLiveCalcViewModel {
 			var rest_cost: number = use_cost;
 			for(var i = 0; i < this.idol_list.length && i < front_num && (!cost_cut || rest_cost > 0); i++) {
 				var idol: UserIdol = this.idol_list[i];
-				if(parseInt(idol.skill_id) > 0 && parseInt(idol.skill_level) > 0) {
-					// 発動スキルを取得
-					var skill: Skill = this.get_skill(idol, skill_data_list);
-					if(skill != null && this.check_skill_enable(skill, member_num, rival_member_num)) {
-						idol.enable_skill = true;
-						this.correct_skill_value(skill, skills.length);
-						if(skill.target_member == SKILL_TARGET_MEMBER.SELF) {
-							// 自分スキルの適用
-							this.apply_skill_effect(idol, true, [skill]);
-						}
-						skills.push(skill);
-					}
-
-					if(skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && skills.length >= this.max_skill_invoke) {
-						break;
-					}
+				rest_cost -= idol.get_cost();
+				
+				var skill: Skill = this.get_invoke_skill(idol, skill_data_list, member_num, rival_member_num, skills.length);
+				if(skill == null) {
+					continue;
+				}
+				skills.push(skill);
+				
+				if(skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && skills.length >= this.max_skill_invoke) {
+					break;
 				}
 			}
 			deferred.resolve(skills);

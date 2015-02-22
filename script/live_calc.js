@@ -1534,30 +1534,42 @@ var BaseLiveCalcViewModel = (function () {
         // 発動可能スキル
         var deferred = jQuery.Deferred();
         jQuery.when(Common.load_skill_list()).done(function (skill_data_list) {
-            var invoke_skills = [];
+            var skills = [];
             var skill_input_type = parseInt(_this.skill_input_type);
             for (var i = 0; i < _this.idol_list.length && i < front_num; i++) {
                 var idol = _this.idol_list[i];
-                if (parseInt(idol.skill_id) > 0 && parseInt(idol.skill_level) > 0) {
-                    // 発動スキルを取得
-                    var skill = _this.get_skill(idol, skill_data_list);
-                    if (skill != null && _this.check_skill_enable(skill, member_num, rival_member_num)) {
-                        idol.enable_skill = true;
-                        _this.correct_skill_value(skill, invoke_skills.length);
-                        if (skill.target_member == 0 /* SELF */) {
-                            // 自分スキルの適用
-                            _this.apply_skill_value(idol, skill);
-                        }
-                        invoke_skills.push(skill);
-                    }
-                    if (skill_input_type != 2 /* AUTO_MEAN */ && invoke_skills.length >= _this.max_skill_invoke) {
-                        break;
-                    }
+                var skill = _this.get_invoke_skill(idol, skill_data_list, member_num, rival_member_num, skills.length);
+                if (skill == null) {
+                    continue;
+                }
+                skills.push(skill);
+                if (skill_input_type != 2 /* AUTO_MEAN */ && skills.length >= _this.max_skill_invoke) {
+                    break;
                 }
             }
-            deferred.resolve(invoke_skills);
+            deferred.resolve(skills);
         });
         return deferred.promise();
+    };
+    BaseLiveCalcViewModel.prototype.get_invoke_skill = function (idol, skill_data_list, member_num, rival_member_num, index) {
+        if (parseInt(idol.skill_id) == 0 || parseInt(idol.skill_level) == 0) {
+            return null;
+        }
+        // 発動スキルを取得
+        var skill = this.get_skill(idol, skill_data_list);
+        if (skill == null) {
+            return null;
+        }
+        if (!this.check_skill_enable(skill, member_num, rival_member_num)) {
+            return null;
+        }
+        idol.enable_skill = true;
+        this.correct_skill_value(skill, index);
+        if (skill.target_member == 0 /* SELF */) {
+            // 自分スキルの適用
+            this.apply_skill_value(idol, skill);
+        }
+        return skill;
     };
     // スキル取得
     BaseLiveCalcViewModel.prototype.get_skill = function (idol, skill_data_list) {
@@ -1934,21 +1946,14 @@ var ViewModel = (function (_super) {
             var rest_cost = use_cost;
             for (var i = 0; i < _this.idol_list.length && i < front_num && (!cost_cut || rest_cost > 0); i++) {
                 var idol = _this.idol_list[i];
-                if (parseInt(idol.skill_id) > 0 && parseInt(idol.skill_level) > 0) {
-                    // 発動スキルを取得
-                    var skill = _this.get_skill(idol, skill_data_list);
-                    if (skill != null && _this.check_skill_enable(skill, member_num, rival_member_num)) {
-                        idol.enable_skill = true;
-                        _this.correct_skill_value(skill, skills.length);
-                        if (skill.target_member == 0 /* SELF */) {
-                            // 自分スキルの適用
-                            _this.apply_skill_effect(idol, true, [skill]);
-                        }
-                        skills.push(skill);
-                    }
-                    if (skill_input_type != 2 /* AUTO_MEAN */ && skills.length >= _this.max_skill_invoke) {
-                        break;
-                    }
+                rest_cost -= idol.get_cost();
+                var skill = _this.get_invoke_skill(idol, skill_data_list, member_num, rival_member_num, skills.length);
+                if (skill == null) {
+                    continue;
+                }
+                skills.push(skill);
+                if (skill_input_type != 2 /* AUTO_MEAN */ && skills.length >= _this.max_skill_invoke) {
+                    break;
                 }
             }
             deferred.resolve(skills);

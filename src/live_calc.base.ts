@@ -463,32 +463,49 @@ class BaseLiveCalcViewModel {
 		// 発動可能スキル
 		var deferred: JQueryDeferred<Skill[]> = jQuery.Deferred();
 		jQuery.when(Common.load_skill_list()).done((skill_data_list: { [index: string]: { [index: string]: any; } }) => {
-			var invoke_skills: Skill[] = [];
+			var skills: Skill[] = [];
 			var skill_input_type: number = parseInt(this.skill_input_type);
 			for(var i: number = 0; i < this.idol_list.length && i < front_num; i++) {
 				var idol: UserIdol = this.idol_list[i];
-				if(parseInt(idol.skill_id) > 0 && parseInt(idol.skill_level) > 0) {
-					// 発動スキルを取得
-					var skill: Skill = this.get_skill(idol, skill_data_list);
-					if(skill != null && this.check_skill_enable(skill, member_num, rival_member_num)) {
-						idol.enable_skill = true;
-						this.correct_skill_value(skill, invoke_skills.length);
-						if(skill.target_member == SKILL_TARGET_MEMBER.SELF) {
-							// 自分スキルの適用
-							this.apply_skill_value(idol, skill);
-						}
-						invoke_skills.push(skill);
-					}
+				
+				var skill: Skill = this.get_invoke_skill(idol, skill_data_list, member_num, rival_member_num, skills.length);
+				if(skill == null) {
+					continue;
+				}
+				skills.push(skill);
 
-					if(skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && invoke_skills.length >= this.max_skill_invoke) {
-						break;
-					}
+				if(skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && skills.length >= this.max_skill_invoke) {
+					break;
 				}
 			}
-			deferred.resolve(invoke_skills);
+			deferred.resolve(skills);
 		});
 
 		return deferred.promise();
+	}
+
+
+	get_invoke_skill(idol: UserIdol, skill_data_list: { [index: string]: { [index: string]: any; } }, 
+	                 member_num: number[][], rival_member_num: number[][], index: number): Skill {
+		if(parseInt(idol.skill_id) == 0 || parseInt(idol.skill_level) == 0) {
+			return null;
+		}
+		// 発動スキルを取得
+		var skill: Skill = this.get_skill(idol, skill_data_list);
+		if(skill == null) {
+			return null
+		}
+		if(!this.check_skill_enable(skill, member_num, rival_member_num)) {
+			return null;
+		}
+
+		idol.enable_skill = true;
+		this.correct_skill_value(skill, index);
+		if(skill.target_member == SKILL_TARGET_MEMBER.SELF) {
+			// 自分スキルの適用
+			this.apply_skill_value(idol, skill);
+		}
+		return skill;
 	}
 
 	// スキル取得
