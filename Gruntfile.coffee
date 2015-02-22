@@ -8,22 +8,22 @@ module.exports = (grunt) ->
 				sourceMap: true
 				target: "es5"
 			live_calc:
-				src: ["src/common.ts", "src/idol.model.ts", "src/live_calc.base.ts", "src/live_calc.ts"]
+				src: ["src/common.ts", "src/idol.model.ts", "src/skill.ts", "src/live_calc.base.ts", "src/live_calc.ts"]
 				dest: "script/live_calc.js"
 			survival_calc:
-				src: ["src/common.ts", "src/idol.model.ts", "src/live_calc.base.ts", "src/survival_calc.ts"]
+				src: ["src/common.ts", "src/idol.model.ts", "src/skill.ts", "src/live_calc.base.ts", "src/survival_calc.ts"]
 				dest: "script/survival_calc.js"
 			live_tour_calc:
-				src: ["src/common.ts", "src/idol.model.ts", "src/live_calc.base.ts", "src/live_tour_calc.base.ts", "src/live_tour_calc.ts"]
+				src: ["src/common.ts", "src/idol.model.ts", "src/skill.ts", "src/live_calc.base.ts", "src/live_tour_calc.base.ts", "src/live_tour_calc.ts"]
 				dest: "script/live_tour_calc.js"
 			live_royal_calc:
-				src: ["src/common.ts", "src/idol.model.ts", "src/live_calc.base.ts", "src/live_tour_calc.base.ts", "src/live_royal_calc.ts"]
+				src: ["src/common.ts", "src/idol.model.ts", "src/skill.ts", "src/live_calc.base.ts", "src/live_tour_calc.base.ts", "src/live_royal_calc.ts"]
 				dest: "script/live_royal_calc.js"
 			challenge_calc:
-				src: ["src/common.ts", "src/idol.model.ts", "src/live_calc.base.ts", "src/live_tour_calc.base.ts", "src/challenge_calc.ts"]
+				src: ["src/common.ts", "src/idol.model.ts", "src/skill.ts", "src/live_calc.base.ts", "src/live_tour_calc.base.ts", "src/challenge_calc.ts"]
 				dest: "script/challenge_calc.js"
 			live_trial_calc:
-				src: ["src/common.ts", "src/idol.model.ts", "src/live_calc.base.ts", "src/live_trial_calc.ts"]
+				src: ["src/common.ts", "src/idol.model.ts", "src/skill.ts", "src/live_calc.base.ts", "src/live_trial_calc.ts"]
 				dest: "script/live_trial_calc.js"
 		uglify:
 			options:

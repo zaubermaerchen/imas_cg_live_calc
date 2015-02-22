@@ -188,7 +188,7 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 			return false;
 		}
 
-		if(this.check_skill_target(skill, rival_member_num)) {
+		if(skill.check_skill_target(rival_member_num)) {
 			switch (skill.target_param) {
 				case SKILL_TARGET_PARAM.OFFENSE:
 					skill.target_param = SKILL_TARGET_PARAM.DEFENSE;

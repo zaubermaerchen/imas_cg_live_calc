@@ -202,7 +202,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		}
 
 		// 対象範囲チェック
-		return this.check_skill_target(skill, member_num);
+		return skill.check_skill_target(member_num);
 	}
 
 	apply_skill_value(idol: UserIdol, skill: Skill): void {

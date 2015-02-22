@@ -967,6 +967,82 @@ var UserIdol = (function () {
     UserIdol.TALK_BATTLE_COMBO_LEVEL_COEFFICIENT = 50; // コンボLV係数
     return UserIdol;
 })();
+// スキル効果対象ユニット
+var SKILL_TARGET_UNIT;
+(function (SKILL_TARGET_UNIT) {
+    SKILL_TARGET_UNIT[SKILL_TARGET_UNIT["OWN"] = 0] = "OWN";
+    SKILL_TARGET_UNIT[SKILL_TARGET_UNIT["RIVAL"] = 1] = "RIVAL"; // 相手ユニット
+})(SKILL_TARGET_UNIT || (SKILL_TARGET_UNIT = {}));
+// スキル効果対象メンバー
+var SKILL_TARGET_MEMBER;
+(function (SKILL_TARGET_MEMBER) {
+    SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["SELF"] = 0] = "SELF";
+    SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["FRONT"] = 1] = "FRONT";
+    SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["BACK"] = 2] = "BACK";
+    SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["ALL"] = 3] = "ALL"; // 全メンバー
+})(SKILL_TARGET_MEMBER || (SKILL_TARGET_MEMBER = {}));
+// スキル効果対象属性
+var SKILL_TARGET_TYPE;
+(function (SKILL_TARGET_TYPE) {
+    SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["CUTE"] = 1] = "CUTE";
+    SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["COOL"] = 2] = "COOL";
+    SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["PASSION"] = 4] = "PASSION";
+    SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["ALL"] = 7] = "ALL"; // 全属性
+})(SKILL_TARGET_TYPE || (SKILL_TARGET_TYPE = {}));
+// スキル効果対象ステータス
+var SKILL_TARGET_PARAM;
+(function (SKILL_TARGET_PARAM) {
+    SKILL_TARGET_PARAM[SKILL_TARGET_PARAM["ALL"] = 0] = "ALL";
+    SKILL_TARGET_PARAM[SKILL_TARGET_PARAM["OFFENSE"] = 1] = "OFFENSE";
+    SKILL_TARGET_PARAM[SKILL_TARGET_PARAM["DEFENSE"] = 2] = "DEFENSE"; // 守
+})(SKILL_TARGET_PARAM || (SKILL_TARGET_PARAM = {}));
+var Skill = (function () {
+    function Skill(skill_data, level) {
+        this.target_unit = parseInt(skill_data["target_unit"]);
+        this.target_member = parseInt(skill_data["target_member"]);
+        this.target_type = parseInt(skill_data["target_type"]);
+        this.target_num = parseInt(skill_data["target_num"]);
+        this.target_param = parseInt(skill_data["target_param"]);
+        this.value = 0;
+        if (level > 0) {
+            this.value = parseInt(skill_data["skill_value_list"][level - 1]);
+        }
+    }
+    // スキルの対象範囲をチェック
+    Skill.prototype.check_skill_target = function (member_num) {
+        var enable_skill = false;
+        switch (this.target_member) {
+            case 1 /* FRONT */:
+                for (var i = 0; i < member_num[0].length; i++) {
+                    if ((this.target_type & (1 << i)) > 0 && member_num[0][i] > 0) {
+                        enable_skill = true;
+                        break;
+                    }
+                }
+                break;
+            case 2 /* BACK */:
+                for (var i = 0; i < member_num[1].length; i++) {
+                    if ((this.target_type & (1 << i)) > 0 && member_num[1][i] > 0) {
+                        enable_skill = true;
+                        break;
+                    }
+                }
+                break;
+            case 3 /* ALL */:
+                for (var i = 0; i < member_num.length; i++) {
+                    for (var j = 0; j < member_num[i].length; j++) {
+                        if ((this.target_type & (1 << j)) > 0 && member_num[i][j] > 0) {
+                            enable_skill = true;
+                            break;
+                        }
+                    }
+                }
+                break;
+        }
+        return enable_skill;
+    };
+    return Skill;
+})();
 /// <reference path="typings/knockout/knockout.d.ts" />
 /// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 var UserPetitIdol = (function () {
@@ -1062,6 +1138,7 @@ var UserPetitIdol = (function () {
 /// <reference path="common.ts" />
 /// <reference path="idol.model.ts" />
 /// <reference path="petit_idol.ts" />
+/// <reference path="skill.ts" />
 // 計算モード
 var CALCULATION_TYPE;
 (function (CALCULATION_TYPE) {
@@ -1077,35 +1154,6 @@ var CALCULATION_TYPE;
     CALCULATION_TYPE[CALCULATION_TYPE["CHALLENGE"] = 9] = "CHALLENGE";
     CALCULATION_TYPE[CALCULATION_TYPE["FESTIVAL_S"] = 10] = "FESTIVAL_S"; // フェスS
 })(CALCULATION_TYPE || (CALCULATION_TYPE = {}));
-// スキル効果対象ユニット
-var SKILL_TARGET_UNIT;
-(function (SKILL_TARGET_UNIT) {
-    SKILL_TARGET_UNIT[SKILL_TARGET_UNIT["OWN"] = 0] = "OWN";
-    SKILL_TARGET_UNIT[SKILL_TARGET_UNIT["RIVAL"] = 1] = "RIVAL"; // 相手ユニット
-})(SKILL_TARGET_UNIT || (SKILL_TARGET_UNIT = {}));
-// スキル効果対象メンバー
-var SKILL_TARGET_MEMBER;
-(function (SKILL_TARGET_MEMBER) {
-    SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["SELF"] = 0] = "SELF";
-    SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["FRONT"] = 1] = "FRONT";
-    SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["BACK"] = 2] = "BACK";
-    SKILL_TARGET_MEMBER[SKILL_TARGET_MEMBER["ALL"] = 3] = "ALL"; // 全メンバー
-})(SKILL_TARGET_MEMBER || (SKILL_TARGET_MEMBER = {}));
-// スキル効果対象属性
-var SKILL_TARGET_TYPE;
-(function (SKILL_TARGET_TYPE) {
-    SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["CUTE"] = 1] = "CUTE";
-    SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["COOL"] = 2] = "COOL";
-    SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["PASSION"] = 4] = "PASSION";
-    SKILL_TARGET_TYPE[SKILL_TARGET_TYPE["ALL"] = 7] = "ALL"; // 全属性
-})(SKILL_TARGET_TYPE || (SKILL_TARGET_TYPE = {}));
-// スキル効果対象ステータス
-var SKILL_TARGET_PARAM;
-(function (SKILL_TARGET_PARAM) {
-    SKILL_TARGET_PARAM[SKILL_TARGET_PARAM["ALL"] = 0] = "ALL";
-    SKILL_TARGET_PARAM[SKILL_TARGET_PARAM["OFFENSE"] = 1] = "OFFENSE";
-    SKILL_TARGET_PARAM[SKILL_TARGET_PARAM["DEFENSE"] = 2] = "DEFENSE"; // 守
-})(SKILL_TARGET_PARAM || (SKILL_TARGET_PARAM = {}));
 // スキル入力モード
 var SKILL_INPUT_MODE;
 (function (SKILL_INPUT_MODE) {
@@ -1120,20 +1168,6 @@ var ENABLE_SKILL_TYPE;
     ENABLE_SKILL_TYPE[ENABLE_SKILL_TYPE["OFFENSE"] = 1] = "OFFENSE";
     ENABLE_SKILL_TYPE[ENABLE_SKILL_TYPE["DEFENSE"] = 2] = "DEFENSE"; // 守備時発動スキル
 })(ENABLE_SKILL_TYPE || (ENABLE_SKILL_TYPE = {}));
-var Skill = (function () {
-    function Skill(skill_data, level) {
-        this.target_unit = parseInt(skill_data["target_unit"]);
-        this.target_member = parseInt(skill_data["target_member"]);
-        this.target_type = parseInt(skill_data["target_type"]);
-        this.target_num = parseInt(skill_data["target_num"]);
-        this.target_param = parseInt(skill_data["target_param"]);
-        this.value = 0;
-        if (level > 0) {
-            this.value = parseInt(skill_data["skill_value_list"][level - 1]);
-        }
-    }
-    return Skill;
-})();
 var BaseLiveCalcViewModel = (function () {
     function BaseLiveCalcViewModel() {
         var self = this;
@@ -1553,45 +1587,12 @@ var BaseLiveCalcViewModel = (function () {
             return true;
         }
         // 対象範囲チェック
-        return this.check_skill_target(skill, member_num);
+        return skill.check_skill_target(member_num);
     };
     BaseLiveCalcViewModel.prototype.check_target_rival_unit_skill_enable = function (skill, rival_member_num) {
         var enable_skill_type = parseInt(this.enable_skill_type);
         // 有効スキルかチェック
         return (enable_skill_type == 0 /* ALL */ || (enable_skill_type ^ skill.target_param) > 0);
-    };
-    // スキルの対象範囲をチェック
-    BaseLiveCalcViewModel.prototype.check_skill_target = function (skill, member_num) {
-        var enable_skill = false;
-        switch (skill.target_member) {
-            case 1 /* FRONT */:
-                for (var i = 0; i < member_num[0].length; i++) {
-                    if ((skill.target_type & (1 << i)) > 0 && member_num[0][i] > 0) {
-                        enable_skill = true;
-                        break;
-                    }
-                }
-                break;
-            case 2 /* BACK */:
-                for (var i = 0; i < member_num[1].length; i++) {
-                    if ((skill.target_type & (1 << i)) > 0 && member_num[1][i] > 0) {
-                        enable_skill = true;
-                        break;
-                    }
-                }
-                break;
-            case 3 /* ALL */:
-                for (var i = 0; i < member_num.length; i++) {
-                    for (var j = 0; j < member_num[i].length; j++) {
-                        if ((skill.target_type & (1 << j)) > 0 && member_num[i][j] > 0) {
-                            enable_skill = true;
-                            break;
-                        }
-                    }
-                }
-                break;
-        }
-        return enable_skill;
     };
     //
     BaseLiveCalcViewModel.prototype.correct_skill_value = function (skill, index) {
