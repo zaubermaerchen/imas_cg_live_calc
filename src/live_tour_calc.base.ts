@@ -177,53 +177,46 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 	/******************************************************************************/
 	// スキル関連
 	/******************************************************************************/
-	check_target_rival_unit_skill_enable(skill: { [index: string]: any; }, rival_member_num: number[][]): boolean {
+	check_target_rival_unit_skill_enable(skill: Skill, rival_member_num: number[][]): boolean {
 		var enable_skill_type: number = parseInt(this.enable_skill_type);
-		var target_param: number = parseInt(skill["target_param"]);
-		var target_member: number = parseInt(skill["target_member"]);
-		var target_type: number = parseInt(skill["target_type"]);
 
 		// 有効スキルかチェック
-		if(enable_skill_type != ENABLE_SKILL_TYPE.ALL && (enable_skill_type ^ target_param) == 0) {
+		if(enable_skill_type != ENABLE_SKILL_TYPE.ALL && (enable_skill_type ^ skill.target_param) == 0) {
 			return false;
 		}
-		if(target_member != SKILL_TARGET_MEMBER.FRONT && target_member != SKILL_TARGET_MEMBER.ALL) {
+		if(skill.target_member != SKILL_TARGET_MEMBER.FRONT && skill.target_member != SKILL_TARGET_MEMBER.ALL) {
 			return false;
 		}
 
-		if(this.check_skill_target(target_member, target_type, rival_member_num)) {
-			switch (target_param) {
+		if(this.check_skill_target(skill, rival_member_num)) {
+			switch (skill.target_param) {
 				case SKILL_TARGET_PARAM.OFFENSE:
-					target_param = SKILL_TARGET_PARAM.DEFENSE;
+					skill.target_param = SKILL_TARGET_PARAM.DEFENSE;
 					break;
 				case SKILL_TARGET_PARAM.DEFENSE:
-					target_param = SKILL_TARGET_PARAM.OFFENSE;
+					skill.target_param = SKILL_TARGET_PARAM.OFFENSE;
 					break;
 			}
-			skill["target_member"] = SKILL_TARGET_MEMBER.FRONT;
-			skill["target_param"] = target_param;
+			skill.target_member = SKILL_TARGET_MEMBER.FRONT;
 		} else {
-			skill["skill_level"] = 0;
+			skill.value = 0;
 		}
 
 		return true;
 	}
 
 	// スキル効果適用可能チェック
-	check_apply_skill(idol: UserIdol, invoke_skill: { [index: string]: string; }): boolean {
+	check_apply_skill(idol: UserIdol, skill: Skill): boolean {
 		var result: boolean = false;
 
 		var type: number = parseInt(idol.type);
-		var target_unit: number = parseInt(invoke_skill["target_unit"]);
-		var target_member: number = parseInt(invoke_skill["target_member"]);
-		var target_type: number = parseInt(invoke_skill["target_type"]);
 
 		// スキルが効果適用可能かチェック
-		if(target_unit == SKILL_TARGET_UNIT.OWN) {
-			if(target_member == SKILL_TARGET_MEMBER.SELF || (target_type & (1 << type)) > 0) {
+		if(skill.target_unit == SKILL_TARGET_UNIT.OWN) {
+			if(skill.target_member == SKILL_TARGET_MEMBER.SELF || (skill.target_type & (1 << type)) > 0) {
 				result = true;
 			}
-		} else if(target_unit == SKILL_TARGET_UNIT.RIVAL) {
+		} else if(skill.target_unit == SKILL_TARGET_UNIT.RIVAL) {
 			result = true;
 		}
 

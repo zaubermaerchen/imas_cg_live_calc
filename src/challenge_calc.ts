@@ -124,23 +124,23 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	/******************************************************************************/
 	// スキル関連
 	/******************************************************************************/
-	apply_skill_value(idol: UserIdol, target_param: number, skill_value: number): void {
+	apply_skill_value(idol: UserIdol, skill: Skill): void {
 		var offense_skill: number = parseFloat(idol.offense_skill);
 		var defense_skill: number = parseFloat(idol.defense_skill);
 
-		skill_value = 1 + (skill_value / 100);
+		skill.value = 1 + (skill.value / 100);
 		offense_skill = 1 + (offense_skill / 100);
 		defense_skill = 1 + (defense_skill / 100);
-		switch(target_param) {
+		switch(skill.target_param) {
 			case SKILL_TARGET_PARAM.ALL:
-				offense_skill *= skill_value;
-				defense_skill *= skill_value;
+				offense_skill *= skill.value;
+				defense_skill *= skill.value;
 				break;
 			case SKILL_TARGET_PARAM.OFFENSE:
-				offense_skill *= skill_value;
+				offense_skill *= skill.value;
 				break;
 			case SKILL_TARGET_PARAM.DEFENSE:
-				defense_skill *= skill_value;
+				defense_skill *= skill.value;
 				break
 		}
 		offense_skill = (offense_skill - 1) * 100;

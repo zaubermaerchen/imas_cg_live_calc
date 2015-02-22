@@ -184,20 +184,17 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	/******************************************************************************/
 	// スキル関連
 	/******************************************************************************/
-	check_target_own_unit_skill_enable(skill: { [index: string]: any; }, member_num: number[][]): boolean {
+	check_target_own_unit_skill_enable(skill: Skill, member_num: number[][]): boolean {
 		var enable_skill_type: number = parseInt(this.enable_skill_type);
-		var target_param: number = parseInt(skill["target_param"]);
-		var target_member: number = parseInt(skill["target_member"]);
-		var target_type: number = parseInt(skill["target_type"]);
 
 		// 有効スキルかチェック
 		if(enable_skill_type != ENABLE_SKILL_TYPE.ALL &&
-			target_param != SKILL_TARGET_PARAM.ALL &&
-			enable_skill_type != target_param) {
+			skill.target_param != SKILL_TARGET_PARAM.ALL &&
+			enable_skill_type != skill.target_param) {
 			return true;
 		}
 
-		if(target_member == SKILL_TARGET_MEMBER.SELF) {
+		if(skill.target_member == SKILL_TARGET_MEMBER.SELF) {
 			if(this.is_dream_live_festival()) {
 				skill["skill_value"] = 0;
 			}
@@ -205,31 +202,31 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		}
 
 		// 対象範囲チェック
-		return this.check_skill_target(target_member, target_type, member_num);
+		return this.check_skill_target(skill, member_num);
 	}
 
-	apply_skill_value(idol: UserIdol, target_param: number, skill_value: number): void {
+	apply_skill_value(idol: UserIdol, skill: Skill): void {
 		if(!this.is_talk_battle()) {
-			super.apply_skill_value(idol, target_param, skill_value);
+			super.apply_skill_value(idol, skill);
 			return;
 		}
 
 		var offense_skill: number = parseFloat(idol.offense_skill);
 		var defense_skill: number = parseFloat(idol.defense_skill);
 
-		skill_value = 1 + (skill_value / 100);
+		skill.value = 1 + (skill.value / 100);
 		offense_skill = 1 + (offense_skill / 100);
 		defense_skill = 1 + (defense_skill / 100);
-		switch(target_param) {
+		switch(skill.target_param) {
 			case SKILL_TARGET_PARAM.ALL:
-				offense_skill *= skill_value;
-				defense_skill *= skill_value;
+				offense_skill *= skill.value;
+				defense_skill *= skill.value;
 				break;
 			case SKILL_TARGET_PARAM.OFFENSE:
-				offense_skill *= skill_value;
+				offense_skill *= skill.value;
 				break;
 			case SKILL_TARGET_PARAM.DEFENSE:
-				defense_skill *= skill_value;
+				defense_skill *= skill.value;
 				break
 		}
 		offense_skill = (offense_skill - 1) * 100;

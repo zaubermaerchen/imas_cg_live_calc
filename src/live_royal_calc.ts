@@ -140,34 +140,30 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	/******************************************************************************/
 	// スキル関連
 	/******************************************************************************/
-	check_target_rival_unit_skill_enable(skill: { [index: string]: any; }, rival_member_num: number[][]): boolean {
+	check_target_rival_unit_skill_enable(skill: Skill, rival_member_num: number[][]): boolean {
 		if(this.is_guest_live()) {
 			return super.check_target_rival_unit_skill_enable(skill, rival_member_num);
 		}
 
 		var enable_skill_type: number = parseInt(this.enable_skill_type);
-		var target_param: number = parseInt(skill["target_param"]);
 
 		// 有効スキルかチェック
-		return (enable_skill_type == ENABLE_SKILL_TYPE.ALL || (enable_skill_type ^ target_param) > 0);
+		return (enable_skill_type == ENABLE_SKILL_TYPE.ALL || (enable_skill_type ^ skill.target_param) > 0);
 	}
 
 	// スキル効果適用可能チェック
-	check_apply_skill(idol: UserIdol, invoke_skill: { [index: string]: string; }): boolean {
+	check_apply_skill(idol: UserIdol, skill: Skill): boolean {
 		if(this.is_guest_live()) {
-			return super.check_apply_skill(idol, invoke_skill);
+			return super.check_apply_skill(idol, skill);
 		}
 
 		var result: boolean = false;
 
 		var type: number = parseInt(idol.type);
-		var target_unit: number = parseInt(invoke_skill["target_unit"]);
-		var target_member: number = parseInt(invoke_skill["target_member"]);
-		var target_type: number = parseInt(invoke_skill["target_type"]);
 
 		// スキルが効果適用可能かチェック
-		if(target_unit == SKILL_TARGET_UNIT.OWN) {
-			if(target_member == SKILL_TARGET_MEMBER.SELF || (target_type & (1 << type)) > 0) {
+		if(skill.target_unit == SKILL_TARGET_UNIT.OWN) {
+			if(skill.target_member == SKILL_TARGET_MEMBER.SELF || (skill.target_type & (1 << type)) > 0) {
 				result = true;
 			}
 		}
