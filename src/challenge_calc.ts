@@ -85,7 +85,8 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 		// ぷちデレラボーナス計算
 		var petit_idol_bonus_type: number = parseInt(this.petit_idol_bonus_type);
-		var petit_idol_total_status: number = this.calculation_petit_idol(fever_bonus, petit_idol_bonus_type);
+		var petit_idol_bonus_parameter: number = parseInt(this.petit_idol_bonus_parameter);
+		var petit_idol_total_status: number = this.calculation_petit_idol(fever_bonus, petit_idol_bonus_type, petit_idol_bonus_parameter);
 		for(var i: number = 0; i < damage_list.length; i++) {
 			damage_list[i].add_bonus(Math.ceil(petit_idol_total_status * ViewModel.USE_POINT_COEFFICIENT[i] / 5));
 		}
@@ -127,20 +128,20 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	apply_skill_value(idol: UserIdol, skill: Skill): void {
 		var offense_skill: number = parseFloat(idol.offense_skill);
 		var defense_skill: number = parseFloat(idol.defense_skill);
-
-		skill.value = 1 + (skill.value / 100);
+		var skill_value: number = 1 + (skill.value / 100);
+		
 		offense_skill = 1 + (offense_skill / 100);
 		defense_skill = 1 + (defense_skill / 100);
 		switch(skill.target_param) {
 			case SKILL_TARGET_PARAM.ALL:
-				offense_skill *= skill.value;
-				defense_skill *= skill.value;
+				offense_skill *= skill_value;
+				defense_skill *= skill_value;
 				break;
 			case SKILL_TARGET_PARAM.OFFENSE:
-				offense_skill *= skill.value;
+				offense_skill *= skill_value;
 				break;
 			case SKILL_TARGET_PARAM.DEFENSE:
-				defense_skill *= skill.value;
+				defense_skill *= skill_value;
 				break
 		}
 		offense_skill = (offense_skill - 1) * 100;

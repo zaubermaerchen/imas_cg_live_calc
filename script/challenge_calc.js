@@ -1938,7 +1938,8 @@ var ViewModel = (function (_super) {
         this.back_defense = Math.ceil(back_defense);
         // ぷちデレラボーナス計算
         var petit_idol_bonus_type = parseInt(this.petit_idol_bonus_type);
-        var petit_idol_total_status = this.calculation_petit_idol(fever_bonus, petit_idol_bonus_type);
+        var petit_idol_bonus_parameter = parseInt(this.petit_idol_bonus_parameter);
+        var petit_idol_total_status = this.calculation_petit_idol(fever_bonus, petit_idol_bonus_type, petit_idol_bonus_parameter);
         for (var i = 0; i < damage_list.length; i++) {
             damage_list[i].add_bonus(Math.ceil(petit_idol_total_status * ViewModel.USE_POINT_COEFFICIENT[i] / 5));
         }
@@ -1972,19 +1973,19 @@ var ViewModel = (function (_super) {
     ViewModel.prototype.apply_skill_value = function (idol, skill) {
         var offense_skill = parseFloat(idol.offense_skill);
         var defense_skill = parseFloat(idol.defense_skill);
-        skill.value = 1 + (skill.value / 100);
+        var skill_value = 1 + (skill.value / 100);
         offense_skill = 1 + (offense_skill / 100);
         defense_skill = 1 + (defense_skill / 100);
         switch (skill.target_param) {
             case 0 /* ALL */:
-                offense_skill *= skill.value;
-                defense_skill *= skill.value;
+                offense_skill *= skill_value;
+                defense_skill *= skill_value;
                 break;
             case 1 /* OFFENSE */:
-                offense_skill *= skill.value;
+                offense_skill *= skill_value;
                 break;
             case 2 /* DEFENSE */:
-                defense_skill *= skill.value;
+                defense_skill *= skill_value;
                 break;
         }
         offense_skill = (offense_skill - 1) * 100;
