@@ -1235,7 +1235,7 @@ var BaseLiveCalcViewModel = (function () {
     };
     BaseLiveCalcViewModel.prototype.init_petit_idol_list = function () {
         var petit_idols = [];
-        for (var i = 0; i < ViewModel.PETIT_IDOL_NUM; i++) {
+        for (var i = 0; i < BaseLiveCalcViewModel.PETIT_IDOL_NUM; i++) {
             var petit_idol = new UserPetitIdol();
             petit_idols.push(petit_idol);
         }
@@ -1822,7 +1822,7 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         // アイドル個別のパラメータ設定
         this.set_idol_setting(setting["idol"], this.max_member_num);
         // ぷちアイドル個別のパラメータ設定
-        this.set_petit_idol_setting(setting["petit_idol"], ViewModel.PETIT_IDOL_NUM);
+        this.set_petit_idol_setting(setting["petit_idol"], BaseLiveCalcViewModel.PETIT_IDOL_NUM);
     };
     /******************************************************************************/
     // スキル関連
@@ -1980,20 +1980,20 @@ var ViewModel = (function (_super) {
         switch (calc_type) {
             case 5 /* DREAM_LIVE_FESTIVAL */:
                 // ドリームLIVEフェス
-                petit_idol_total_status = this.calculation_petit_idol(fever_bonus, petit_idol_bonus_type);
+                petit_idol_total_status = this.calculation_petit_idol(fever_bonus, petit_idol_bonus_type, petit_idol_bonus_parameter);
                 damage_list[0].add_bonus(Math.floor(petit_idol_total_status * UserIdol.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT / 5));
                 damage_list[1].add_bonus(Math.floor(petit_idol_total_status * UserIdol.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT / 5));
                 break;
             case 8 /* TALK_BATTLE */:
                 // トークバトル
-                petit_idol_total_status = this.calculation_petit_idol(cheer_bonus, petit_idol_bonus_type);
+                petit_idol_total_status = this.calculation_petit_idol(cheer_bonus, petit_idol_bonus_type, petit_idol_bonus_parameter);
                 for (var i = 0; i < damage_list.length; i++) {
                     damage_list[i].add_bonus(Math.ceil(petit_idol_total_status * ViewModel.USE_POINT_COEFFICIENT[i] / 5));
                 }
                 break;
             default:
                 // LIVEツアー
-                petit_idol_total_status = this.calculation_petit_idol(voltage_bonus, -1, petit_idol_bonus_parameter);
+                petit_idol_total_status = this.calculation_petit_idol(voltage_bonus, petit_idol_bonus_type, petit_idol_bonus_parameter);
                 damage_list[0].add_bonus(Math.floor(petit_idol_total_status * UserIdol.LIVE_TOUR_NORMAL_LIVE_COEFFICIENT / 5));
                 damage_list[1].add_bonus(Math.floor(petit_idol_total_status * UserIdol.LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT / 5));
         }
@@ -2043,7 +2043,7 @@ var ViewModel = (function (_super) {
         }
         if (skill.target_member == 0 /* SELF */) {
             if (this.is_dream_live_festival()) {
-                skill["skill_value"] = 0;
+                skill.value = 0;
             }
             return true;
         }

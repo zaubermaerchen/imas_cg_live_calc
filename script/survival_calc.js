@@ -1235,7 +1235,7 @@ var BaseLiveCalcViewModel = (function () {
     };
     BaseLiveCalcViewModel.prototype.init_petit_idol_list = function () {
         var petit_idols = [];
-        for (var i = 0; i < ViewModel.PETIT_IDOL_NUM; i++) {
+        for (var i = 0; i < BaseLiveCalcViewModel.PETIT_IDOL_NUM; i++) {
             var petit_idol = new UserPetitIdol();
             petit_idols.push(petit_idol);
         }

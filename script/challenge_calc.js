@@ -1235,7 +1235,7 @@ var BaseLiveCalcViewModel = (function () {
     };
     BaseLiveCalcViewModel.prototype.init_petit_idol_list = function () {
         var petit_idols = [];
-        for (var i = 0; i < ViewModel.PETIT_IDOL_NUM; i++) {
+        for (var i = 0; i < BaseLiveCalcViewModel.PETIT_IDOL_NUM; i++) {
             var petit_idol = new UserPetitIdol();
             petit_idols.push(petit_idol);
         }
@@ -1822,7 +1822,7 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         // アイドル個別のパラメータ設定
         this.set_idol_setting(setting["idol"], this.max_member_num);
         // ぷちアイドル個別のパラメータ設定
-        this.set_petit_idol_setting(setting["petit_idol"], ViewModel.PETIT_IDOL_NUM);
+        this.set_petit_idol_setting(setting["petit_idol"], BaseLiveCalcViewModel.PETIT_IDOL_NUM);
     };
     /******************************************************************************/
     // スキル関連

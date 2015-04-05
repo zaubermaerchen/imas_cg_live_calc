@@ -121,20 +121,20 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		switch(calc_type) {
 			case CALCULATION_TYPE.DREAM_LIVE_FESTIVAL:
 				// ドリームLIVEフェス
-				petit_idol_total_status = this.calculation_petit_idol(fever_bonus, petit_idol_bonus_type);
+				petit_idol_total_status = this.calculation_petit_idol(fever_bonus, petit_idol_bonus_type, petit_idol_bonus_parameter);
 				damage_list[0].add_bonus(Math.floor(petit_idol_total_status * UserIdol.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT / 5));
 				damage_list[1].add_bonus(Math.floor(petit_idol_total_status * UserIdol.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT / 5));
 				break;
 			case CALCULATION_TYPE.TALK_BATTLE:
 				// トークバトル
-				petit_idol_total_status = this.calculation_petit_idol(cheer_bonus, petit_idol_bonus_type);
+				petit_idol_total_status = this.calculation_petit_idol(cheer_bonus, petit_idol_bonus_type, petit_idol_bonus_parameter);
 				for(var i: number = 0; i < damage_list.length; i++) {
 					damage_list[i].add_bonus(Math.ceil(petit_idol_total_status * ViewModel.USE_POINT_COEFFICIENT[i] / 5));
 				}
 				break;
 			default:
 				// LIVEツアー
-				petit_idol_total_status = this.calculation_petit_idol(voltage_bonus, -1, petit_idol_bonus_parameter);
+				petit_idol_total_status = this.calculation_petit_idol(voltage_bonus, petit_idol_bonus_type, petit_idol_bonus_parameter);
 				damage_list[0].add_bonus(Math.floor(petit_idol_total_status * UserIdol.LIVE_TOUR_NORMAL_LIVE_COEFFICIENT / 5));
 				damage_list[1].add_bonus(Math.floor(petit_idol_total_status * UserIdol.LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT / 5));
 		}
@@ -196,7 +196,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 		if(skill.target_member == SKILL_TARGET_MEMBER.SELF) {
 			if(this.is_dream_live_festival()) {
-				skill["skill_value"] = 0;
+				skill.value = 0;
 			}
 			return true;
 		}

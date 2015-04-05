@@ -135,7 +135,7 @@ class BaseLiveCalcViewModel {
 	init_idol_list(): void {}
 	init_petit_idol_list(): void {
 		var petit_idols: UserPetitIdol[] = [];
-		for(var i: number = 0; i < ViewModel.PETIT_IDOL_NUM; i++) {
+		for(var i: number = 0; i < BaseLiveCalcViewModel.PETIT_IDOL_NUM; i++) {
 			var petit_idol: UserPetitIdol = new UserPetitIdol();
 			petit_idols.push(petit_idol);
 		}

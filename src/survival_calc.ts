@@ -68,7 +68,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		// ソート
 		this.sort_idol();
 
-		var total_cost = parseInt(this.total_cost)
+		var total_cost = parseInt(this.total_cost);
 		var cost_cut: boolean = (total_cost > 0);
 		var status_up = parseInt(this.status_up);
 		var training_room_level = parseInt(this.training_room_level);
