@@ -290,7 +290,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 
 		// 発動可能スキル
 		var deferred: JQueryDeferred<Skill[]> = jQuery.Deferred();
-		jQuery.when(Common.load_skill_list()).done((skill_data_list: { [index: string]: { [index: string]: any; } }) => {
+		Common.load_skill_list().done((skill_data_list: { [index: string]: { [index: string]: any; } }) => {
 			var skills: Skill[] = [];
 			var skill_input_type: number = parseInt(this.skill_input_type);
 			var rest_cost: number = use_cost;
@@ -379,7 +379,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		//set_rival_member_setting(setting["rival_member"]);
 
 		// アイドル個別のパラメータ設定
-		jQuery.when(this.set_idol_setting(setting["idol"])).done(() => {
+		this.set_idol_setting(setting["idol"]).done(() => {
 			this.change_calc_type();
 		});
 

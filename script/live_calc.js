@@ -138,10 +138,10 @@ var Common = (function () {
     };
     // 各種定義
     // アイドルデータAPI関係
-    Common.IDOL_DATA_API_URL = "http://www4018uf.sakura.ne.jp/imas_cg/api/idol/list/";
+    Common.IDOL_DATA_API_URL = "http://zaubermaerchen.info/imas_cg/api/idol/list/";
     Common.IDOL_LIST_KEY_BASE = "imas_cg_idol_list";
     // スキルデータAPI関係
-    Common.SKILL_DATA_API_URL = "http://www4018uf.sakura.ne.jp/imas_cg/api/skill/list/";
+    Common.SKILL_DATA_API_URL = "http://zaubermaerchen.info/imas_cg/api/skill/list/";
     Common.SKILL_LIST_KEY = "imas_cg_skill_list";
     // QRコード関連
     Common.GOOGLE_CHART_API_URL = "http://chart.apis.google.com/chart";
@@ -1420,28 +1420,22 @@ var BaseLiveCalcViewModel = (function () {
     };
     // 設定読込
     BaseLiveCalcViewModel.prototype.load_setting = function () {
-        try {
-            // localStorageからタイトル読み込み
-            var key = this.save_data_key + "_title_" + this.save_data_id;
-            var title = localStorage.getItem(key);
-            // localStorageから設定読み込み
-            key = this.save_data_key + "_" + this.save_data_id;
-            var value = localStorage.getItem(key);
-            if (value != null) {
-                if (title == null) {
-                    title = "";
-                }
-                var setting = JSON.parse(value);
-                this.save_data_title = title;
-                this.set_setting(setting);
+        // localStorageからタイトル読み込み
+        var key = this.save_data_key + "_title_" + this.save_data_id;
+        var title = localStorage.getItem(key);
+        // localStorageから設定読み込み
+        key = this.save_data_key + "_" + this.save_data_id;
+        var value = localStorage.getItem(key);
+        if (value != null) {
+            if (title == null) {
+                title = "";
             }
-            else {
-                alert("データが保存されていません。");
-            }
+            var setting = JSON.parse(value);
+            this.save_data_title = title;
+            this.set_setting(setting);
         }
-        catch (e) {
-            console.log(e.message);
-            alert("データ読み込み時にエラーが発生しました。");
+        else {
+            alert("データが保存されていません。");
         }
     };
     // コード生成
@@ -1499,7 +1493,7 @@ var BaseLiveCalcViewModel = (function () {
             idol.enable_skill = false;
         }
         // 発動スキル取得
-        jQuery.when(this.get_invoke_skill_list()).done(function (skills) {
+        this.get_invoke_skill_list().done(function (skills) {
             // スキル効果適用
             var front_num = parseInt(_this.front_num);
             for (var i = 0; i < _this.idol_list.length; i++) {
@@ -1533,7 +1527,7 @@ var BaseLiveCalcViewModel = (function () {
         }
         // 発動可能スキル
         var deferred = jQuery.Deferred();
-        jQuery.when(Common.load_skill_list()).done(function (skill_data_list) {
+        Common.load_skill_list().done(function (skill_data_list) {
             var skills = [];
             var skill_input_type = parseInt(_this.skill_input_type);
             for (var i = 0; i < _this.idol_list.length && i < front_num; i++) {
@@ -1575,7 +1569,7 @@ var BaseLiveCalcViewModel = (function () {
     BaseLiveCalcViewModel.prototype.get_skill = function (idol, skill_data_list) {
         // 発動スキルを取得
         var skill_data = jQuery.extend(true, {}, skill_data_list[idol.skill_id]);
-        if (skill_data["skill_value_list"].length == 0) {
+        if (skill_data["skill_value_list"] == null || skill_data["skill_value_list"].length == 0) {
             return null;
         }
         var skill = new Skill(skill_data, parseInt(idol.skill_level));
@@ -1940,7 +1934,7 @@ var ViewModel = (function (_super) {
         var rival_member_num = [[0, 0, 0], [0, 0, 0]];
         // 発動可能スキル
         var deferred = jQuery.Deferred();
-        jQuery.when(Common.load_skill_list()).done(function (skill_data_list) {
+        Common.load_skill_list().done(function (skill_data_list) {
             var skills = [];
             var skill_input_type = parseInt(_this.skill_input_type);
             var rest_cost = use_cost;
@@ -2017,7 +2011,7 @@ var ViewModel = (function (_super) {
         this.enable_skill_type = setting["enable_skill_type"];
         //set_rival_member_setting(setting["rival_member"]);
         // アイドル個別のパラメータ設定
-        jQuery.when(this.set_idol_setting(setting["idol"])).done(function () {
+        this.set_idol_setting(setting["idol"]).done(function () {
             _this.change_calc_type();
         });
         // ぷちアイドル個別のパラメータ取得

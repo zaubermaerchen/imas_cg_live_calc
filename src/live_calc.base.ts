@@ -338,28 +338,23 @@ class BaseLiveCalcViewModel {
 
 	// 設定読込
 	load_setting(): void {
-		try {
-			// localStorageからタイトル読み込み
-			var key: string = this.save_data_key + "_title_" + this.save_data_id;
-			var title: string = localStorage.getItem(key);
+		// localStorageからタイトル読み込み
+		var key: string = this.save_data_key + "_title_" + this.save_data_id;
+		var title: string = localStorage.getItem(key);
 
-			// localStorageから設定読み込み
-			key = this.save_data_key + "_" + this.save_data_id;
-			var value: string = localStorage.getItem(key);
+		// localStorageから設定読み込み
+		key = this.save_data_key + "_" + this.save_data_id;
+		var value: string = localStorage.getItem(key);
 
-			if(value != null) {
-				if(title == null) {
-					title = "";
-				}
-				var setting: { [index: string]: any; } = JSON.parse(value);
-				this.save_data_title = title;
-				this.set_setting(setting);
-			} else {
-				alert("データが保存されていません。");
+		if(value != null) {
+			if(title == null) {
+				title = "";
 			}
-		} catch(e) {
-			console.log(e.message);
-			alert("データ読み込み時にエラーが発生しました。");
+			var setting: { [index: string]: any; } = JSON.parse(value);
+			this.save_data_title = title;
+			this.set_setting(setting);
+		} else {
+			alert("データが保存されていません。");
 		}
 	}
 
@@ -426,7 +421,7 @@ class BaseLiveCalcViewModel {
 		}
 
 		// 発動スキル取得
-		jQuery.when(this.get_invoke_skill_list()).done((skills: Skill[]) => {
+		this.get_invoke_skill_list().done((skills: Skill[]) => {
 			// スキル効果適用
 			var front_num: number = parseInt(this.front_num);
 			for(var i: number = 0; i < this.idol_list.length; i++) {
@@ -461,8 +456,8 @@ class BaseLiveCalcViewModel {
 		}
 
 		// 発動可能スキル
-		var deferred: JQueryDeferred<Skill[]> = jQuery.Deferred();
-		jQuery.when(Common.load_skill_list()).done((skill_data_list: { [index: string]: { [index: string]: any; } }) => {
+		var deferred: JQueryDeferred<Skill[]> = jQuery.Deferred()
+		Common.load_skill_list().done((skill_data_list: { [index: string]: { [index: string]: any; } }) => {
 			var skills: Skill[] = [];
 			var skill_input_type: number = parseInt(this.skill_input_type);
 			for(var i: number = 0; i < this.idol_list.length && i < front_num; i++) {
@@ -512,7 +507,7 @@ class BaseLiveCalcViewModel {
 	get_skill(idol: UserIdol, skill_data_list: { [index: string]: { [index: string]: any; } }): Skill {
 		// 発動スキルを取得
 		var skill_data:{ [index: string]: any; } = jQuery.extend(true, {}, skill_data_list[idol.skill_id]);
-		if (skill_data["skill_value_list"].length == 0) {
+		if (skill_data["skill_value_list"] == null || skill_data["skill_value_list"].length == 0) {
 			return null;
 		}
 		var skill: Skill = new Skill(skill_data, parseInt(idol.skill_level));
