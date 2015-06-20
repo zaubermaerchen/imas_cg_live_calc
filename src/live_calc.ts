@@ -110,7 +110,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 			status_up = 0;
 		}
 		var high_tension: boolean = (parseInt(this.high_tension) == 1);
-		var groove_type: number = parseInt(this.groove_type);
+		var groove_type: number = (calc_type == CALCULATION_TYPE.FESTIVAL_S) ? parseInt(this.groove_type) : -1;
 		var training_room_level: number = parseInt(this.training_room_level);
 		var cost_cut: boolean = (total_cost > 0);
 
@@ -140,13 +140,14 @@ class ViewModel extends BaseLiveCalcViewModel {
 
 			// アイドルごとの発揮値計算
 			switch(calc_type) {
-				case CALCULATION_TYPE.FESTIVAL_S:
-					// フェスS
-					idol.calculation_festivalS(cost_cut, rest_cost, member_type, producer_type, this.appeal_bonus, this.institution, status_up, training_room_level, high_tension, groove_type);
+				case CALCULATION_TYPE.NORMAL:
+					// 通常
+					idol.calculation(cost_cut, rest_cost, member_type, producer_type, this.appeal_bonus, this.institution, status_up);
 					break;
-				default:
-					// 通常・フェス
-					idol.calculation(cost_cut, rest_cost, member_type, producer_type, this.appeal_bonus, this.institution, status_up, training_room_level, high_tension);
+				case CALCULATION_TYPE.FESTIVAL:
+				case CALCULATION_TYPE.FESTIVAL_S:
+					// フェス・フェスS
+					idol.calculation_festival(cost_cut, rest_cost, member_type, producer_type, this.appeal_bonus, this.institution, status_up, training_room_level, high_tension, groove_type);
 					break;
 			}
 			var offense: number = idol.actual_offense;

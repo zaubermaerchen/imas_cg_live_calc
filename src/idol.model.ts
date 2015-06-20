@@ -133,7 +133,7 @@ class UserIdol {
 	get_cost_corrected_status(status: number, cost: number, rest_cost: number): number {
 		if(cost > rest_cost) {
 			var ratio: number = rest_cost / cost;
-			if(this.is_survival) {
+			if(this.is_survival || this.is_festival) {
 				status = Math.ceil(status * ratio);
 			} else {
 				ratio = Math.ceil(ratio * 10) / 10;
@@ -324,7 +324,7 @@ class UserIdol {
 	// 通常・フェスティバル
 	/******************************************************************************/
 	// 攻発揮値計算
-	calculation(cost_cut: boolean, rest_cost: number, member_type: boolean, producer_type: number, appeal_bonus_list: string[], institution_list: string[], status_up: number, training_room_level: number, high_tension: boolean): void {
+	calculation(cost_cut: boolean, rest_cost: number, member_type: boolean, producer_type: number, appeal_bonus_list: string[], institution_list: string[], status_up: number): void {
 		var actual_offense: number = 0;
 		var actual_defense: number = 0;
 		if(!cost_cut || rest_cost >= 1) {
@@ -334,8 +334,8 @@ class UserIdol {
 			var defense_skill: number = parseFloat(this.defense_skill);
 			if(member_type) {
 				// フロント
-				actual_offense = this.calc_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
-				actual_defense = this.calc_front_status(defense, defense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension);
+				actual_offense = this.calc_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up);
+				actual_defense = this.calc_front_status(defense, defense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up);
 			} else {
 				// バック
 				actual_offense = this.calc_back_status(offense, offense_skill, cost_cut, rest_cost);
@@ -346,7 +346,7 @@ class UserIdol {
 		this.actual_defense = actual_defense;
 	}
 
-	calculation_festivalS(cost_cut: boolean, rest_cost: number, member_type: boolean, producer_type: number, appeal_bonus_list: string[], institution_list: string[], status_up: number, training_room_level: number, high_tension: boolean, groove_type: number): void {
+	calculation_festival(cost_cut: boolean, rest_cost: number, member_type: boolean, producer_type: number, appeal_bonus_list: string[], institution_list: string[], status_up: number, training_room_level: number, high_tension: boolean, groove_type: number): void {
 		var offense: number = parseInt(this.offense);
 		var defense: number = parseInt(this.defense);
 		var offense_skill: number = parseFloat(this.offense_skill);
@@ -355,8 +355,8 @@ class UserIdol {
 		var actual_defense: number = 0;
 		if(member_type) {
 			// フロント
-			actual_offense = this.calc_festivalS_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension, groove_type);
-			actual_defense = this.calc_festivalS_front_status(defense, defense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension, -1);
+			actual_offense = this.calc_festival_front_status(offense, offense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension, groove_type);
+			actual_defense = this.calc_festival_front_status(defense, defense_skill, cost_cut, rest_cost, producer_type, appeal_bonus_list, institution_list, status_up, training_room_level, high_tension, -1);
 		} else {
 			// バック
 			actual_offense = this.calc_back_status(offense, offense_skill, cost_cut, rest_cost);
@@ -367,7 +367,7 @@ class UserIdol {
 	}
 
 	// フロントメンバー発揮値計算
-	calc_front_status(status: number, skill: number, cost_cut: boolean, rest_cost: number, producer_type: number, appeal_bonus_list: string[], institution_list: string[], status_up: number, training_room_level: number, high_tension: boolean): number {
+	calc_front_status(status: number, skill: number, cost_cut: boolean, rest_cost: number, producer_type: number, appeal_bonus_list: string[], institution_list: string[], status_up: number): number {
 		// コスト補正
 		if(cost_cut) {
 			status = this.get_cost_corrected_status(status, this.get_cost(), rest_cost);
@@ -384,13 +384,8 @@ class UserIdol {
 
 		// ボーナス補正計算
 		var ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + (status_up + skill) / 100;
-		if(this.is_festival) {
-			ratio += training_room_level / 100;
-			if(high_tension) {
-				ratio += UserIdol.HIGH_TENSION_BONUS_COEFFICIENT;
-			}
-		}
 		status = Math.ceil(status * ratio);
+
 
 		return status;
 	}
@@ -415,8 +410,7 @@ class UserIdol {
 		return actual_status;
 	}
 
-	// フェスフロントメンバー発揮値計算
-	calc_festivalS_front_status(status: number, skill: number, cost_cut: boolean, rest_cost: number, producer_type: number, appeal_bonus_list: string[], institution_list: string[], status_up: number, training_room_level: number, high_tension: boolean , groove_type: number): number {
+	calc_festival_front_status(status: number, skill: number, cost_cut: boolean, rest_cost: number, producer_type: number, appeal_bonus_list: string[], institution_list: string[], status_up: number, training_room_level: number, high_tension: boolean , groove_type: number): number {
 		// コスト補正
 		if(cost_cut) {
 			status = this.get_cost_corrected_status(status, this.get_cost(), rest_cost);
@@ -435,7 +429,7 @@ class UserIdol {
 		var ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + (skill + training_room_level) / 100;
 		status = Math.ceil(status * ratio);
 
-		// コンボボーナス・
+		// コンボボーナス
 		ratio = 1 + status_up /100;
 		status = status * ratio;
 
