@@ -133,9 +133,7 @@ var Common = (function () {
         }
         return parseInt(value, 10);
     };
-    Common.is_smartphone = function () {
-        return (navigator.userAgent.match(/(Android|iPhone|iPad|Mobile)/g) != null);
-    };
+    Common.is_smartphone = function () { return (navigator.userAgent.match(/(Android|iPhone|iPad|Mobile)/g) != null); };
     // 各種定義
     // アイドルデータAPI関係
     Common.IDOL_DATA_API_URL = "http://zaubermaerchen.info/imas_cg/api/idol/list/";
@@ -182,32 +180,16 @@ var UserIdol = (function () {
         ko.track(this);
     }
     // 総ステータス取得
-    UserIdol.prototype.display_offense = function () {
-        return Math.ceil(this.actual_offense);
-    };
-    UserIdol.prototype.display_defense = function () {
-        return Math.ceil(this.actual_defense);
-    };
-    UserIdol.prototype.status = function () {
-        return parseInt(this.offense) + parseInt(this.defense);
-    };
+    UserIdol.prototype.display_offense = function () { return Math.ceil(this.actual_offense); };
+    UserIdol.prototype.display_defense = function () { return Math.ceil(this.actual_defense); };
+    UserIdol.prototype.status = function () { return parseInt(this.offense) + parseInt(this.defense); };
     // コスト比
-    UserIdol.prototype.offense_per_cost = function () {
-        return this.calc_cost_ratio(parseInt(this.offense));
-    };
-    UserIdol.prototype.defense_per_cost = function () {
-        return this.calc_cost_ratio(parseInt(this.defense));
-    };
-    UserIdol.prototype.status_per_cost = function () {
-        return this.calc_cost_ratio(this.status());
-    };
+    UserIdol.prototype.offense_per_cost = function () { return this.calc_cost_ratio(parseInt(this.offense)); };
+    UserIdol.prototype.defense_per_cost = function () { return this.calc_cost_ratio(parseInt(this.defense)); };
+    UserIdol.prototype.status_per_cost = function () { return this.calc_cost_ratio(this.status()); };
     // アイドル・スキル選択リスト
-    UserIdol.prototype.select_idol_list = function () {
-        return this.idol_data_list;
-    };
-    UserIdol.prototype.select_skill_list = function () {
-        return this.skill_data_list;
-    };
+    UserIdol.prototype.select_idol_list = function () { return this.idol_data_list; };
+    UserIdol.prototype.select_skill_list = function () { return this.skill_data_list; };
     // 実コスト取得
     UserIdol.prototype.get_cost = function () {
         var cost = parseInt(this.cost);
@@ -659,20 +641,6 @@ var UserIdol = (function () {
         actual_status = Math.ceil(actual_status * ratio);
         return actual_status;
     };
-    // 与ダメージ計算
-    UserIdol.prototype.calc_dream_live_festival_damage = function (full_power) {
-        var damage = Math.floor(this.actual_offense);
-        if (full_power) {
-            // フルパワー
-            damage = damage * UserIdol.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT;
-        }
-        else {
-            // LP1
-            damage = damage * UserIdol.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT;
-        }
-        damage = damage / 5;
-        return damage;
-    };
     /******************************************************************************/
     // LIVEロワイヤル
     /******************************************************************************/
@@ -860,16 +828,6 @@ var UserIdol = (function () {
         actual_status = Math.ceil(actual_status * ratio);
         return actual_status;
     };
-    // ダメージ計算
-    UserIdol.prototype.calc_talk_battle_damage = function (full_power) {
-        var damage = Math.floor(this.actual_offense);
-        if (full_power) {
-            // 全力トーク
-            damage = damage * UserIdol.TALK_BATTLE_FULL_POWER_LIVE_COEFFICIENT;
-        }
-        damage = damage / 5;
-        return damage;
-    };
     /******************************************************************************/
     // アイドルチャレンジ
     /******************************************************************************/
@@ -952,11 +910,8 @@ var UserIdol = (function () {
     // LIVEロワイヤル係数
     UserIdol.LIVE_ROYAL_DAMAGE_COEFFICIENT = 0.2; // ダメージ係数
     // ドリームLIVEフェス
-    UserIdol.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT = 0.5; // 通常LIVE時
-    UserIdol.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT = 2.5; // 全力LIVE時
     UserIdol.DREAM_LIVE_FESTIVAL_COMBO_LEVEL_COEFFICIENT = 125; // コンボLV係数
     // トークバトル
-    UserIdol.TALK_BATTLE_FULL_POWER_LIVE_COEFFICIENT = 5; // 全力LIVE時
     UserIdol.TALK_BATTLE_COMBO_LEVEL_COEFFICIENT = 50; // コンボLV係数
     return UserIdol;
 })();
@@ -1005,7 +960,9 @@ var Skill = (function () {
     Skill.prototype.check_skill_target = function (member_num) {
         var enable_skill = false;
         switch (this.target_member) {
-            case 1 /* FRONT */:
+            case SKILL_TARGET_MEMBER.FRONT:
+                // フロントメンバー
+                // 対象が存在するかチェック
                 for (var i = 0; i < member_num[0].length; i++) {
                     if ((this.target_type & (1 << i)) > 0 && member_num[0][i] > 0) {
                         enable_skill = true;
@@ -1013,7 +970,9 @@ var Skill = (function () {
                     }
                 }
                 break;
-            case 2 /* BACK */:
+            case SKILL_TARGET_MEMBER.BACK:
+                // バックメンバー
+                // 対象が存在するかチェック
                 for (var i = 0; i < member_num[1].length; i++) {
                     if ((this.target_type & (1 << i)) > 0 && member_num[1][i] > 0) {
                         enable_skill = true;
@@ -1021,7 +980,9 @@ var Skill = (function () {
                     }
                 }
                 break;
-            case 3 /* ALL */:
+            case SKILL_TARGET_MEMBER.ALL:
+                // 全メンバー
+                // 対象が存在するかチェック
                 for (var i = 0; i < member_num.length; i++) {
                     for (var j = 0; j < member_num[i].length; j++) {
                         if ((this.target_type & (1 << j)) > 0 && member_num[i][j] > 0) {
@@ -1048,9 +1009,7 @@ var UserPetitIdol = (function () {
         this.status = 0;
         ko.track(this);
     }
-    UserPetitIdol.prototype.display_status = function () {
-        return Math.ceil(this.status);
-    };
+    UserPetitIdol.prototype.display_status = function () { return Math.ceil(this.status); };
     // 総ステータス取得
     UserPetitIdol.prototype.calculation = function (event_bonus, bonus_type, bonus_parameter) {
         if (event_bonus === void 0) { event_bonus = 0; }
@@ -1165,7 +1124,7 @@ var BaseLiveCalcViewModel = (function () {
     function BaseLiveCalcViewModel() {
         var self = this;
         // 入力項目
-        this.calc_type = 0 /* NORMAL */.toString();
+        this.calc_type = CALCULATION_TYPE.NORMAL.toString();
         this.front_num = "0";
         this.producer_type = "-1";
         this.appeal_bonus = ["0", "0", "0"];
@@ -1201,18 +1160,10 @@ var BaseLiveCalcViewModel = (function () {
         };
     }
     // 発揮値
-    BaseLiveCalcViewModel.prototype.actual_status = function () {
-        return [0, 0];
-    };
-    BaseLiveCalcViewModel.prototype.change_appeal_bonus = function () {
-        ko.valueHasMutated(this, "appeal_bonus");
-    };
-    BaseLiveCalcViewModel.prototype.change_rival_front_num = function () {
-        ko.valueHasMutated(this, "rival_front_num");
-    };
-    BaseLiveCalcViewModel.prototype.change_rival_back_num = function () {
-        ko.valueHasMutated(this, "rival_back_num");
-    };
+    BaseLiveCalcViewModel.prototype.actual_status = function () { return [0, 0]; };
+    BaseLiveCalcViewModel.prototype.change_appeal_bonus = function () { ko.valueHasMutated(this, "appeal_bonus"); };
+    BaseLiveCalcViewModel.prototype.change_rival_front_num = function () { ko.valueHasMutated(this, "rival_front_num"); };
+    BaseLiveCalcViewModel.prototype.change_rival_back_num = function () { ko.valueHasMutated(this, "rival_back_num"); };
     // アイドルリスト初期化
     BaseLiveCalcViewModel.prototype.init_list = function () {
         this.init_idol_list();
@@ -1224,8 +1175,7 @@ var BaseLiveCalcViewModel = (function () {
             this.apply_code();
         }
     };
-    BaseLiveCalcViewModel.prototype.init_idol_list = function () {
-    };
+    BaseLiveCalcViewModel.prototype.init_idol_list = function () { };
     BaseLiveCalcViewModel.prototype.init_petit_idol_list = function () {
         var petit_idols = [];
         for (var i = 0; i < BaseLiveCalcViewModel.PETIT_IDOL_NUM; i++) {
@@ -1246,17 +1196,12 @@ var BaseLiveCalcViewModel = (function () {
         }
         return petit_idol_bonus;
     };
-    BaseLiveCalcViewModel.prototype.is_smartphone = function () {
-        return Common.is_smartphone();
-    };
+    BaseLiveCalcViewModel.prototype.is_smartphone = function () { return Common.is_smartphone(); };
     /******************************************************************************/
     // 設定関連
     /******************************************************************************/
-    BaseLiveCalcViewModel.prototype.get_setting = function () {
-        return {};
-    };
-    BaseLiveCalcViewModel.prototype.set_setting = function (setting) {
-    };
+    BaseLiveCalcViewModel.prototype.get_setting = function () { return {}; };
+    BaseLiveCalcViewModel.prototype.set_setting = function (setting) { };
     // アイドル設定取得
     BaseLiveCalcViewModel.prototype.get_idol_setting = function () {
         var setting = [];
@@ -1470,15 +1415,14 @@ var BaseLiveCalcViewModel = (function () {
     // スキル関連
     /******************************************************************************/
     // スキル入力モードがマニュアルか
-    BaseLiveCalcViewModel.prototype.is_skill_input_type_manual = function () {
-        return (parseInt(this.skill_input_type) == 0 /* MANUAL */);
-    };
+    BaseLiveCalcViewModel.prototype.is_skill_input_type_manual = function () { return (parseInt(this.skill_input_type) == SKILL_INPUT_MODE.MANUAL); };
     // スキル自動計算
     BaseLiveCalcViewModel.prototype.calc_skill_value = function () {
         var _this = this;
         if (this.is_skill_input_type_manual()) {
             return;
         }
+        // 初期化
         for (var i = 0; i < this.idol_list.length; i++) {
             var idol = this.idol_list[i];
             idol.offense_skill = "0";
@@ -1530,7 +1474,7 @@ var BaseLiveCalcViewModel = (function () {
                     continue;
                 }
                 skills.push(skill);
-                if (skill_input_type != 2 /* AUTO_MEAN */ && skills.length >= _this.max_skill_invoke) {
+                if (skill_input_type != SKILL_INPUT_MODE.AUTO_MEAN && skills.length >= _this.max_skill_invoke) {
                     break;
                 }
             }
@@ -1552,7 +1496,7 @@ var BaseLiveCalcViewModel = (function () {
         }
         idol.enable_skill = true;
         this.correct_skill_value(skill, index);
-        if (skill.target_member == 0 /* SELF */) {
+        if (skill.target_member == SKILL_TARGET_MEMBER.SELF) {
             // 自分スキルの適用
             this.apply_skill_value(idol, skill);
         }
@@ -1569,7 +1513,7 @@ var BaseLiveCalcViewModel = (function () {
         return skill;
     };
     BaseLiveCalcViewModel.prototype.check_skill_enable = function (skill, member_num, rival_member_num) {
-        if (skill.target_unit == 0 /* OWN */) {
+        if (skill.target_unit == SKILL_TARGET_UNIT.OWN) {
             // 自分
             return this.check_target_own_unit_skill_enable(skill, member_num);
         }
@@ -1579,10 +1523,12 @@ var BaseLiveCalcViewModel = (function () {
     BaseLiveCalcViewModel.prototype.check_target_own_unit_skill_enable = function (skill, member_num) {
         var enable_skill_type = parseInt(this.enable_skill_type);
         // 有効スキルかチェック
-        if (enable_skill_type != 0 /* ALL */ && skill.target_param != 0 /* ALL */ && enable_skill_type != skill.target_param) {
+        if (enable_skill_type != ENABLE_SKILL_TYPE.ALL &&
+            skill.target_param != SKILL_TARGET_PARAM.ALL &&
+            enable_skill_type != skill.target_param) {
             return false;
         }
-        if (skill.target_member == 0 /* SELF */) {
+        if (skill.target_member == SKILL_TARGET_MEMBER.SELF) {
             return true;
         }
         // 対象範囲チェック
@@ -1591,11 +1537,11 @@ var BaseLiveCalcViewModel = (function () {
     BaseLiveCalcViewModel.prototype.check_target_rival_unit_skill_enable = function (skill, rival_member_num) {
         var enable_skill_type = parseInt(this.enable_skill_type);
         // 有効スキルかチェック
-        return (enable_skill_type == 0 /* ALL */ || (enable_skill_type ^ skill.target_param) > 0);
+        return (enable_skill_type == ENABLE_SKILL_TYPE.ALL || (enable_skill_type ^ skill.target_param) > 0);
     };
     //
     BaseLiveCalcViewModel.prototype.correct_skill_value = function (skill, index) {
-        if (parseInt(this.skill_input_type) != 2 /* AUTO_MEAN */) {
+        if (parseInt(this.skill_input_type) != SKILL_INPUT_MODE.AUTO_MEAN) {
             return;
         }
         var rate = this.skill_invocation_rate_list[index];
@@ -1610,22 +1556,24 @@ var BaseLiveCalcViewModel = (function () {
                 continue;
             }
             switch (skill.target_member) {
-                case 0 /* SELF */:
+                case SKILL_TARGET_MEMBER.SELF:
+                    // 発動者
+                    // 何もしない
                     break;
-                case 1 /* FRONT */:
+                case SKILL_TARGET_MEMBER.FRONT:
                     // フロントメンバー
                     if (front_member) {
                         this.apply_skill_value(idol, skill);
                     }
                     break;
-                case 2 /* BACK */:
+                case SKILL_TARGET_MEMBER.BACK:
                     // バックメンバー
                     if (!front_member && (skill.target_num == -1 || skill.target_num > 0)) {
                         this.apply_skill_value(idol, skill);
                         skill.target_num--;
                     }
                     break;
-                case 3 /* ALL */:
+                case SKILL_TARGET_MEMBER.ALL:
                     // 全メンバー
                     if (front_member) {
                         this.apply_skill_value(idol, skill);
@@ -1644,14 +1592,14 @@ var BaseLiveCalcViewModel = (function () {
         var offense_skill = parseFloat(idol.offense_skill);
         var defense_skill = parseFloat(idol.defense_skill);
         switch (skill.target_param) {
-            case 0 /* ALL */:
+            case SKILL_TARGET_PARAM.ALL:
                 offense_skill += skill.value;
                 defense_skill += skill.value;
                 break;
-            case 1 /* OFFENSE */:
+            case SKILL_TARGET_PARAM.OFFENSE:
                 offense_skill += skill.value;
                 break;
-            case 2 /* DEFENSE */:
+            case SKILL_TARGET_PARAM.DEFENSE:
                 defense_skill += skill.value;
                 break;
         }
@@ -1663,8 +1611,8 @@ var BaseLiveCalcViewModel = (function () {
         var result = false;
         var type = parseInt(idol.type);
         // スキルが効果適用可能かチェック
-        if (skill.target_unit == 0 /* OWN */) {
-            if (skill.target_member == 0 /* SELF */ || (skill.target_type & (1 << type)) > 0) {
+        if (skill.target_unit == SKILL_TARGET_UNIT.OWN) {
+            if (skill.target_member == SKILL_TARGET_MEMBER.SELF || (skill.target_type & (1 << type)) > 0) {
                 result = true;
             }
         }
@@ -1817,22 +1765,22 @@ var BaseLiveTourCalcViewModel = (function (_super) {
     BaseLiveTourCalcViewModel.prototype.check_target_rival_unit_skill_enable = function (skill, rival_member_num) {
         var enable_skill_type = parseInt(this.enable_skill_type);
         // 有効スキルかチェック
-        if (enable_skill_type != 0 /* ALL */ && (enable_skill_type ^ skill.target_param) == 0) {
+        if (enable_skill_type != ENABLE_SKILL_TYPE.ALL && (enable_skill_type ^ skill.target_param) == 0) {
             return false;
         }
-        if (skill.target_member != 1 /* FRONT */ && skill.target_member != 3 /* ALL */) {
+        if (skill.target_member != SKILL_TARGET_MEMBER.FRONT && skill.target_member != SKILL_TARGET_MEMBER.ALL) {
             return false;
         }
         if (skill.check_skill_target(rival_member_num)) {
             switch (skill.target_param) {
-                case 1 /* OFFENSE */:
-                    skill.target_param = 2 /* DEFENSE */;
+                case SKILL_TARGET_PARAM.OFFENSE:
+                    skill.target_param = SKILL_TARGET_PARAM.DEFENSE;
                     break;
-                case 2 /* DEFENSE */:
-                    skill.target_param = 1 /* OFFENSE */;
+                case SKILL_TARGET_PARAM.DEFENSE:
+                    skill.target_param = SKILL_TARGET_PARAM.OFFENSE;
                     break;
             }
-            skill.target_member = 1 /* FRONT */;
+            skill.target_member = SKILL_TARGET_MEMBER.FRONT;
         }
         else {
             skill.value = 0;
@@ -1844,12 +1792,12 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         var result = false;
         var type = parseInt(idol.type);
         // スキルが効果適用可能かチェック
-        if (skill.target_unit == 0 /* OWN */) {
-            if (skill.target_member == 0 /* SELF */ || (skill.target_type & (1 << type)) > 0) {
+        if (skill.target_unit == SKILL_TARGET_UNIT.OWN) {
+            if (skill.target_member == SKILL_TARGET_MEMBER.SELF || (skill.target_type & (1 << type)) > 0) {
                 result = true;
             }
         }
-        else if (skill.target_unit == 1 /* RIVAL */) {
+        else if (skill.target_unit == SKILL_TARGET_UNIT.RIVAL) {
             result = true;
         }
         return result;
@@ -1862,7 +1810,7 @@ var ViewModel = (function (_super) {
     function ViewModel() {
         _super.call(this);
         // 入力値
-        this.calc_type = 6 /* ROYAL */.toString();
+        this.calc_type = CALCULATION_TYPE.ROYAL.toString();
         this.battle_point = "2";
         // セーブデータ関係
         this.save_data_key = "imas_cg_live_royal_calc";
@@ -1870,12 +1818,8 @@ var ViewModel = (function (_super) {
         ko.track(this);
     }
     // 発揮値
-    ViewModel.prototype.actual_status = function () {
-        return this.calculation();
-    };
-    ViewModel.prototype.is_guest_live = function () {
-        return (parseInt(this.calc_type) == 7 /* ROYAL_GUEST */);
-    };
+    ViewModel.prototype.actual_status = function () { return this.calculation(); };
+    ViewModel.prototype.is_guest_live = function () { return (parseInt(this.calc_type) == CALCULATION_TYPE.ROYAL_GUEST); };
     // 発揮値計算
     ViewModel.prototype.calculation = function () {
         // スキル効果反映
@@ -1975,7 +1919,7 @@ var ViewModel = (function (_super) {
         }
         var enable_skill_type = parseInt(this.enable_skill_type);
         // 有効スキルかチェック
-        return (enable_skill_type == 0 /* ALL */ || (enable_skill_type ^ skill.target_param) > 0);
+        return (enable_skill_type == ENABLE_SKILL_TYPE.ALL || (enable_skill_type ^ skill.target_param) > 0);
     };
     // スキル効果適用可能チェック
     ViewModel.prototype.check_apply_skill = function (idol, skill) {
@@ -1985,8 +1929,8 @@ var ViewModel = (function (_super) {
         var result = false;
         var type = parseInt(idol.type);
         // スキルが効果適用可能かチェック
-        if (skill.target_unit == 0 /* OWN */) {
-            if (skill.target_member == 0 /* SELF */ || (skill.target_type & (1 << type)) > 0) {
+        if (skill.target_unit == SKILL_TARGET_UNIT.OWN) {
+            if (skill.target_member == SKILL_TARGET_MEMBER.SELF || (skill.target_type & (1 << type)) > 0) {
                 result = true;
             }
         }

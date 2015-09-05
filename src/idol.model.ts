@@ -23,11 +23,8 @@ class UserIdol {
 	// LIVEロワイヤル係数
 	static LIVE_ROYAL_DAMAGE_COEFFICIENT: number = 0.2; // ダメージ係数
 	// ドリームLIVEフェス
-	static DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT: number = 0.5;		// 通常LIVE時
-	static DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT: number = 2.5;	// 全力LIVE時
 	static DREAM_LIVE_FESTIVAL_COMBO_LEVEL_COEFFICIENT: number = 125;		// コンボLV係数
 	// トークバトル
-	static TALK_BATTLE_FULL_POWER_LIVE_COEFFICIENT: number = 5;		// 全力LIVE時
 	static TALK_BATTLE_COMBO_LEVEL_COEFFICIENT: number = 50;			// コンボLV係数
 
 	// ステータス
@@ -635,23 +632,6 @@ class UserIdol {
 		return actual_status;
 	}
 
-	// 与ダメージ計算
-	calc_dream_live_festival_damage(full_power: boolean): number {
-		var damage: number = Math.floor(this.actual_offense);
-
-		if(full_power) {
-			// フルパワー
-			damage = damage * UserIdol.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT;
-		} else {
-			// LP1
-			damage = damage * UserIdol.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT;
-		}
-
-		damage = damage / 5;
-
-		return damage;
-	}
-
 	/******************************************************************************/
 	// LIVEロワイヤル
 	/******************************************************************************/
@@ -873,20 +853,6 @@ class UserIdol {
 		actual_status = Math.ceil(actual_status * ratio);
 
 		return actual_status;
-	}
-
-	// ダメージ計算
-	calc_talk_battle_damage(full_power: boolean): number {
-		var damage: number = Math.floor(this.actual_offense);
-
-		if(full_power) {
-			// 全力トーク
-			damage = damage * UserIdol.TALK_BATTLE_FULL_POWER_LIVE_COEFFICIENT;
-		}
-
-		damage = damage / 5;
-
-		return damage;
 	}
 
 	/******************************************************************************/

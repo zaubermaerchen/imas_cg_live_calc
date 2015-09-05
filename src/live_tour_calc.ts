@@ -57,10 +57,15 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		var total_offense: number = 0;
 		var total_defense: number = 0;
 		var damage_list: Damage[];
-		if(calc_type == CALCULATION_TYPE.TALK_BATTLE) {
-			damage_list = [new Damage("TP1"), new Damage("TP2"), new Damage("TP3")];
-		} else {
-			damage_list = [new Damage("通常"), new Damage("全力")];
+		switch(calc_type) {
+			case CALCULATION_TYPE.DREAM_LIVE_FESTIVAL:
+				damage_list = [new Damage("AP1"), new Damage("AP2"), new Damage("AP3")];
+				break;
+			case CALCULATION_TYPE.TALK_BATTLE:
+				damage_list = [new Damage("TP1"), new Damage("TP2"), new Damage("TP3")];
+				break;
+			default:
+				damage_list = [new Damage("通常"), new Damage("全力")];
 		}
 
 		// アイドルごとの発揮値・与ダメージ計算
@@ -76,13 +81,15 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 				case CALCULATION_TYPE.DREAM_LIVE_FESTIVAL:
 					// ドリームLIVEフェス
 					idol.calculation_dream_live_festival(member_type, producer_type, this.appeal_bonus, combo_level, fever_bonus, training_room_level);
-					damage_list[0].add_damage(idol.calc_dream_live_festival_damage(false));
-					damage_list[1].add_damage(idol.calc_dream_live_festival_damage(true));
+					var base_damage: number  = Math.floor(idol.actual_offense) / 5;
+					for(var j: number = 0; j < damage_list.length; j++) {
+						damage_list[j].add_damage(base_damage * ViewModel.USE_POINT_COEFFICIENT[j]);
+					}
 					break;
 				case CALCULATION_TYPE.TALK_BATTLE:
 					// トークバトル
 					idol.calculation_talk_battle(member_type, producer_type, this.appeal_bonus, combo_level, cheer_bonus, training_room_level);
-					var base_damage: number  = idol.calc_talk_battle_damage(false);
+					var base_damage: number  = Math.floor(idol.actual_offense) / 5;
 					for(var j: number = 0; j < damage_list.length; j++) {
 						damage_list[j].add_damage(base_damage * ViewModel.USE_POINT_COEFFICIENT[j]);
 					}
@@ -122,8 +129,9 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 			case CALCULATION_TYPE.DREAM_LIVE_FESTIVAL:
 				// ドリームLIVEフェス
 				petit_idol_total_status = this.calculation_petit_idol(fever_bonus, petit_idol_bonus_type, petit_idol_bonus_parameter);
-				damage_list[0].add_bonus(Math.floor(petit_idol_total_status * UserIdol.DREAM_LIVE_FESTIVAL_NORMAL_LIVE_COEFFICIENT / 5));
-				damage_list[1].add_bonus(Math.floor(petit_idol_total_status * UserIdol.DREAM_LIVE_FESTIVAL_FULL_POWER_LIVE_COEFFICIENT / 5));
+				for(var i: number = 0; i < damage_list.length; i++) {
+					damage_list[i].add_bonus(Math.ceil(petit_idol_total_status / 5));
+				}
 				break;
 			case CALCULATION_TYPE.TALK_BATTLE:
 				// トークバトル
