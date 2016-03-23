@@ -136,13 +136,13 @@ var Common = (function () {
     Common.is_smartphone = function () { return (navigator.userAgent.match(/(Android|iPhone|iPad|Mobile)/g) != null); };
     // 各種定義
     // アイドルデータAPI関係
-    Common.IDOL_DATA_API_URL = "http://zaubermaerchen.info/imas_cg/api/idol/list/";
+    Common.IDOL_DATA_API_URL = "https://zaubermaerchen.info/imas_cg/api/idol/list/";
     Common.IDOL_LIST_KEY_BASE = "imas_cg_idol_list";
     // スキルデータAPI関係
-    Common.SKILL_DATA_API_URL = "http://zaubermaerchen.info/imas_cg/api/skill/list/";
+    Common.SKILL_DATA_API_URL = "https://zaubermaerchen.info/imas_cg/api/skill/list/";
     Common.SKILL_LIST_KEY = "imas_cg_skill_list";
     // QRコード関連
-    Common.GOOGLE_CHART_API_URL = "http://chart.apis.google.com/chart";
+    Common.GOOGLE_CHART_API_URL = "https://chart.apis.google.com/chart";
     Common.cache_data = {};
     return Common;
 })();
@@ -1622,11 +1622,10 @@ var BaseLiveCalcViewModel = (function () {
     BaseLiveCalcViewModel.PETIT_IDOL_NUM = 3;
     return BaseLiveCalcViewModel;
 })();
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 /// <reference path="live_calc.base.ts" />
 var DamageValue = (function () {

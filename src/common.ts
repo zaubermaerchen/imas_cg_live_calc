@@ -4,13 +4,13 @@ declare var Zlib: any;
 class Common {
 	// 各種定義
 	// アイドルデータAPI関係
-	static IDOL_DATA_API_URL :string	= "http://zaubermaerchen.info/imas_cg/api/idol/list/";
+	static IDOL_DATA_API_URL :string	= "https://zaubermaerchen.info/imas_cg/api/idol/list/";
 	static IDOL_LIST_KEY_BASE :string	= "imas_cg_idol_list";
 	// スキルデータAPI関係
-	static SKILL_DATA_API_URL :string	= "http://zaubermaerchen.info/imas_cg/api/skill/list/";
+	static SKILL_DATA_API_URL :string	= "https://zaubermaerchen.info/imas_cg/api/skill/list/";
 	static SKILL_LIST_KEY :string		= "imas_cg_skill_list";
 	// QRコード関連
-	static GOOGLE_CHART_API_URL: string = "http://chart.apis.google.com/chart";
+	static GOOGLE_CHART_API_URL: string = "https://chart.apis.google.com/chart";
 
 	static cache_data: { [index: string]: any; } = {};
 
