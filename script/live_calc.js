@@ -159,6 +159,7 @@ var UserIdol = (function () {
         this.offense = "0";
         this.defense = "0";
         this.event_power = "1";
+        this.accessories_power = "1";
         // スキル
         this.offense_skill = "0";
         this.defense_skill = "0";
@@ -320,6 +321,7 @@ var UserIdol = (function () {
         setting["offense"] = this.offense;
         setting["defense"] = this.defense;
         setting["event_power"] = this.event_power;
+        setting["accessories_power"] = this.accessories_power;
         setting["offense_skill"] = this.offense_skill;
         setting["defense_skill"] = this.defense_skill;
         setting["skill_id"] = this.skill_id;
@@ -340,6 +342,9 @@ var UserIdol = (function () {
             _this.offense = setting["offense"];
             _this.defense = setting["defense"];
             _this.event_power = setting["event_power"];
+            if (setting["accessories_power"]) {
+                _this.accessories_power = setting["accessories_power"];
+            }
             _this.offense_skill = setting["offense_skill"];
             _this.defense_skill = setting["defense_skill"];
             _this.set_skill_setting(idol_list[setting["id"]], setting["skill_id"], setting["skill_level"]);
@@ -507,7 +512,7 @@ var UserIdol = (function () {
     /******************************************************************************/
     // LIVEツアー
     /******************************************************************************/
-    UserIdol.prototype.calculation_live_tour = function (member_type, producer_type, appeal_bonus_list, voltage_bonus, status_up, compatibility_type, training_room_level) {
+    UserIdol.prototype.calculation_live_tour = function (member_type, producer_type, appeal_bonus_list, training_room_level) {
         var offense = parseInt(this.offense);
         var defense = parseInt(this.defense);
         var offense_skill = parseFloat(this.offense_skill);
@@ -516,79 +521,37 @@ var UserIdol = (function () {
         var actual_defense = 0;
         if (member_type) {
             // フロント
-            actual_offense = this.calc_live_tour_front_status(offense, offense_skill, producer_type, appeal_bonus_list, voltage_bonus, status_up, compatibility_type, training_room_level);
-            actual_defense = this.calc_live_tour_front_status(defense, defense_skill, producer_type, appeal_bonus_list, voltage_bonus, status_up, compatibility_type, training_room_level);
+            actual_offense = this.calc_live_tour_front_status(offense, offense_skill, producer_type, appeal_bonus_list, training_room_level);
+            actual_defense = this.calc_live_tour_front_status(defense, defense_skill, producer_type, appeal_bonus_list, training_room_level);
         }
         else {
             // バック
-            actual_offense = this.calc_live_tour_back_status(offense, offense_skill, voltage_bonus);
-            actual_defense = this.calc_live_tour_back_status(defense, defense_skill, voltage_bonus);
+            actual_offense = this.calc_live_tour_back_status(offense, offense_skill);
+            actual_defense = this.calc_live_tour_back_status(defense, defense_skill);
         }
         this.actual_offense = actual_offense;
         this.actual_defense = actual_defense;
     };
     // 発揮値計算
-    UserIdol.prototype.calc_live_tour_status = function (status, skill, producer_type, appeal_bonus_list, status_up, compatibility_type) {
+    UserIdol.prototype.calc_live_tour_front_status = function (status, skill, producer_type, appeal_bonus_list, training_room_level) {
+        // アクセサリ効果
+        var actual_status = Math.ceil(status * parseFloat(this.accessories_power)); // 切り上げになってる？
         // スターダムパワー補正
-        var actual_status = Math.floor(status * parseFloat(this.event_power));
-        // プロデューサー+アピールボーナス+スキル補正計算
-        var ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + skill / 100;
-        actual_status = Math.ceil(actual_status * ratio);
-        // コンボボーナス
-        ratio = 1;
-        ratio += (status_up) / 100;
-        actual_status = Math.ceil(actual_status * ratio);
-        // 相性ボーナス
-        ratio = 1;
-        if (parseInt(this.type) == compatibility_type) {
-            ratio += UserIdol.COMPATIBILITY_BONUS_COEFFICIENT;
-        }
-        actual_status = actual_status * ratio;
-        return actual_status;
-    };
-    UserIdol.prototype.calc_live_tour_front_status = function (status, skill, producer_type, appeal_bonus_list, voltage_bonus, status_up, compatibility_type, training_room_level) {
-        // スターダムパワー補正
-        var actual_status = Math.floor(status * parseFloat(this.event_power));
+        actual_status = Math.floor(actual_status * parseFloat(this.event_power));
         // ボーナス補正計算
         var ratio = 1 + this.get_type_ratio(producer_type, appeal_bonus_list) + (skill + training_room_level) / 100;
         actual_status = Math.ceil(actual_status * ratio);
-        // ボルテージボーナス
-        ratio = 1 + voltage_bonus / 100;
-        actual_status = Math.ceil(actual_status * ratio);
-        // コンボボーナス
-        ratio = 1 + status_up / 100;
-        actual_status = Math.ceil(actual_status * ratio);
-        // 相性ボーナス
-        ratio = 1;
-        if (parseInt(this.type) == compatibility_type) {
-            ratio += UserIdol.COMPATIBILITY_BONUS_COEFFICIENT;
-        }
-        actual_status = actual_status * ratio;
         return actual_status;
     };
-    UserIdol.prototype.calc_live_tour_back_status = function (status, skill, voltage_bonus) {
+    UserIdol.prototype.calc_live_tour_back_status = function (status, skill) {
         // スターダムパワー補正
         var actual_status = Math.floor(status * parseFloat(this.event_power));
         // バックメンバー補正
         actual_status = Math.ceil(actual_status * UserIdol.BACK_MEMBER_COEFFICIENT);
-        // スキル・ボルテージボーナス補正計算
-        var ratio = 1 + (skill + voltage_bonus) / 100;
+        // スキル補正計算
+        var ratio = 1 + skill / 100;
         actual_status = Math.ceil(actual_status * ratio);
         return actual_status;
-    };
-    // ダメージ計算
-    UserIdol.prototype.calc_live_tour_damage = function (full_power) {
-        var damage = Math.floor(this.actual_offense);
-        if (full_power) {
-            // フルパワー
-            damage = damage * UserIdol.LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT;
-        }
-        else {
-            // LP1
-            damage = damage * UserIdol.LIVE_TOUR_NORMAL_LIVE_COEFFICIENT;
-        }
-        damage = damage / 5;
-        return damage;
     };
     /******************************************************************************/
     // ドリームLIVEフェス

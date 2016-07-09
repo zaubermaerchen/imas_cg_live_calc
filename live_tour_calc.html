@@ -56,34 +56,6 @@
 							</select>
 						</td>
 					</tr>
-					<!-- ko if: is_live_tour() -->
-					<tr>
-						<th>コンボボーナス</th>
-						<td><input type="number" name="status_up" value="0" data-bind="textInput: status_up" />%</td>
-					</tr>
-					<tr>
-						<th>ボルテージボーナス</th>
-						<td>
-							<select name="event_power" data-bind="value: voltage_bonus">
-								<option value="0" selected="selected">無し</option>
-								<option value="10">10%</option>
-								<option value="20">20%</option>
-								<option value="50">50%</option>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<th>相性ボーナス</th>
-						<td>
-							<select name="compatibility_type"  data-bind="value: compatibility_type">
-								<option value="-1" selected="selected">無し</option>
-								<option value="0">キュート</option>
-								<option value="1">クール</option>
-								<option value="2">パッション</option>
-							</select>
-						</td>
-					</tr>
-					<!-- /ko -->
 					<!-- ko ifnot: is_live_tour() -->
 					<tr>
 						<th>コンボレベル</th>
@@ -214,6 +186,9 @@
 					<th>&nbsp;</th>
 					<th>アイドル</th>
 					<th>ステータス</th>
+					<!-- ko if: is_live_tour() -->
+					<th>アクセサリー</th>
+					<!-- /ko -->
 					<th>イベント<br />パワー</th>
 					<th>スキル</th>
 					<th>攻発揮値</th>
@@ -222,21 +197,21 @@
 			</thead>
 			<tfoot>
 				<tr>
-					<th colspan="5">フロントメンバー発揮値</th>
+					<th data-bind="attr: { colspan: (is_live_tour() ? '6' : '5') }">フロントメンバー発揮値</th>
 					<td class="numeric" data-bind="text: front_offense">0</td>
 					<td class="numeric" data-bind="text: front_defense">0</td>
 				</tr>
 				<tr>
-					<th colspan="5">バックメンバー発揮値</th>
+					<th data-bind="attr: { colspan: (is_live_tour() ? '6' : '5') }">バックメンバー発揮値</th>
 					<td class="numeric" data-bind="text: back_offense">0</td>
 					<td class="numeric" data-bind="text: back_defense">0</td>
 				</tr>
 				<tr>
-					<th colspan="5">ぷちデレラ発揮値</th>
+					<th data-bind="attr: { colspan: (is_live_tour() ? '6' : '5') }">ぷちデレラ発揮値</th>
 					<td colspan="2" class="numeric" data-bind="text: petit_idol_total_status">0</td>
 				</tr>
 				<tr>
-					<th colspan="5">総発揮値</th>
+					<th data-bind="attr: { colspan: (is_live_tour() ? '6' : '5') }">総発揮値</th>
 					<td class="numeric" data-bind="text: actual_status()[0]">0</td>
 					<td class="numeric" data-bind="text: actual_status()[1]">0</td>
 				</tr>
@@ -270,6 +245,16 @@
 						<span style="color: #0000ff;">守</span>
 						<input type="number" name="defense" class="status" value="0" data-bind="textInput: defense" /><br />
 					</td>
+					<!-- ko if: $root.is_live_tour() -->
+					<td>
+						<select name="accessories_power" data-bind="value: accessories_power">
+							<option value="1" selected="selected">無し</option>
+							<option value="1.5">1.5倍</option>
+							<option value="2">2倍</option>
+							<option value="3">3倍</option>
+						</select>
+					</td>
+					<!-- /ko -->
 					<td>
 						<select name="event_power" data-bind="value: event_power">
 							<option value="1" selected="selected">無し</option>

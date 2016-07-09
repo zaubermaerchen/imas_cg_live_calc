@@ -4,8 +4,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	static USE_POINT_COEFFICIENT: number[] = [1, 2.5, 5];
 
 	// 入力項目
-	status_up: string;
-	compatibility_type: string;
 	combo_level: string;
 	fever_bonus: string;
 	cheer_bonus: string;
@@ -14,10 +12,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		super();
 
 		// 入力値
-		this.voltage_bonus = "0";
 		this.calc_type = CALCULATION_TYPE.LIVE_TOUR.toString();
-		this.status_up = "0";
-		this.compatibility_type = "-1";
 		this.combo_level = "0";
 		this.fever_bonus = "1";
 		this.cheer_bonus = "0";
@@ -44,9 +39,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 
 		var calc_type: number = parseInt(this.calc_type);
 		var producer_type: number = parseInt(this.producer_type);
-		var voltage_bonus: number = parseInt(this.voltage_bonus);
-		var status_up: number = parseInt(this.status_up);
-		var compatibility_type: number = parseInt(this.compatibility_type);
 		var combo_level: number = parseInt(this.combo_level);
 		var training_room_level: number = parseInt(this.training_room_level);
 		var fever_bonus: number = parseInt(this.fever_bonus);
@@ -65,7 +57,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 				damage_list = [new Damage("TP1"), new Damage("TP2"), new Damage("TP3")];
 				break;
 			default:
-				damage_list = [new Damage("通常"), new Damage("全力")];
+				damage_list = [new Damage("LP1"), new Damage("LP2"), new Damage("LP3")];
 		}
 
 		// アイドルごとの発揮値・与ダメージ計算
@@ -81,25 +73,19 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 				case CALCULATION_TYPE.DREAM_LIVE_FESTIVAL:
 					// ドリームLIVEフェス
 					idol.calculation_dream_live_festival(member_type, producer_type, this.appeal_bonus, combo_level, fever_bonus, training_room_level);
-					var base_damage: number  = Math.floor(idol.actual_offense) / 5;
-					for(var j: number = 0; j < damage_list.length; j++) {
-						damage_list[j].add_damage(base_damage * ViewModel.USE_POINT_COEFFICIENT[j]);
-					}
 					break;
 				case CALCULATION_TYPE.TALK_BATTLE:
 					// トークバトル
 					idol.calculation_talk_battle(member_type, producer_type, this.appeal_bonus, combo_level, cheer_bonus, training_room_level);
-					var base_damage: number  = Math.floor(idol.actual_offense) / 5;
-					for(var j: number = 0; j < damage_list.length; j++) {
-						damage_list[j].add_damage(base_damage * ViewModel.USE_POINT_COEFFICIENT[j]);
-					}
 					break;
 				default:
 					// LIVEツアー
-					idol.calculation_live_tour(member_type, producer_type, this.appeal_bonus, voltage_bonus, status_up, compatibility_type, training_room_level);
-					damage_list[0].add_damage(idol.calc_live_tour_damage(false));
-					damage_list[1].add_damage(idol.calc_live_tour_damage(true));
+					idol.calculation_live_tour(member_type, producer_type, this.appeal_bonus, training_room_level);
 					break;
+			}
+			var base_damage: number  = Math.floor(idol.actual_offense) / 5;
+			for(var j: number = 0; j < damage_list.length; j++) {
+				damage_list[j].add_damage(base_damage * ViewModel.USE_POINT_COEFFICIENT[j]);
 			}
 			var offense: number = idol.actual_offense;
 			var defense: number = idol.actual_defense;
@@ -142,9 +128,10 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 				break;
 			default:
 				// LIVEツアー
-				petit_idol_total_status = this.calculation_petit_idol(voltage_bonus, petit_idol_bonus_type, petit_idol_bonus_parameter);
-				damage_list[0].add_bonus(Math.floor(petit_idol_total_status * UserIdol.LIVE_TOUR_NORMAL_LIVE_COEFFICIENT / 5));
-				damage_list[1].add_bonus(Math.floor(petit_idol_total_status * UserIdol.LIVE_TOUR_FULL_POWER_LIVE_COEFFICIENT / 5));
+				petit_idol_total_status = this.calculation_petit_idol(0, petit_idol_bonus_type, petit_idol_bonus_parameter);
+				for(var i: number = 0; i < damage_list.length; i++) {
+					damage_list[i].add_bonus(Math.ceil(petit_idol_total_status * ViewModel.USE_POINT_COEFFICIENT[i] / 5));
+				}
 		}
 		total_offense += petit_idol_total_status;
 		total_defense += petit_idol_total_status;
@@ -162,9 +149,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	get_setting(): { [index: string]: any; } {
 		var setting: { [index: string]: any; } = super.get_setting();
 
-		setting["voltage_bonus"] = this.voltage_bonus;
-		setting["status_up"] = this.status_up;
-		setting["compatibility_type"] = this.compatibility_type;
 		setting["combo_level"] = this.combo_level;
 		setting["fever_bonus"] = this.fever_bonus;
 		setting["cheer_bonus"] = this.cheer_bonus;
@@ -177,11 +161,6 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		super.set_setting(setting);
 
 		// 共通部分のパラメータ設定
-		if(setting["voltage_bonus"]) {
-			this.voltage_bonus = setting["voltage_bonus"];
-		}
-		this.status_up = setting["status_up"];
-		this.compatibility_type = setting["compatibility_type"];
 		this.combo_level = setting["combo_level"];
 		this.fever_bonus = setting["fever_bonus"];
 		if(setting["cheer_bonus"]) {
