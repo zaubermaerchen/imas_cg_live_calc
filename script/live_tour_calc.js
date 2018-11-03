@@ -1930,25 +1930,25 @@ var ViewModel = (function (_super) {
         return skill.check_skill_target(member_num);
     };
     ViewModel.prototype.apply_skill_value = function (idol, skill) {
-        if (!this.is_talk_battle()) {
+        if (this.is_dream_live_festival()) {
             _super.prototype.apply_skill_value.call(this, idol, skill);
             return;
         }
         var offense_skill = parseFloat(idol.offense_skill);
         var defense_skill = parseFloat(idol.defense_skill);
-        skill.value = 1 + (skill.value / 100);
+        var value = 1 + (skill.value / 100);
         offense_skill = 1 + (offense_skill / 100);
         defense_skill = 1 + (defense_skill / 100);
         switch (skill.target_param) {
             case SKILL_TARGET_PARAM.ALL:
-                offense_skill *= skill.value;
-                defense_skill *= skill.value;
+                offense_skill *= value;
+                defense_skill *= value;
                 break;
             case SKILL_TARGET_PARAM.OFFENSE:
-                offense_skill *= skill.value;
+                offense_skill *= value;
                 break;
             case SKILL_TARGET_PARAM.DEFENSE:
-                defense_skill *= skill.value;
+                defense_skill *= value;
                 break;
         }
         offense_skill = (offense_skill - 1) * 100;

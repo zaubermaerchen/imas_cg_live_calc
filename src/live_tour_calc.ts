@@ -193,7 +193,7 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 	}
 
 	apply_skill_value(idol: UserIdol, skill: Skill): void {
-		if(!this.is_talk_battle()) {
+		if(this.is_dream_live_festival()) {
 			super.apply_skill_value(idol, skill);
 			return;
 		}
@@ -201,19 +201,19 @@ class ViewModel extends BaseLiveTourCalcViewModel {
 		var offense_skill: number = parseFloat(idol.offense_skill);
 		var defense_skill: number = parseFloat(idol.defense_skill);
 
-		skill.value = 1 + (skill.value / 100);
+		var value: number = 1 + (skill.value / 100);
 		offense_skill = 1 + (offense_skill / 100);
 		defense_skill = 1 + (defense_skill / 100);
 		switch(skill.target_param) {
 			case SKILL_TARGET_PARAM.ALL:
-				offense_skill *= skill.value;
-				defense_skill *= skill.value;
+				offense_skill *= value;
+				defense_skill *= value;
 				break;
 			case SKILL_TARGET_PARAM.OFFENSE:
-				offense_skill *= skill.value;
+				offense_skill *= value;
 				break;
 			case SKILL_TARGET_PARAM.DEFENSE:
-				defense_skill *= skill.value;
+				defense_skill *= value;
 				break
 		}
 		offense_skill = (offense_skill - 1) * 100;
