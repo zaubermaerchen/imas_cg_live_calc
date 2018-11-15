@@ -35,8 +35,8 @@ var Common = (function () {
                 post_data["fields"] = fields.join(" ");
             }
             jQuery.post(this.IDOL_DATA_API_URL, post_data, function (response) {
-                _this.cache_data[key] = JSON.stringify(response);
-                deferred.resolve(response);
+                _this.cache_data[key] = JSON.stringify(response['results']);
+                deferred.resolve(response['results']);
             }, "json");
         }
         return deferred.promise();

@@ -43,9 +43,9 @@ class Common {
 			if(fields.length > 0) {
 				post_data["fields"] = fields.join(" ");
 			}
-			jQuery.post(this.IDOL_DATA_API_URL, post_data, (response: { [index: string]: { [index: string]: string; } }) => {
-				this.cache_data[key] = JSON.stringify(response);
-				deferred.resolve(response);
+			jQuery.post(this.IDOL_DATA_API_URL, post_data, (response: { [index: string]: any; }) => {
+				this.cache_data[key] = JSON.stringify(response['results']);
+				deferred.resolve(response['results']);
 			}, "json");
 		}
 
