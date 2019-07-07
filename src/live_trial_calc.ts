@@ -193,7 +193,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.front_num = setting["front_num"];
 		this.producer_type = setting["producer_type"];
 		this.calc_type = setting["calc_type"];
-		this.skill_input_type = setting["skill_input_type"];
+		//this.skill_input_type = setting["skill_input_type"];
 		this.enable_skill_type = setting["enable_skill_type"];
 		//this.set_rival_member_setting(setting["rival_member"]);
 

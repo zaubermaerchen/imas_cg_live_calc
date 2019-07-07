@@ -163,7 +163,7 @@ class BaseLiveTourCalcViewModel extends BaseLiveCalcViewModel {
 		this.petit_idol_bonus_type = setting["petit_idol_bonus_type"];
 		this.petit_idol_bonus_parameter = setting["petit_idol_bonus_parameter"];
 		this.calc_type = setting["calc_type"];
-		this.skill_input_type = setting["skill_input_type"];
+		//this.skill_input_type = setting["skill_input_type"];
 		this.enable_skill_type = setting["enable_skill_type"];
 		this.set_rival_member_setting(setting["rival_member"]);
 

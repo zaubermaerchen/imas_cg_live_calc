@@ -375,7 +375,7 @@ class ViewModel extends BaseLiveCalcViewModel {
 		this.high_tension = setting["high_tension"];
 		this.groove_type = setting["groove_type"];
 		this.calc_type = setting["calc_type"];
-		this.skill_input_type = setting["skill_input_type"];
+		//this.skill_input_type = setting["skill_input_type"];
 		this.enable_skill_type = setting["enable_skill_type"];
 		//set_rival_member_setting(setting["rival_member"]);
 

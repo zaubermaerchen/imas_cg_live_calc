@@ -10,8 +10,8 @@
 	<body>
 		<h1>発揮値計算機</h1>
 
-		<div class="box">
-			<table class="left-box">
+		<div>
+			<table>
 				<tbody>
 					<tr>
 						<th>フロントの人数</th>
@@ -147,29 +147,6 @@
 								<option value="2">フェスティバル</option>
 								<option value="10">フェスティバルS</option>
 							</select>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-
-			<table class="right-box">
-				<tbody>
-					<tr>
-						<th>特技入力</th>
-						<td>
-							<select name="skill_input_type" data-bind="value: skill_input_type">
-								<option value="0" selected="selected">マニュアル</option>
-								<option value="1">オート</option>
-								<option value="2">オート(期待値)</option>
-							</select>
-
-							<!-- ko ifnot: is_skill_input_type_manual() -->
-							<select name="enable_skill_type" data-bind="value: enable_skill_type">
-								<option value="0">全特技有効</option>
-								<option value="1" selected="selected">攻撃時特技有効</option>
-								<option value="2">守備時特技有効</option>
-							</select>
-							<!-- /ko -->
 						</td>
 					</tr>
 				</tbody>
