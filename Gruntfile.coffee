@@ -2,7 +2,7 @@ module.exports = (grunt) ->
 	# Project configuration.
 	grunt.initConfig
 		pkg: grunt.file.readJSON("package.json")
-		typescript:
+		ts:
 			options:
 				comments: true
 				sourceMap: true
@@ -48,14 +48,14 @@ module.exports = (grunt) ->
 					"script/live_trial_calc.min.js": ["script/live_trial_calc.js"]
 
 	# Load the plugin
-	grunt.loadNpmTasks "grunt-typescript"
+	grunt.loadNpmTasks "grunt-ts"
 	grunt.loadNpmTasks "grunt-contrib-uglify"
 
 	# Tasks
-	grunt.registerTask "build_live_calc", ["typescript:live_calc", "uglify:live_calc"]
-	grunt.registerTask "build_survival_calc", ["typescript:survival_calc", "uglify:survival_calc"]
-	grunt.registerTask "build_live_tour_calc", ["typescript:live_tour_calc", "uglify:live_tour_calc"]
-	grunt.registerTask "build_live_royal_calc", ["typescript:live_royal_calc", "uglify:live_royal_calc"]
-	grunt.registerTask "build_challenge_calc", ["typescript:challenge_calc", "uglify:challenge_calc"]
-	grunt.registerTask "build_live_trial_calc", ["typescript:live_trial_calc", "uglify:live_trial_calc"]
-	grunt.registerTask "default", ["typescript", "uglify"]
+	grunt.registerTask "build_live_calc", ["ts:live_calc", "uglify:live_calc"]
+	grunt.registerTask "build_survival_calc", ["ts:survival_calc", "uglify:survival_calc"]
+	grunt.registerTask "build_live_tour_calc", ["ts:live_tour_calc", "uglify:live_tour_calc"]
+	grunt.registerTask "build_live_royal_calc", ["ts:live_royal_calc", "uglify:live_royal_calc"]
+	grunt.registerTask "build_challenge_calc", ["ts:challenge_calc", "uglify:challenge_calc"]
+	grunt.registerTask "build_live_trial_calc", ["ts:live_trial_calc", "uglify:live_trial_calc"]
+	grunt.registerTask "default", ["ts", "uglify"]

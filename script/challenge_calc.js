@@ -1,5 +1,18 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 /// <reference path="typings/jquery/jquery.d.ts" />
-var Common = (function () {
+var Common = /** @class */ (function () {
     function Common() {
     }
     // アイドルリスト読込
@@ -145,11 +158,11 @@ var Common = (function () {
     Common.GOOGLE_CHART_API_URL = "https://chart.apis.google.com/chart";
     Common.cache_data = {};
     return Common;
-})();
+}());
 /// <reference path="typings/knockout/knockout.d.ts" />
 /// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 /// <reference path="common.ts" />
-var UserIdol = (function () {
+var UserIdol = /** @class */ (function () {
     function UserIdol() {
         // ステータス
         this.id = "0";
@@ -877,7 +890,7 @@ var UserIdol = (function () {
     // トークバトル
     UserIdol.TALK_BATTLE_COMBO_LEVEL_COEFFICIENT = 50; // コンボLV係数
     return UserIdol;
-})();
+}());
 // スキル効果対象ユニット
 var SKILL_TARGET_UNIT;
 (function (SKILL_TARGET_UNIT) {
@@ -907,7 +920,7 @@ var SKILL_TARGET_PARAM;
     SKILL_TARGET_PARAM[SKILL_TARGET_PARAM["OFFENSE"] = 1] = "OFFENSE";
     SKILL_TARGET_PARAM[SKILL_TARGET_PARAM["DEFENSE"] = 2] = "DEFENSE"; // 守
 })(SKILL_TARGET_PARAM || (SKILL_TARGET_PARAM = {}));
-var Skill = (function () {
+var Skill = /** @class */ (function () {
     function Skill(skill_data, level) {
         this.target_unit = parseInt(skill_data["target_unit"]);
         this.target_member = parseInt(skill_data["target_member"]);
@@ -959,10 +972,10 @@ var Skill = (function () {
         return enable_skill;
     };
     return Skill;
-})();
+}());
 /// <reference path="typings/knockout/knockout.d.ts" />
 /// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
-var UserPetitIdol = (function () {
+var UserPetitIdol = /** @class */ (function () {
     function UserPetitIdol() {
         // ステータス
         this.type = "0";
@@ -1047,7 +1060,7 @@ var UserPetitIdol = (function () {
     // ハイテンションボーナス係数
     UserPetitIdol.HIGH_TENSION_BONUS_COEFFICIENT = 0.1;
     return UserPetitIdol;
-})();
+}());
 /// <reference path="typings/knockout/knockout.d.ts" />
 /// <reference path="typings/knockout.es5/knockout.es5.d.ts" />
 /// <reference path="common.ts" />
@@ -1083,7 +1096,7 @@ var ENABLE_SKILL_TYPE;
     ENABLE_SKILL_TYPE[ENABLE_SKILL_TYPE["OFFENSE"] = 1] = "OFFENSE";
     ENABLE_SKILL_TYPE[ENABLE_SKILL_TYPE["DEFENSE"] = 2] = "DEFENSE"; // 守備時発動スキル
 })(ENABLE_SKILL_TYPE || (ENABLE_SKILL_TYPE = {}));
-var BaseLiveCalcViewModel = (function () {
+var BaseLiveCalcViewModel = /** @class */ (function () {
     function BaseLiveCalcViewModel() {
         var self = this;
         // 入力項目
@@ -1584,14 +1597,9 @@ var BaseLiveCalcViewModel = (function () {
     // ぷちアイドル最大数
     BaseLiveCalcViewModel.PETIT_IDOL_NUM = 3;
     return BaseLiveCalcViewModel;
-})();
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+}());
 /// <reference path="live_calc.base.ts" />
-var DamageValue = (function () {
+var DamageValue = /** @class */ (function () {
     function DamageValue(value) {
         if (value === void 0) { value = 0; }
         this.value = value;
@@ -1604,8 +1612,8 @@ var DamageValue = (function () {
     };
     DamageValue.BATTLE_DAMAGE_COEFFICIENT = 5;
     return DamageValue;
-})();
-var Damage = (function () {
+}());
+var Damage = /** @class */ (function () {
     function Damage(name, value) {
         if (name === void 0) { name = ""; }
         if (value === void 0) { value = 0; }
@@ -1630,21 +1638,21 @@ var Damage = (function () {
     Damage.COEFFICIENT_MAX = 1.02;
     Damage.COEFFICIENT_AVG = 0.995;
     return Damage;
-})();
-var BaseLiveTourCalcViewModel = (function (_super) {
+}());
+var BaseLiveTourCalcViewModel = /** @class */ (function (_super) {
     __extends(BaseLiveTourCalcViewModel, _super);
     function BaseLiveTourCalcViewModel() {
-        _super.call(this);
+        var _this = _super.call(this) || this;
         // 最大メンバー数
-        this.max_member_num = 20;
+        _this.max_member_num = 20;
         // 入力値
-        this.front_num = "10";
-        this.voltage_bonus = "0";
-        this.petit_idol_bonus_type = "-1";
-        this.petit_idol_bonus_parameter = "-1";
+        _this.front_num = "10";
+        _this.voltage_bonus = "0";
+        _this.petit_idol_bonus_type = "-1";
+        _this.petit_idol_bonus_parameter = "-1";
         // 特技関係
-        this.max_skill_invoke = 5;
-        this.skill_invocation_rate_list = [
+        _this.max_skill_invoke = 5;
+        _this.skill_invocation_rate_list = [
             100,
             50,
             37.5,
@@ -1657,12 +1665,13 @@ var BaseLiveTourCalcViewModel = (function (_super) {
             13.09043737128377
         ];
         // 発揮値
-        this.front_offense = 0;
-        this.front_defense = 0;
-        this.back_offense = 0;
-        this.back_defense = 0;
+        _this.front_offense = 0;
+        _this.front_defense = 0;
+        _this.back_offense = 0;
+        _this.back_defense = 0;
         // LIVE時の与ダメージ
-        this.damage_list = [];
+        _this.damage_list = [];
+        return _this;
     }
     // アイドルリスト初期化
     BaseLiveTourCalcViewModel.prototype.init_idol_list = function () {
@@ -1765,21 +1774,22 @@ var BaseLiveTourCalcViewModel = (function (_super) {
         return result;
     };
     return BaseLiveTourCalcViewModel;
-})(BaseLiveCalcViewModel);
+}(BaseLiveCalcViewModel));
 /// <reference path="live_tour_calc.base.ts" />
-var ViewModel = (function (_super) {
+var ViewModel = /** @class */ (function (_super) {
     __extends(ViewModel, _super);
     function ViewModel() {
-        _super.call(this);
+        var _this = _super.call(this) || this;
         // 入力値
-        this.calc_type = CALCULATION_TYPE.CHALLENGE.toString();
-        this.status_up = "0";
-        this.unit_type = "-1";
-        this.fever_bonus = "1";
+        _this.calc_type = CALCULATION_TYPE.CHALLENGE.toString();
+        _this.status_up = "0";
+        _this.unit_type = "-1";
+        _this.fever_bonus = "1";
         // セーブデータ関係
-        this.save_data_key = "imas_cg_challenge_calc";
-        this.init_list();
-        ko.track(this);
+        _this.save_data_key = "imas_cg_challenge_calc";
+        _this.init_list();
+        ko.track(_this);
+        return _this;
     }
     // 発揮値
     ViewModel.prototype.actual_status = function () { return this.calculation(); };
@@ -1892,7 +1902,7 @@ var ViewModel = (function (_super) {
     ViewModel.USE_POINT_COEFFICIENT = [1, 2.5, 5];
     ViewModel.SCORE_OFFSET = 2000;
     return ViewModel;
-})(BaseLiveTourCalcViewModel);
+}(BaseLiveTourCalcViewModel));
 jQuery(function () {
     ko.applyBindings(new ViewModel());
 });
