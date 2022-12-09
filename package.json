@@ -2,7 +2,7 @@
 	"name": "imas_cg_live_calc",
 	"version": "0.0.1",
 	"devDependencies": {
-		"grunt": "^1.3.0",
+		"grunt": "^1.5.3",
 		"grunt-cli": "^1.3.2",
 		"grunt-contrib-uglify": "^4.0.1",
 		"grunt-ts": "^6.0.0-beta.22",
